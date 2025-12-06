@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Model files (if you want to exclude large model downloads)
+# Uncomment if you don't want to track downloaded models
+# .cache/
+# models/
+
+# Streamlit
+.streamlit/
+
+# Environment variables
+.env
+.env.local
+

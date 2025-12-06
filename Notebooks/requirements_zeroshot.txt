@@ -1,0 +1,5 @@
+# Minimal requirements for zero-shot chatbot with Streamlit
+sentence-transformers>=2.2.0
+streamlit>=1.28.0
+# torch is automatically installed as a dependency of sentence-transformers
+
