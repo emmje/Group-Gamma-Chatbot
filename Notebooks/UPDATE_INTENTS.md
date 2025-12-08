@@ -1,7 +1,5 @@
 # How to Update intents.json
 
-## Quick Answer
-
 **After editing `intents.json`, you need to reload the chatbot:**
 
 ### For Terminal Chatbot:
@@ -9,17 +7,17 @@
 2. Run it again: `python3 chatbot_zeroshot.py`
 
 ### For Streamlit Web Interface:
-1. Click the **"🔄 Reload Intents"** button in the sidebar, OR
+1. Click the **"Reload Intents"** button in the sidebar, OR
 2. Stop Streamlit (press `Ctrl+C`) and restart: `streamlit run app.py`
 
 ## What You Can Change
 
 You can modify `intents.json` to:
-- ✅ Add new intents (new tags)
-- ✅ Add new patterns to existing intents
-- ✅ Add new responses to existing intents
-- ✅ Modify existing responses
-- ✅ Remove intents
+-  Add new intents (new tags)
+-  Add new patterns to existing intents
+-  Add new responses to existing intents
+-  Modify existing responses
+-  Remove intents
 
 ## Example: Adding a New Intent
 
@@ -32,13 +30,11 @@ You can modify `intents.json` to:
     "What's for lunch"
   ],
   "responses": [
-    "The cafeteria serves a variety of meals including local and international dishes.",
+    "The cafeteria serves a variety of meals including breakfast and local dishes for lunch and dinner .",
     "Check the daily menu posted at the dining hall entrance."
   ]
 }
 ```
-
-After adding this, reload the chatbot and it will work immediately!
 
 ## Example: Adding to Existing Intent
 
@@ -67,7 +63,6 @@ Find an existing intent in `intents.json` and add to it:
 Unlike traditional chatbots, **zero-shot classification doesn't require retraining**. Just:
 1. Edit `intents.json`
 2. Reload the chatbot
-3. Done!
 
 The model automatically understands the new patterns using semantic similarity.
 
