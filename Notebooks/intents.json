@@ -1,27 +1,24 @@
 {
   "intents": [
         {
-      "tag": "greetings",
-      "patterns": [
-        "Hello","Hi","Hey","Good morning","Good afternoon","Good evening","Hi there","Greetings","What's up","How are you",
-        "Hello bot","Hey there","Morning","Afternoon","Evening","Hi UCU bot","Hey UCU","Hello there","whats up","Yo",
-        "Good day","Hi assistant","Hello assistant","Hey assistant","Hi there assistant","Good to see you","What's good",
-        "Hey bot","Hello UCU","Wagwan","Heyo","Salutations","Hello there UCU","Hi friend","Good to meet you",
-        "Hey buddy","Hello student","Hi student","Greetings UCU","Hi UCU student","Hello there friend","Yo UCU","Hey hi","Hi there mate",
-        "Good day UCU","Hello everyone","Hi all","Hey everyone","Morning UCU","Evening UCU","Afternoon UCU","Hello and welcome"
-      ],
-      "responses": [
-        "Hello! How can I assist you today?",
-        "Hi there! What do you need help with at Uganda Christian University?",
-        "Hey! Great to see a UCU student. What's on your mind?",
-        "Good morning! Hope you're having a blessed day at campus.",
-        "Hi! I'm here to help with anything UCU-related.",
-        "Hello! God bless you. How may I help you today?",
-        "Hey! Ready to answer all your UCU questions.",
-        "Hi! Welcome back to the session.",
-        "Good afternoon! How can I support you today?",
-        "Hello there! What would you like to know about UCU?"
-      ]
+"tag": "greetings",
+  "patterns": [
+    "Hello","Hi","Hey","Good morning","Good afternoon","Good evening","Hi there","Greetings","What's up","How are you",
+    "Hello bot","Hey there","Morning","Afternoon","Evening","Hi UCU bot","Hey UCU","Hello there","Yo","Good day",
+    "Hi assistant","Hey assistant","Wagwan","Heyo","Salutations","Hi friend","Good to see you","What's good",
+    "Hey buddy","Hello student","Hi student","Greetings UCU","Hey hi","Hi there mate","Good day UCU"
+  ],
+  "responses": [
+    "Hello! God bless you. How can I assist you today at UCU?",
+    "Hi there! Welcome back. What do you need help with?",
+    "Hey! Great to see a UCU student. How may I serve you today?",
+    "Good morning! Hope you're having a blessed day on campus.",
+    "Hi! I'm here to help with anything UCU-related.",
+    "Hello! The Lord bless you. How can I support you?",
+    "Hey! Ready to answer your questions — fire away!",
+    "Good afternoon! How can I make your day better?",
+    "Hello there! What would you like to know about UCU?"
+  ]
     },
     {
       "tag": "quit",
