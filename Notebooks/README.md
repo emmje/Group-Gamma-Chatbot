@@ -1,10 +1,10 @@
 # 🎓 UCU Chatbot - Zero-Shot with Streamlit Interface
 
-A chatbot for Uganda Christian University using zero-shot classification with MiniLM-v2 and a beautiful Streamlit web interface.
+A chatbot for Uganda Christian University using zero-shot classification with MiniLM-v2 and Streamlit web interface.
 
-## 🚀 Quick Start
 
-### 1. Setup (One-time)
+
+### 1. Setup
 
 ```bash
 cd /home/nico/Downloads/Notebooks-20251124T065302Z-1-001/Notebooks
@@ -18,7 +18,7 @@ This will:
 
 ### 2. Run the Chatbot
 
-**Option A: Web Interface (Recommended)**
+**Option A: Web Interface**
 ```bash
 source venv/bin/activate
 streamlit run app.py
@@ -32,7 +32,7 @@ source venv/bin/activate
 python3 chatbot_zeroshot.py
 ```
 
-## 📁 Files
+## Files
 
 - `chatbot_zeroshot.py` - Zero-shot chatbot logic
 - `app.py` - Streamlit web interface
@@ -40,15 +40,15 @@ python3 chatbot_zeroshot.py
 - `requirements_zeroshot.txt` - Dependencies
 - `setup_zeroshot.sh` - Setup script
 
-## 🎯 Features
+## Features
 
-- ✅ Zero-shot classification (no training needed)
-- ✅ Beautiful Streamlit web interface
-- ✅ Chat history
-- ✅ Fast responses
-- ✅ Easy to add new intents
+- Zero-shot classification (no training needed)
+- Beautiful Streamlit web interface
+- Chat history
+- Fast responses
+- Easy to add new intents
 
-## 💡 Example Questions
+## Example Questions
 
 - "Who is the vice chancellor of UCU?"
 - "Where is Alan Galpin Health Centre?"
@@ -56,21 +56,12 @@ python3 chatbot_zeroshot.py
 - "What are UCU's library opening hours?"
 - "Hello"
 
-## 🔧 Troubleshooting
-
-**Streamlit not found:**
-```bash
-source venv/bin/activate
-pip install streamlit
-```
 
 **Port already in use:**
 ```bash
 streamlit run app.py --server.port 8502
 ```
 
-**Model download issues:**
-The first run will download the MiniLM-v2 model (~80MB). Make sure you have internet connection.
 
 ## 📝 Notes
 
