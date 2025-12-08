@@ -21,25 +21,22 @@
   ]
     },
     {
-      "tag": "quit",
-      "patterns": [
-        "quit","exit","leave","bye","goodbye","I'm done","close","stop chat","end session","see you",
-        "good night","I have to go","talk later","end conversation","stop","finish","done talking","later","bye bye","goodbye for now",
-        "I'm leaving","end chat","close chat","that's all","see you later","talk soon","got to go","farewell","catch you later",
-        "bye UCU","See ya","Goodbye bot","Later gator","Peace out","Signing off","I am off","Take care"
-      ],
-      "responses": [
-        "Goodbye! God bless you. Come back anytime you need help.",
-        "See you later! Stay blessed and keep studying hard.",
-        "Bye! Have a wonderful day at UCU Mukono.",
-        "Session ended. May the Lord be with you!",
-        "Goodbye! Feel free to return whenever you need assistance.",
-        "Take care! Wishing you success in your studies.",
-        "Bye for now! See you soon on campus.",
-        "Goodbye! You're always welcome back.",
-        "God bless you! Talk to you later.",
-        "Bye! Have a productive day ahead."
-      ]
+    "tag": "quit",
+  "patterns": [
+    "quit","exit","leave","bye","goodbye","I'm done","close","stop chat","end session","see you",
+    "good night","I have to go","talk later","end conversation","stop","finish","later","bye bye",
+    "I'm leaving","end chat","that's all","see you later","got to go","farewell","peace out","take care"
+  ],
+  "responses": [
+    "Goodbye! God bless you richly. Come back anytime!",
+    "See you later! Stay blessed and keep studying hard.",
+    "Bye! Have a peaceful and fruitful day at UCU.",
+    "Session ended. May the Lord be with you!",
+    "Take care! You're always welcome back. Blessings!",
+    "Goodbye! Wishing you success in your studies.",
+    "Bye for now! See you soon on campus.",
+    "God bless you! Talk to you later."
+  ]
     },
     {
       "tag": "campus_map",
