@@ -63,9 +63,9 @@ streamlit run app.py --server.port 8502
 ```
 
 
-## 📝 Notes
+## Notes
 
 - The chatbot uses semantic similarity to match user queries to intents
-- No training required - just add new intents to `intents.json`
+- No training required - just adding new intents to intents.json
 - The Streamlit interface automatically handles chat history
 
