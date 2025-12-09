@@ -40,7 +40,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for attractive styling
+# Custom CSS for clean, simple styling
 st.markdown("""
 <style>
     /* Main container */
@@ -48,99 +48,54 @@ st.markdown("""
         padding-top: 2rem;
     }
     
-    /* Title styling with gradient background */
+    /* Title styling - simple and clean */
     h1 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 3rem;
-        font-weight: 800;
+        color: #1f2937;
+        font-size: 2.5rem;
+        font-weight: 700;
         margin-bottom: 0.5rem;
         text-align: center;
     }
     
     /* Subtitle styling */
     .subtitle-text {
-        color: #667eea;
-        font-size: 1.3rem;
+        color: #4b5563;
+        font-size: 1.2rem;
         text-align: center;
-        margin-bottom: 2.5rem;
-        font-weight: 500;
-    }
-    
-    /* Chat message bubbles */
-    .stChatMessage {
-        padding: 1rem;
-        border-radius: 15px;
-        margin: 0.5rem 0;
-    }
-    
-    /* User message styling */
-    [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
-        padding: 0.75rem 1rem;
-    }
-    
-    /* Sidebar styling with gradient */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f0f4ff 0%, #e8f0fe 100%);
+        margin-bottom: 2rem;
     }
     
     /* Sidebar header */
     [data-testid="stSidebar"] h2 {
-        color: #667eea;
-        font-weight: 700;
+        color: #1f2937;
+        font-weight: 600;
     }
     
-    /* Button styling with gradient */
+    /* Button styling - simple solid color */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: #3b82f6;
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-        font-size: 1rem;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
         width: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
     }
     
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-    
-    /* Chat input styling */
-    .stChatInput > div > div {
-        border-radius: 25px;
-        border: 2px solid #667eea;
-        background: white;
-    }
-    
-    .stChatInput > div > div:focus-within {
-        border-color: #764ba2;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background-color: #2563eb;
     }
     
     /* Remove divider styling */
     hr {
         display: none;
     }
-    
-    /* Success message styling */
-    .stSuccess {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# Title and description with attractive styling
+# Title and description - clean and simple
 st.markdown("### 🎓 UCU Student Assistant Chatbot")
-st.markdown('<p class="subtitle-text">Ask anything about <strong style="color: #764ba2;">Uganda Christian University</strong>! 👋</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle-text">Ask anything about <strong>Uganda Christian University</strong>! 👋</p>', unsafe_allow_html=True)
 
 # Initialize chat history
 if "messages" not in st.session_state:
