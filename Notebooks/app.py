@@ -1,6 +1,36 @@
 # app.py - Streamlit Interface for UCU Chatbot
 import streamlit as st
-from chatbot_zeroshot import get_response, reload_intents
+import sys
+import subprocess
+
+# Check and install dependencies if missing
+def check_dependencies():
+    """Check if required packages are installed, show error if not"""
+    try:
+        from chatbot_zeroshot import get_response, reload_intents
+        return get_response, reload_intents
+    except ImportError as e:
+        st.error("❌ **Missing Dependencies!**")
+        st.markdown("""
+        ### Required packages are not installed.
+        
+        **To fix this, run in your terminal:**
+        ```bash
+        pip install -r requirements_zeroshot.txt
+        ```
+        
+        Or install individually:
+        ```bash
+        pip install sentence-transformers streamlit
+        ```
+        
+        Then refresh this page.
+        """)
+        st.stop()
+        return None, None
+
+# Check dependencies before proceeding
+get_response, reload_intents = check_dependencies()
 
 # Page configuration
 st.set_page_config(
