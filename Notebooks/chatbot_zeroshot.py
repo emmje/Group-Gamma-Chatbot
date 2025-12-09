@@ -19,7 +19,11 @@ except ImportError as e:
     sys.exit(1)
 
 # Path configuration
-INTENTS_FILE = "intents.json"
+import os
+
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+INTENTS_FILE = os.path.join(SCRIPT_DIR, "intents.json")
 
 # Global variables (will be initialized on first use)
 _model = None
