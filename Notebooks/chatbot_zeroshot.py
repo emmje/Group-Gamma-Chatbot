@@ -6,8 +6,17 @@ Good for small datasets and when you want to add new intents without retraining
 """
 import json
 import random
-from sentence_transformers import SentenceTransformer, util
-import torch
+import sys
+
+try:
+    from sentence_transformers import SentenceTransformer, util
+    import torch
+except ImportError as e:
+    print("ERROR: Missing required packages!")
+    print("Please install dependencies by running:")
+    print("  pip install -r requirements_zeroshot.txt")
+    print(f"\nMissing package: {e}")
+    sys.exit(1)
 
 # Path configuration
 INTENTS_FILE = "intents.json"
