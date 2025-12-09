@@ -47,6 +47,14 @@ def _initialize_model():
         return  # Already initialized
     
     # Load intents
+    if not os.path.exists(INTENTS_FILE):
+        raise FileNotFoundError(
+            f"intents.json not found at {INTENTS_FILE}. "
+            f"Current directory: {os.getcwd()}. "
+            f"Script directory: {SCRIPT_DIR}. "
+            f"Please ensure intents.json is in the same directory as chatbot_zeroshot.py"
+        )
+    
     with open(INTENTS_FILE, "r", encoding="utf-8") as f:
         intents = json.load(f)["intents"]
 
