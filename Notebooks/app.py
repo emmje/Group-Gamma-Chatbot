@@ -95,7 +95,7 @@ st.markdown("""
 
 # Title and description - clean and simple
 st.markdown("### 🎓 UCU Student Assistant Chatbot")
-st.markdown('<p class="subtitle-text">Ask anything about <strong>Uganda Christian University</strong>! 👋</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle-text">Ask anything about <strong>Uganda Christian University</strong>!</p>', unsafe_allow_html=True)
 
 # Initialize chat history
 if "messages" not in st.session_state:
