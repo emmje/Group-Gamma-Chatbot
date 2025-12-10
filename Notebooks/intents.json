@@ -238,6 +238,33 @@
   ]
     },
     {
+      "tag":"",
+      "patterns": [
+        "How do I access the UCU e-library"
+      ],
+      "response": [
+        "To access the e-library, use the link below e-library https://library.ucu.ac.ug/ Login in using your credentials. UCU also subscribes to databases like Scopus. Check this link to acces them: "
+      ]
+    },
+      {
+      "tag":"Counselling",
+      "patterns": [
+        "How can i get counselling help"
+      ],
+      "response": [
+        "UCU offers Counselling and Guidance services through the Para-counsellors, contact:+256 312 350 890"
+      ]
+    },
+      {
+      "tag":"Security",
+      "patterns": [
+        "What's the emergency security contact"
+      ],
+      "response": [
+        "UCU's Security number is (toll-free): 0800-200-140."
+      ]
+    },
+    {
       "tag": "library_hours",
       "patterns": [
         "What are UCU's library operating hours",
@@ -707,10 +734,10 @@
         "You can reach the UCU counseling team during crises using the emergency line.",
         "Use the security line to report incidents that require immediate UCU campus intervention.",
         "For serious medical incidents, dial the health centre emergency line.",
-        "If a student is injured in hall, use the UCU emergency number to call for first-aid support.",
+        "If a student is injured in hall, use the UCU emergency number to call for first-aid support.Allan Galpin Health Centre emergency number: 0800-200-141.",
         "Campus crisis response at UCU is coordinated via the security and health emergency numbers.",
         "UCU's emergency contacts are accessible on the university website and campus directory.",
-        "The security gatehouse is reachable via the emergency line for rapid response.",
+        
         "Please save UCU's emergency numbers — security, health centre, and counseling — in your phone."
       ]
     },
