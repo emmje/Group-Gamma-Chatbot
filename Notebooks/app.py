@@ -122,18 +122,22 @@ if prompt := st.chat_input("Type your message here..."):
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": response})
 
-# Sidebar with info
+# Sidebar with chat history
 with st.sidebar:
-    st.header("ℹ️ About")
-    st.markdown("""
-    This chatbot uses **zero-shot classification** with MiniLM-v2 to answer questions about UCU.
+    st.header("💬 Chat History")
     
-    **Try asking:**
-    - Who is the vice chancellor?
-    - Where is Alan Galpin Health Centre?
-    - Library opening hours
-    - Campus locations
-    """)
+    # Show chat history (only user questions)
+    if st.session_state.messages:
+        user_questions = [msg["content"] for msg in st.session_state.messages if msg["role"] == "user"]
+        
+        if user_questions:
+            st.markdown("**Previous Questions:**")
+            for i, question in enumerate(user_questions[-10:], 1):  # Show last 10 questions
+                st.markdown(f"{i}. {question}")
+        else:
+            st.info("No questions yet. Start chatting!")
+    else:
+        st.info("No chat history yet. Start asking questions!")
     
     st.divider()
     
