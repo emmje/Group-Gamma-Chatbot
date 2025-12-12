@@ -110,7 +110,7 @@ if __name__ == "__main__":
     print("Loading UCU Chatbot...")
     _initialize_model()
     print(f"Loaded {len(_intent_embeddings)} intent categories")
-    print("✅ Zero-shot chatbot ready!")
+    print("Zero-shot chatbot ready!")
     print("=" * 50)
     print("UCU Chatbot (Zero-Shot) is ready! Type 'quit' to exit.")
     print("=" * 50)
