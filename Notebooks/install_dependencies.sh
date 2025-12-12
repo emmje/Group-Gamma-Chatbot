@@ -1,12 +1,12 @@
 #!/bin/bash
 # Quick dependency installer for UCU Chatbot Streamlit app
 
-echo "🔧 Installing UCU Chatbot dependencies..."
+echo "Installing dependencies..."
 echo ""
 
 # Check if pip is available
 if ! command -v pip &> /dev/null && ! command -v pip3 &> /dev/null; then
-    echo "❌ Error: pip not found. Please install pip first."
+    echo "Error: pip not found. Please install pip first."
     exit 1
 fi
 
@@ -29,8 +29,7 @@ else
 fi
 
 echo ""
-echo "✅ Installation complete!"
+echo "Installation complete!"
 echo ""
-echo "Now you can run:"
 echo "  streamlit run app.py"
 
