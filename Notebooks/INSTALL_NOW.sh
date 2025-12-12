@@ -1,8 +1,8 @@
 #!/bin/bash
-# Simple dependency installer - Copy and paste this entire script
+# Simple dependency installer
 
 echo "=========================================="
-echo "Installing UCU Chatbot Dependencies"
+echo "Installing Chatbot Dependencies"
 echo "=========================================="
 echo ""
 
@@ -12,7 +12,7 @@ if command -v python3 &> /dev/null; then
 elif command -v python &> /dev/null; then
     PYTHON="python"
 else
-    echo "❌ Error: Python not found!"
+    echo "Error: Python not found!"
     exit 1
 fi
 
@@ -21,7 +21,7 @@ if command -v pip3 &> /dev/null; then
 elif command -v pip &> /dev/null; then
     PIP="pip"
 else
-    echo "❌ Error: pip not found! Trying python -m pip..."
+    echo "Error: pip not found! Trying python -m pip..."
     PIP="$PYTHON -m pip"
 fi
 
@@ -31,9 +31,9 @@ echo ""
 
 # Check if we're in a virtual environment
 if [ -n "$VIRTUAL_ENV" ]; then
-    echo "✅ Virtual environment detected: $VIRTUAL_ENV"
+    echo "Virtual environment detected: $VIRTUAL_ENV"
 else
-    echo "⚠️  No virtual environment detected (this is okay)"
+    echo "No virtual environment detected (this is okay)"
 fi
 
 echo ""
@@ -46,11 +46,11 @@ $PIP install streamlit
 
 echo ""
 echo "=========================================="
-echo "✅ Installation Complete!"
+echo "Installation Complete!"
 echo "=========================================="
 echo ""
 echo "To verify, run:"
-echo "  $PYTHON -c \"from sentence_transformers import SentenceTransformer; print('✅ Ready!')\""
+echo "  $PYTHON -c \"from sentence_transformers import SentenceTransformer; print('Ready!')\""
 echo ""
 echo "Then start Streamlit:"
 echo "  streamlit run app.py"
