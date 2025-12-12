@@ -10,7 +10,7 @@ def check_dependencies():
         from chatbot_zeroshot import get_response, reload_intents
         return get_response, reload_intents
     except ImportError as e:
-        st.error("❌ **Missing Dependencies!**")
+        st.error("**Missing Dependencies!**")
         st.markdown("""
         ### Required packages are not installed.
         
