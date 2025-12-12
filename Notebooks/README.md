@@ -2,19 +2,15 @@
 
 A chatbot for Uganda Christian University using zero-shot classification with MiniLM-v2 and Streamlit web interface.
 
-
-
 ### 1. Setup
 
 ```bash
-cd /home/nico/Downloads/Notebooks-20251124T065302Z-1-001/Notebooks
 bash setup_zeroshot.sh
 ```
 
 This will:
 - Create a virtual environment
 - Install sentence-transformers and Streamlit
-- Set everything up
 
 ### 2. Run the Chatbot
 
@@ -43,7 +39,7 @@ python3 chatbot_zeroshot.py
 ## Features
 
 - Zero-shot classification (no training needed)
-- Beautiful Streamlit web interface
+- Streamlit web interface
 - Chat history
 - Fast responses
 - Easy to add new intents
