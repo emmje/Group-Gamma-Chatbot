@@ -237,33 +237,6 @@
       ]
     },
     {
-      "tag": "e_library",
-      "patterns": [
-        "How do I access the UCU e-library"
-      ],
-      "responses": [
-        "To access the e-library, use the link below e-library https://library.ucu.ac.ug/ Login in using your credentials. UCU also subscribes to databases like Scopus. Check this link to access them: https://library.ucu.ac.ug/databases"
-      ]
-    },
-    {
-      "tag": "counselling",
-      "patterns": [
-        "How can I get counselling help"
-      ],
-      "responses": [
-        "UCU offers Counselling and Guidance services through the Para-counsellors, contact:+256 312 350 890"
-      ]
-    },
-    {
-      "tag": "security",
-      "patterns": [
-        "What's the emergency security contact"
-      ],
-      "responses": [
-        "UCU's Security number is (toll-free): 0800-200-140."
-      ]
-    },
-    {
       "tag": "library_hours",
       "patterns": [
         "What are UCU's library operating hours",
