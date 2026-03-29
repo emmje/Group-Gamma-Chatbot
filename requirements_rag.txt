@@ -1,10 +1,11 @@
-chromadb
 flask
 flask-login
-gradio
-ollama
+gunicorn
+groq
+python-dotenv
 pypdf
 pytesseract
 pdf2image
+qdrant-client
 sentence-transformers
 requests

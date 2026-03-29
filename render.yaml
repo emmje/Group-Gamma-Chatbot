@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     region: frankfurt
-    branch: rewrite-main
+    branch: main
     buildCommand: pip install -r requirements_rag.txt
     startCommand: gunicorn web.app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     autoDeploy: true
