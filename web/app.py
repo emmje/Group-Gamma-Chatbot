@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+import time
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -17,18 +18,30 @@ from web.db import (
     save_chat, get_user_chats,
     get_total_users, get_total_chats, get_frequent_questions,
     get_recent_chats, get_chats_per_day, get_avg_answer_length,
+    create_data_deletion_request,
 )
-from rag.pipeline import RAGPipeline
-from rag.generator import generate_answer
-from web.whatsapp_infobip import (
+from rag.sunbird import SunbirdClient, SunbirdError
+from web.whatsapp_meta import (
     extract_inbound_text_messages,
     is_whatsapp_configured,
     load_whatsapp_config,
     send_whatsapp_text,
+    send_whatsapp_interactive_list,
 )
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.secret_key = "gamma-chatbot-secret-key-change-in-production"
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "change-me-in-production")
+
+def initialize_database() -> bool:
+    try:
+        init_db()
+        return True
+    except Exception:
+        app.logger.exception("Database initialization failed during startup")
+        return False
+
+
+db_ready = initialize_database()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -36,17 +49,122 @@ login_manager.login_view = "login"
 
 # Pipeline (loaded once)
 pipeline = None
+sunbird = SunbirdClient()
+
+SUPPORTED_SUNBIRD_TRANSLATION_LANGS = {"eng", "ach", "teo", "lug", "lgg", "nyn"}
+SUPPORTED_LLM_TRANSLATION_LANGS = {"swa"}
+_WHATSAPP_DEDUPE_TTL_SECONDS = 600
+_processed_whatsapp_message_ids: dict[str, float] = {}
+
+# Track WhatsApp contacts who have already received the welcome message
+_known_whatsapp_contacts: set[str] = set()
+
+WELCOME_MESSAGE = (
+    "Hello! \U0001F44B I can answer questions about UCU using a verified knowledge base "
+    "and official university documents. What would you like to know?"
+)
+
+# ── Campus information (events & clubs) used by web slider and WhatsApp ──
+CAMPUS_INFO = {
+    "events": {
+        "title": "What's going on around Campus",
+        "subtitle": "Stay connected with events, festivals & campus life",
+        "image": "/static/images/campus_events.png",
+        "items": [
+            {
+                "name": "Africa Day Celebrations",
+                "date": "Coming Soon",
+                "description": "A vibrant celebration of African culture with music, dance, food and art from across the continent.",
+            },
+            {
+                "name": "UCU Music Festival",
+                "date": "Coming Soon",
+                "description": "Live performances by student bands, solo artists and guest musicians on the main campus grounds.",
+            },
+            {
+                "name": "Career Fair 2026",
+                "date": "Coming Soon",
+                "description": "Connect with top employers, attend workshops and explore internship opportunities.",
+            },
+        ],
+    },
+    "tribes": {
+        "title": "Find your Tribe",
+        "subtitle": "Join a student club or group today",
+        "image": "/static/images/find_your_tribe.png",
+        "items": [
+            {
+                "name": "Launch Padders",
+                "category": "Innovation & Tech",
+                "description": "A community of student innovators building startups and tech projects together.",
+            },
+            {
+                "name": "Debate Society",
+                "category": "Academic",
+                "description": "Sharpen your public speaking and critical thinking through competitive debates.",
+            },
+            {
+                "name": "Campus Voices",
+                "category": "Music & Arts",
+                "description": "UCU's premier music group — choir, band and solo performances.",
+            },
+            {
+                "name": "Tech/Coding Club",
+                "category": "Technology",
+                "description": "Weekly coding sessions, hackathons and tech talks for aspiring developers.",
+            },
+            {
+                "name": "Sports Teams",
+                "category": "Athletics",
+                "description": "Football, basketball, volleyball, athletics and more — compete or play for fun.",
+            },
+        ],
+    },
+}
+
+
+def get_public_base_url() -> str:
+    return os.getenv("PUBLIC_BASE_URL", "").strip().rstrip("/")
+
+
+def should_initialize_rag_for_whatsapp() -> bool:
+    return os.getenv("WHATSAPP_INIT_PIPELINE", "false").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def should_process_whatsapp_message(message_id: str) -> bool:
+    if not message_id:
+        return True
+
+    now = time.time()
+
+    expired = [
+        key
+        for key, timestamp in _processed_whatsapp_message_ids.items()
+        if now - timestamp > _WHATSAPP_DEDUPE_TTL_SECONDS
+    ]
+    for key in expired:
+        _processed_whatsapp_message_ids.pop(key, None)
+
+    if message_id in _processed_whatsapp_message_ids:
+        return False
+
+    _processed_whatsapp_message_ids[message_id] = now
+    return True
 
 
 def get_pipeline():
     global pipeline
     if pipeline is None:
+        from rag.pipeline import RAGPipeline
+
         pipeline = RAGPipeline()
     return pipeline
 
 
 def build_answer(question: str) -> str:
     """Run retrieval + generation for one question."""
+    from rag.generator import generate_answer
+
     pipe = get_pipeline()
     context = pipe.retrieve(question)
     if not context:
@@ -54,6 +172,36 @@ def build_answer(question: str) -> str:
 
         return build_fallback_response(question)
     return generate_answer(question, context, pipe.config.llm_model)
+
+
+def build_whatsapp_answer(question: str) -> str:
+    if should_initialize_rag_for_whatsapp():
+        return build_answer(question)
+
+    try:
+        from pathlib import Path as _Path
+        from rag.config import load_config
+        from rag.lexical_search import lexical_search
+        from rag.generator import generate_answer
+        from rag.vector_store import RetrievedChunk
+
+        config = load_config()
+        lexical_lines = lexical_search(question, config)
+        context = []
+        for text, metadata in lexical_lines[:4]:
+            source = metadata.get("source", "")
+            title = _Path(source).stem.replace("_", " ").replace("-", " ").strip() if source else ""
+            context.append(
+                RetrievedChunk(text=text, metadata={"source": source, "title": title}, distance=0.0)
+            )
+        if context:
+            return generate_answer(question, context, config.llm_model)
+    except Exception:
+        app.logger.exception("Failed to build lexical WhatsApp answer")
+
+    from rag.fallback import build_fallback_response
+
+    return build_fallback_response(question)
 
 
 class User(UserMixin):
@@ -130,6 +278,45 @@ def logout():
     return redirect(url_for("login"))
 
 
+# ── Public legal/compliance pages ───────────────────────────────
+
+@app.route("/terms")
+def terms_of_service():
+    base_url = get_public_base_url()
+    return render_template("terms.html", base_url=base_url)
+
+
+@app.route("/privacy")
+def privacy_policy():
+    base_url = get_public_base_url()
+    return render_template("privacy.html", base_url=base_url)
+
+
+@app.route("/data-deletion", methods=["GET", "POST"])
+def data_deletion():
+    base_url = get_public_base_url()
+    if request.method == "POST":
+        full_name = (request.form.get("full_name") or "").strip()
+        contact_email = (request.form.get("contact_email") or "").strip()
+        whatsapp_number = (request.form.get("whatsapp_number") or "").strip()
+        details = (request.form.get("details") or "").strip()
+
+        if not full_name or not contact_email:
+            flash("Full name and email are required.", "error")
+            return render_template("data_deletion.html", base_url=base_url), 400
+
+        try:
+            create_data_deletion_request(full_name, contact_email, whatsapp_number, details)
+            flash("Your data deletion request has been received. We will contact you by email.")
+            return redirect(url_for("data_deletion"))
+        except Exception:
+            app.logger.exception("Failed to save data deletion request")
+            flash("Could not submit request right now. Please try again.", "error")
+            return render_template("data_deletion.html", base_url=base_url), 503
+
+    return render_template("data_deletion.html", base_url=base_url)
+
+
 # ── Student chat ─────────────────────────────────────────────────
 
 @app.route("/chat")
@@ -142,14 +329,96 @@ def chat():
 @app.route("/api/ask", methods=["POST"])
 @login_required
 def api_ask():
-    data = request.get_json()
-    question = (data.get("question") or "").strip()
-    if not question:
+    data = request.get_json(silent=True) or {}
+    original_question = (data.get("question") or "").strip()
+    if not original_question:
         return jsonify({"error": "Empty question"}), 400
 
-    answer = build_answer(question)
-    save_chat(current_user.id, question, answer)
-    return jsonify({"answer": answer})
+    # The frontend may pass an explicit language code (e.g. "lug", "ach")
+    explicit_language = (data.get("language") or "").strip().lower()
+
+    retrieval_question = original_question
+    source_language = "eng"
+
+    if sunbird.is_configured():
+        # If the user explicitly chose a non-English language, use it directly
+        if explicit_language and explicit_language != "eng":
+            if explicit_language in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+                source_language = explicit_language
+                try:
+                    translated = sunbird.translate(original_question, explicit_language, "eng")
+                    translated_text = (translated.get("text") or "").strip()
+                    if translated_text:
+                        retrieval_question = translated_text
+                except SunbirdError:
+                    app.logger.exception("Sunbird translation failed for inbound question (explicit lang)")
+            elif explicit_language: # Route all unsupported explicit languages through LLM
+                source_language = explicit_language
+                from rag.generator import llm_translate
+                translated_text = llm_translate(original_question, "English")
+                if translated_text:
+                    retrieval_question = translated_text
+        elif not explicit_language or explicit_language == "auto":
+            # Auto-detect language
+            try:
+                detected = sunbird.detect_language(original_question)
+                if detected and detected != "eng":
+                    if detected in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+                        translated = sunbird.translate(original_question, detected, "eng")
+                        translated_text = (translated.get("text") or "").strip()
+                        if translated_text:
+                            retrieval_question = translated_text
+                            source_language = detected
+                    else: # Route all other detected languages through LLM fallback
+                        from rag.generator import llm_translate
+                        translated_text = llm_translate(original_question, "English")
+                        if translated_text:
+                            retrieval_question = translated_text
+                            source_language = detected
+            except SunbirdError:
+                app.logger.exception("Sunbird language detection/translation failed for inbound question")
+
+    try:
+        answer = build_answer(retrieval_question)
+    except Exception:
+        app.logger.exception("Failed to generate answer for question")
+        return jsonify({"error": "Could not generate an answer right now. Please try again."}), 503
+
+    final_answer = answer
+    if source_language != "eng":
+        if sunbird.is_configured() and source_language in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+            try:
+                translated_answer = sunbird.translate(answer, "eng", source_language)
+                translated_text = (translated_answer.get("text") or "").strip()
+                if translated_text:
+                    final_answer = translated_text
+            except SunbirdError:
+                app.logger.warning(f"Sunbird outbound translation failed for {source_language}. Falling back to LLM translation.")
+                from rag.generator import llm_translate
+                lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole"}
+                target = lang_map.get(source_language, source_language)
+                translated_text = llm_translate(answer, target)
+                if translated_text:
+                    final_answer = translated_text
+        else: # Route all other languages through LLM translation
+            from rag.generator import llm_translate
+            lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole", "keo": "Kakwa"}
+            target = lang_map.get(source_language, source_language)
+            translated_text = llm_translate(answer, target)
+            if translated_text:
+                final_answer = translated_text
+
+    try:
+        save_chat(current_user.id, original_question, final_answer)
+    except Exception:
+        app.logger.exception("Failed to persist chat history")
+    return jsonify({"answer": final_answer, "language": source_language})
+
+
+@app.route("/api/campus-info")
+def campus_info():
+    """Return events and clubs data for the web slider / WhatsApp."""
+    return jsonify(CAMPUS_INFO)
 
 
 @app.route("/api/whatsapp/status")
@@ -159,15 +428,124 @@ def whatsapp_status():
         {
             "configured": is_whatsapp_configured(),
             "base_url": cfg["base_url"],
-            "sender": cfg["sender"],
+            "phone_number_id": cfg["phone_number_id"],
+            "api_version": cfg["api_version"],
         }
     )
 
 
-@app.route("/webhooks/infobip/whatsapp", methods=["POST"])
-def infobip_whatsapp_webhook():
-    # Optional shared-secret validation for webhook protection
-    expected_token = os.getenv("INFOBIP_WEBHOOK_TOKEN", "").strip()
+@app.route("/api/sunbird/status")
+@login_required
+def sunbird_status():
+    cfg = sunbird.config
+    return jsonify(
+        {
+            "configured": sunbird.is_configured(),
+            "base_url": cfg.base_url,
+            "translate_endpoint": cfg.translate_endpoint,
+            "tts_endpoint": cfg.tts_endpoint,
+            "stt_endpoint": cfg.stt_endpoint,
+        }
+    )
+
+
+@app.route("/api/sunbird/translate", methods=["POST"])
+@login_required
+def sunbird_translate():
+    data = request.get_json(silent=True) or {}
+    text = (data.get("text") or "").strip()
+    source_language = (data.get("source_language") or "").strip()
+    target_language = (data.get("target_language") or "").strip()
+
+    if not text or not source_language or not target_language:
+        return jsonify({"error": "text, source_language, and target_language are required."}), 400
+
+    try:
+        result = sunbird.translate(text, source_language, target_language)
+        return jsonify({"text": result["text"], "raw": result["raw"]})
+    except SunbirdError as exc:
+        return jsonify({"error": str(exc)}), 502
+
+
+@app.route("/api/sunbird/tts", methods=["POST"])
+@login_required
+def sunbird_tts():
+    data = request.get_json(silent=True) or {}
+    text = (data.get("text") or "").strip()
+    if not text:
+        return jsonify({"error": "text is required."}), 400
+
+    speaker_id = int(data.get("speaker_id", 248))
+    response_mode = (data.get("response_mode") or "url").strip()
+    temperature = data.get("temperature")
+    max_new_audio_tokens = data.get("max_new_audio_tokens")
+
+    try:
+        result = sunbird.text_to_speech(
+            text=text,
+            speaker_id=speaker_id,
+            response_mode=response_mode,
+            temperature=float(temperature) if temperature is not None else None,
+            max_new_audio_tokens=int(max_new_audio_tokens)
+            if max_new_audio_tokens is not None
+            else None,
+        )
+        return jsonify({"audio_url": result["audio_url"], "raw": result["raw"]})
+    except ValueError:
+        return jsonify({"error": "speaker_id, temperature, or max_new_audio_tokens has invalid type."}), 400
+    except SunbirdError as exc:
+        return jsonify({"error": str(exc)}), 502
+
+
+@app.route("/api/sunbird/stt", methods=["POST"])
+@login_required
+def sunbird_stt():
+    audio = request.files.get("audio")
+    if audio is None:
+        return jsonify({"error": "audio file is required."}), 400
+
+    language = (request.form.get("language") or "").strip() or None
+    adapter = (request.form.get("adapter") or "").strip() or None
+
+    whisper_raw = (request.form.get("whisper") or "").strip().lower()
+    recognise_raw = (request.form.get("recognise_speakers") or "").strip().lower()
+
+    whisper = None if whisper_raw == "" else whisper_raw in {"1", "true", "yes", "on"}
+    recognise_speakers = (
+        None if recognise_raw == "" else recognise_raw in {"1", "true", "yes", "on"}
+    )
+
+    try:
+        result = sunbird.speech_to_text(
+            audio_bytes=audio.read(),
+            filename=audio.filename or "audio",
+            content_type=audio.content_type or "application/octet-stream",
+            language=language,
+            adapter=adapter,
+            whisper=whisper,
+            recognise_speakers=recognise_speakers,
+        )
+        return jsonify({"text": result["text"], "raw": result["raw"]})
+    except SunbirdError as exc:
+        return jsonify({"error": str(exc)}), 502
+
+
+@app.route("/webhooks/meta/whatsapp", methods=["GET"])
+def meta_whatsapp_webhook_verify():
+    cfg = load_whatsapp_config()
+    mode = request.args.get("hub.mode", "").strip()
+    token = request.args.get("hub.verify_token", "").strip()
+    challenge = request.args.get("hub.challenge", "")
+
+    if mode == "subscribe" and cfg["verify_token"] and token == cfg["verify_token"]:
+        return challenge, 200
+    return jsonify({"error": "Verification failed"}), 403
+
+
+@app.route("/webhooks/meta/whatsapp", methods=["POST"])
+def meta_whatsapp_webhook_receive():
+    # Backward-compatibility optional token check if defined.
+    expected_token = os.getenv("META_WHATSAPP_WEBHOOK_TOKEN", "").strip()
     if expected_token:
         provided = request.headers.get("X-Webhook-Token", "").strip()
         if provided != expected_token:
@@ -183,12 +561,46 @@ def infobip_whatsapp_webhook():
 
     processed = []
     for msg in inbound:
+        message_id = msg.get("id", "")
+        if not should_process_whatsapp_message(message_id):
+            processed.append(
+                {
+                    "id": message_id,
+                    "to": msg.get("from", ""),
+                    "status_code": 200,
+                    "ok": True,
+                    "provider": {"status": "duplicate_ignored"},
+                }
+            )
+            continue
+
         question = msg["text"]
         recipient = msg["from"]
-        answer = build_answer(question)
-        status_code, provider_response = send_whatsapp_text(recipient, answer)
+
+        # Send welcome message + interactive list on first contact
+        is_first_contact = recipient not in _known_whatsapp_contacts
+        if is_first_contact:
+            _known_whatsapp_contacts.add(recipient)
+            try:
+                send_whatsapp_text(recipient, WELCOME_MESSAGE)
+            except Exception:
+                app.logger.exception("Failed to send WhatsApp welcome message")
+            try:
+                send_whatsapp_interactive_list(recipient)
+            except Exception:
+                app.logger.exception("Failed to send WhatsApp interactive list")
+
+        answer = build_whatsapp_answer(question)
+
+        try:
+            status_code, provider_response = send_whatsapp_text(recipient, answer)
+        except Exception:
+            app.logger.exception("Failed to send WhatsApp answer")
+            status_code, provider_response = 502, {"error": "Failed to send WhatsApp message"}
+
         processed.append(
             {
+                "id": message_id,
                 "to": recipient,
                 "status_code": status_code,
                 "ok": 200 <= status_code < 300,
@@ -219,7 +631,6 @@ def dashboard():
 
 
 if __name__ == "__main__":
-    init_db()
     print("Loading pipeline...")
     get_pipeline()
     print("Pipeline ready. Starting Gamma Chatbot...")

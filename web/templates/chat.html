@@ -67,9 +67,47 @@
     padding: 16px 28px;
     border-bottom: 1px solid var(--border);
     background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
-.chat-header h2 { font-size: 18px; font-weight: 600; }
-.chat-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.chat-header-left h2 { font-size: 18px; font-weight: 600; }
+.chat-header-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Language selector ── */
+.lang-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.lang-selector label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.lang-selector select {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+.lang-selector select:focus { border-color: var(--orange); }
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -85,6 +123,7 @@
     font-size: 14px;
     line-height: 1.5;
     word-wrap: break-word;
+    position: relative;
 }
 .msg-user {
     align-self: flex-end;
@@ -107,6 +146,49 @@
     font-size: 14px;
     color: var(--text-muted);
 }
+
+/* ── TTS button on bot messages ── */
+.msg-bot-wrap {
+    align-self: flex-start;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.msg-bot-wrap .msg-bot {
+    max-width: 100%;
+    align-self: stretch;
+}
+.msg-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px;
+}
+.tts-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.tts-btn:hover {
+    background: var(--orange-light);
+    color: var(--orange);
+}
+.tts-btn.playing {
+    background: var(--orange-light);
+    color: var(--orange);
+}
+.tts-btn svg { width: 14px; height: 14px; }
+.tts-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ── Input bar ── */
 .chat-input-bar {
     padding: 16px 28px;
@@ -139,6 +221,70 @@
 }
 .chat-input-wrap button:hover { background: var(--orange-dark); }
 .chat-input-wrap button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.chat-input-wrap .mic-btn {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.chat-input-wrap .mic-btn svg { width: 18px; height: 18px; }
+.chat-input-wrap .mic-btn:hover { background: var(--orange-light); color: var(--orange); }
+.chat-input-wrap .mic-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.chat-input-wrap .mic-btn.recording {
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-color: #FCA5A5;
+    animation: pulse-recording 1.2s ease-in-out infinite;
+}
+@keyframes pulse-recording {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0); }
+}
+
+/* ── Recording status indicator ── */
+.recording-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #B91C1C;
+    margin-bottom: 8px;
+}
+.recording-indicator.active { display: inline-flex; }
+.recording-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #B91C1C;
+    animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ── Audio player (for TTS) ── */
+.tts-audio-player {
+    margin-top: 4px;
+}
+.tts-audio-player audio {
+    height: 32px;
+    border-radius: 8px;
+}
 {% endblock %}
 
 {% block content %}
@@ -163,15 +309,44 @@
     <!-- Chat area -->
     <div class="chat-main">
         <div class="chat-header">
-            <h2>Gamma Chatbot</h2>
-            <p>Ask questions about Uganda Christian University</p>
+            <div class="chat-header-left">
+                <h2>Gamma Chatbot</h2>
+                <p>Ask questions about Uganda Christian University</p>
+            </div>
+            <div class="lang-selector" id="langSelector">
+                <label for="languageSelect">🌐 Language</label>
+                <select id="languageSelect">
+                    <option value="auto">Auto-detect</option>
+                    <option value="eng">English</option>
+                    <option value="lug">Luganda</option>
+                    <option value="ach">Acholi</option>
+                    <option value="teo">Ateso</option>
+                    <option value="lgg">Lugbara</option>
+                    <option value="nyn">Runyankole</option>
+                    <option value="swa">Swahili</option>
+                </select>
+            </div>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg msg-bot">Hello! I can answer questions about UCU using official university documents. What would you like to know?</div>
+            <div class="msg-bot-wrap">
+                <div class="msg msg-bot">Hello! I can answer questions about UCU using official university documents. What would you like to know?</div>
+            </div>
         </div>
         <div class="chat-input-bar">
+            <div id="recordingIndicator" class="recording-indicator">
+                <span class="recording-dot"></span>
+                <span>Recording… click mic again to stop</span>
+            </div>
             <div class="chat-input-wrap">
                 <input type="text" id="questionInput" placeholder="Type your question..." autocomplete="off">
+                <button id="micBtn" class="mic-btn" type="button" title="Hold to record voice (Sunbird STT)" aria-label="Use microphone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
                 <button id="sendBtn" onclick="sendMessage()">Send</button>
             </div>
         </div>
@@ -184,11 +359,124 @@
 const chatMessages = document.getElementById('chatMessages');
 const questionInput = document.getElementById('questionInput');
 const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
 const sidebarList = document.getElementById('sidebarList');
+const languageSelect = document.getElementById('languageSelect');
+const recordingIndicator = document.getElementById('recordingIndicator');
+
+let sunbirdConfigured = false;
+let currentAudio = null;
+
+// ── Check Sunbird status on load ──
+fetch('/api/sunbird/status')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+        if (data && data.configured) {
+            sunbirdConfigured = true;
+        }
+    })
+    .catch(() => {});
 
 questionInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
 });
+
+// ── Microphone: Sunbird STT via MediaRecorder ──
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+micBtn.addEventListener('click', async function() {
+    if (isRecording) {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+        return;
+    }
+
+    // Start recording
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Try to use webm/opus (good quality, widely supported), fall back to whatever is available
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+            ? 'audio/webm;codecs=opus'
+            : MediaRecorder.isTypeSupported('audio/webm')
+                ? 'audio/webm'
+                : '';
+
+        mediaRecorder = mimeType
+            ? new MediaRecorder(stream, { mimeType })
+            : new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function(e) {
+            if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async function() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            recordingIndicator.classList.remove('active');
+
+            // Stop all tracks to release the microphone
+            stream.getTracks().forEach(t => t.stop());
+
+            if (audioChunks.length === 0) return;
+
+            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+
+            // Determine file extension from mime type
+            let ext = 'webm';
+            const mime = mediaRecorder.mimeType || '';
+            if (mime.includes('ogg')) ext = 'ogg';
+            else if (mime.includes('mp4') || mime.includes('m4a')) ext = 'm4a';
+            else if (mime.includes('wav')) ext = 'wav';
+
+            // Send to Sunbird STT
+            micBtn.disabled = true;
+            questionInput.placeholder = 'Transcribing audio…';
+
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.' + ext);
+
+            // Pass the selected language if not auto
+            const lang = languageSelect.value;
+            if (lang && lang !== 'auto') {
+                formData.append('language', lang);
+            }
+
+            try {
+                const resp = await fetch('/api/sunbird/stt', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await resp.json();
+                if (resp.ok && result.text) {
+                    questionInput.value = result.text;
+                    questionInput.placeholder = 'Type your question...';
+                } else {
+                    questionInput.placeholder = 'Type your question...';
+                    addBotMessage('Could not transcribe audio: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                questionInput.placeholder = 'Type your question...';
+                addBotMessage('Speech-to-text failed. Please type your question instead.');
+            }
+            micBtn.disabled = false;
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        micBtn.classList.add('recording');
+        recordingIndicator.classList.add('active');
+    } catch (err) {
+        addBotMessage('Microphone access denied or not available. Please allow microphone access and try again.');
+    }
+});
+
+// ── Message helpers ──
 
 function addMessage(text, cls) {
     const div = document.createElement('div');
@@ -199,11 +487,109 @@ function addMessage(text, cls) {
     return div;
 }
 
+function addBotMessage(text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-bot-wrap';
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'msg msg-bot';
+    msgDiv.textContent = text;
+    wrap.appendChild(msgDiv);
+
+    // Add TTS button
+    if (sunbirdConfigured) {
+        const actions = document.createElement('div');
+        actions.className = 'msg-actions';
+
+        const ttsBtn = document.createElement('button');
+        ttsBtn.className = 'tts-btn';
+        ttsBtn.title = 'Listen (Text-to-Speech)';
+        ttsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span>Listen</span>';
+        ttsBtn.onclick = function() { playTTS(text, ttsBtn, wrap); };
+        actions.appendChild(ttsBtn);
+
+        wrap.appendChild(actions);
+    }
+
+    chatMessages.appendChild(wrap);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return wrap;
+}
+
+// ── TTS playback ──
+
+async function playTTS(text, btn, container) {
+    // If currently playing, stop it
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+        document.querySelectorAll('.tts-btn.playing').forEach(b => b.classList.remove('playing'));
+        return;
+    }
+
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Loading…';
+
+    try {
+        const resp = await fetch('/api/sunbird/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+        const result = await resp.json();
+
+        if (resp.ok && result.audio_url) {
+            // Remove any existing audio player in this message
+            const existingPlayer = container.querySelector('.tts-audio-player');
+            if (existingPlayer) existingPlayer.remove();
+
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'tts-audio-player';
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = result.audio_url;
+            playerDiv.appendChild(audio);
+            container.appendChild(playerDiv);
+
+            currentAudio = audio;
+            btn.classList.add('playing');
+            btn.querySelector('span').textContent = 'Playing…';
+
+            audio.play().catch(() => {});
+
+            audio.onended = function() {
+                btn.classList.remove('playing');
+                btn.querySelector('span').textContent = 'Listen';
+                currentAudio = null;
+            };
+            audio.onpause = function() {
+                if (audio.ended) return;
+                btn.classList.remove('playing');
+                btn.querySelector('span').textContent = 'Listen';
+            };
+            audio.onplay = function() {
+                btn.classList.add('playing');
+                btn.querySelector('span').textContent = 'Playing…';
+            };
+        } else {
+            btn.querySelector('span').textContent = 'Failed';
+            setTimeout(() => { btn.querySelector('span').textContent = 'Listen'; }, 2000);
+        }
+    } catch (err) {
+        btn.querySelector('span').textContent = 'Failed';
+        setTimeout(() => { btn.querySelector('span').textContent = 'Listen'; }, 2000);
+    }
+    btn.disabled = false;
+}
+
+// ── Send message ──
+
 function sendMessage() {
     const q = questionInput.value.trim();
     if (!q) return;
     questionInput.value = '';
-    addMessage(q, 'msg-user');
+    addMessage(q, 'msg msg-user');
 
     sendBtn.disabled = true;
     const typing = document.createElement('div');
@@ -212,21 +598,38 @@ function sendMessage() {
     chatMessages.appendChild(typing);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
+    const lang = languageSelect.value;
+    const payload = { question: q };
+    if (lang && lang !== 'auto') {
+        payload.language = lang;
+    }
+
     fetch('/api/ask', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({question: q})
+        body: JSON.stringify(payload)
     })
-    .then(r => r.json())
-    .then(data => {
+    .then(async (r) => {
+        let data = {};
+        try {
+            data = await r.json();
+        } catch (e) {
+            data = {};
+        }
+        if (!r.ok) {
+            throw new Error(data.error || 'Something went wrong. Please try again.');
+        }
+        return data;
+    })
+    .then((data) => {
         chatMessages.removeChild(typing);
-        addMessage(data.answer || data.error, 'msg-bot');
+        addBotMessage(data.answer || 'No response returned.');
         sendBtn.disabled = false;
         addToSidebar(q);
     })
     .catch(err => {
         chatMessages.removeChild(typing);
-        addMessage('Something went wrong. Please try again.', 'msg-bot');
+        addBotMessage(err.message || 'Something went wrong. Please try again.');
         sendBtn.disabled = false;
     });
 }
@@ -241,8 +644,8 @@ function addToSidebar(question) {
 }
 
 function showHistoryItem(question, answer) {
-    addMessage(question, 'msg-user');
-    addMessage(answer, 'msg-bot');
+    addMessage(question, 'msg msg-user');
+    addBotMessage(answer);
 }
 </script>
 {% endblock %}
