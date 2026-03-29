@@ -43,10 +43,21 @@ USERS_BACKUP_PATH = _resolve_storage_path("GAMMA_USERS_BACKUP_PATH", DEFAULT_USE
 AUTH_DATABASE_URL = (os.getenv("DATABASE_URL") or "").strip()
 
 FALLBACK_RESPONSE_PREFIX = "i'm not fully confident in the answer based on the available documents"
+AUTH_SOURCE_SQLITE = "sqlite"
+AUTH_SOURCE_POSTGRES = "postgres"
 
 
 def _external_auth_enabled():
     return bool(AUTH_DATABASE_URL and psycopg is not None)
+
+
+def _with_auth_source(user_record, auth_source):
+    if user_record is None:
+        return None
+
+    tagged = dict(user_record)
+    tagged["auth_source"] = auth_source
+    return tagged
 
 
 def _get_postgres_auth_conn():
@@ -890,7 +901,7 @@ def _verify_user_sqlite(normalized_username, password):
         for candidate in _candidate_passwords(password):
             try:
                 if check_password_hash(stored_hash, candidate):
-                    return dict(row)
+                    return _with_auth_source(dict(row), AUTH_SOURCE_SQLITE)
             except ValueError:
                 # Some legacy deployments may have plaintext values from older setups.
                 if stored_hash == candidate:
@@ -900,7 +911,7 @@ def _verify_user_sqlite(normalized_username, password):
                     )
                     conn.commit()
                     _sync_users_backup()
-                    return dict(row)
+                    return _with_auth_source(dict(row), AUTH_SOURCE_SQLITE)
 
         return None
     finally:
@@ -917,7 +928,7 @@ def _verify_user_postgres(normalized_username, password):
             for candidate in _candidate_passwords(password):
                 try:
                     if check_password_hash(stored_hash, candidate):
-                        return dict(row)
+                        return _with_auth_source(dict(row), AUTH_SOURCE_POSTGRES)
                 except ValueError:
                     if stored_hash == candidate:
                         with pg_conn.cursor() as cur:
@@ -927,7 +938,7 @@ def _verify_user_postgres(normalized_username, password):
                             )
                         pg_conn.commit()
                         _sync_users_backup_from_postgres(pg_conn)
-                        return dict(row)
+                        return _with_auth_source(dict(row), AUTH_SOURCE_POSTGRES)
 
         # Legacy path: verify against a pre-existing Postgres `users` table, then migrate into auth_users.
         if not _postgres_table_exists(pg_conn, "users"):
@@ -964,7 +975,7 @@ def _verify_user_postgres(normalized_username, password):
             synced = _lookup_postgres_user_by_username(pg_conn, normalized_username)
             if synced is not None:
                 _sync_users_backup_from_postgres(pg_conn)
-                return dict(synced)
+                return _with_auth_source(dict(synced), AUTH_SOURCE_POSTGRES)
 
             return None
 
@@ -977,7 +988,7 @@ def _get_user_by_id_sqlite(user_id):
     conn = get_conn()
     try:
         row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-        return dict(row) if row else None
+        return _with_auth_source(dict(row), AUTH_SOURCE_SQLITE) if row else None
     finally:
         conn.close()
 
@@ -996,7 +1007,7 @@ def _get_user_by_id_postgres(user_id):
                 (int(user_id),),
             )
             row = cur.fetchone()
-            return dict(row) if row else None
+            return _with_auth_source(dict(row), AUTH_SOURCE_POSTGRES) if row else None
     finally:
         pg_conn.close()
 
@@ -1142,7 +1153,20 @@ def verify_user(username, password):
     return _verify_user_sqlite(normalized_username, password)
 
 
-def get_user_by_id(user_id):
+def get_user_by_id(user_id, auth_source=None):
+    normalized_source = (auth_source or "").strip().lower()
+
+    if normalized_source == AUTH_SOURCE_POSTGRES:
+        if not _external_auth_enabled():
+            return None
+        try:
+            return _get_user_by_id_postgres(user_id)
+        except Exception:
+            return None
+
+    if normalized_source == AUTH_SOURCE_SQLITE:
+        return _get_user_by_id_sqlite(user_id)
+
     if _external_auth_enabled():
         try:
             user = _get_user_by_id_postgres(user_id)
@@ -1154,11 +1178,47 @@ def get_user_by_id(user_id):
     return _get_user_by_id_sqlite(user_id)
 
 
-def save_chat(user_id, question, answer):
+def _resolve_chat_user_id(user_id, username=None, role=None):
+    """
+    Normalize chat user id to the local SQLite users table so chat history is consistent
+    even when auth is backed by Postgres (different numeric ids).
+    """
+    conn = get_conn()
+    try:
+        # Exact id match first.
+        row = conn.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone()
+        if row:
+            return row["id"]
+
+        normalized_username = (username or "").strip()
+        if normalized_username:
+            match = conn.execute(
+                "SELECT id FROM users WHERE LOWER(username) = LOWER(?)",
+                (normalized_username,),
+            ).fetchone()
+            if match:
+                return match["id"]
+
+            placeholder_hash = generate_password_hash(f"external-auth:{normalized_username}")
+            normalized_role = _normalize_role(role)
+            cur = conn.execute(
+                "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+                (normalized_username, placeholder_hash, normalized_role),
+            )
+            conn.commit()
+            return cur.lastrowid
+
+        return user_id
+    finally:
+        conn.close()
+
+
+def save_chat(user_id, question, answer, username=None, role=None):
+    chat_user_id = _resolve_chat_user_id(user_id, username=username, role=role)
     conn = get_conn()
     cur = conn.execute(
         "INSERT INTO chats (user_id, question, answer) VALUES (?, ?, ?)",
-        (user_id, question, answer),
+        (chat_user_id, question, answer),
     )
     conn.commit()
     chat_id = cur.lastrowid
@@ -1166,11 +1226,12 @@ def save_chat(user_id, question, answer):
     return chat_id
 
 
-def get_user_chats(user_id, limit=50):
+def get_user_chats(user_id, limit=50, username=None, role=None):
+    chat_user_id = _resolve_chat_user_id(user_id, username=username, role=role)
     conn = get_conn()
     rows = conn.execute(
         "SELECT question, answer, created_at FROM chats WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
-        (user_id, limit),
+        (chat_user_id, limit),
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
