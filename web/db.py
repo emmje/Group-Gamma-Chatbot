@@ -32,6 +32,15 @@ def init_db():
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
+        CREATE TABLE IF NOT EXISTS data_deletion_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            contact_email TEXT NOT NULL,
+            whatsapp_number TEXT,
+            details TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
     """)
     conn.commit()
     conn.close()
@@ -141,3 +150,16 @@ def get_avg_answer_length():
     result = conn.execute("SELECT AVG(LENGTH(answer)) FROM chats").fetchone()[0]
     conn.close()
     return round(result, 1) if result else 0.0
+
+
+def create_data_deletion_request(full_name, contact_email, whatsapp_number="", details=""):
+    conn = get_conn()
+    cur = conn.execute(
+        """INSERT INTO data_deletion_requests (full_name, contact_email, whatsapp_number, details)
+           VALUES (?, ?, ?, ?)""",
+        (full_name, contact_email, whatsapp_number, details),
+    )
+    conn.commit()
+    request_id = cur.lastrowid
+    conn.close()
+    return request_id

@@ -53,6 +53,7 @@ sunbird = SunbirdClient()
 
 SUPPORTED_SUNBIRD_TRANSLATION_LANGS = {"eng", "ach", "teo", "lug", "lgg", "nyn"}
 SUPPORTED_LLM_TRANSLATION_LANGS = {"swa"}
+SUNBIRD_DETECTED_LANGUAGE_REMAP = {"keo": "lug"}
 _WHATSAPP_DEDUPE_TTL_SECONDS = 600
 _processed_whatsapp_message_ids: dict[str, float] = {}
 
@@ -363,12 +364,13 @@ def api_ask():
             try:
                 detected = sunbird.detect_language(original_question)
                 if detected and detected != "eng":
-                    if detected in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
-                        translated = sunbird.translate(original_question, detected, "eng")
+                    translated_source = SUNBIRD_DETECTED_LANGUAGE_REMAP.get(detected, detected)
+                    if translated_source in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+                        translated = sunbird.translate(original_question, translated_source, "eng")
                         translated_text = (translated.get("text") or "").strip()
                         if translated_text:
                             retrieval_question = translated_text
-                            source_language = detected
+                            source_language = translated_source
                     else: # Route all other detected languages through LLM fallback
                         from rag.generator import llm_translate
                         translated_text = llm_translate(original_question, "English")
