@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - Gamma Chatbot{% endblock %}
+
+{% block extra_style %}
+.content-wrap {
+    max-width: 860px;
+    margin: 28px auto;
+    padding: 0 20px;
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    line-height: 1.6;
+}
+h1 { margin-bottom: 12px; }
+h2 { margin-top: 18px; margin-bottom: 8px; font-size: 18px; }
+p, li { color: var(--text); font-size: 14px; }
+ul { padding-left: 18px; }
+.meta { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
+{% endblock %}
+
+{% block content %}
+<div class="content-wrap">
+    <div class="card">
+        <h1>Privacy Policy</h1>
+        <p class="meta">Last updated: 2026-03-16</p>
+
+        <p>
+            This Privacy Policy explains how Gamma Chatbot collects, uses, stores, and deletes personal data
+            from users interacting through web and WhatsApp channels.
+        </p>
+
+        <h2>1. Data We Collect</h2>
+        <ul>
+            <li>Messages sent to the chatbot and generated responses.</li>
+            <li>Basic account information for authenticated web users (for example, username).</li>
+            <li>WhatsApp metadata required to reply to your messages (for example, phone number).</li>
+        </ul>
+
+        <h2>2. How We Use Data</h2>
+        <ul>
+            <li>To provide chatbot responses and improve service quality.</li>
+            <li>To secure and monitor the service.</li>
+            <li>To comply with legal obligations where applicable.</li>
+        </ul>
+
+        <h2>3. Data Retention</h2>
+        <p>
+            We retain chat records and account data only as long as required for operational or legal purposes,
+            or until a valid deletion request is completed.
+        </p>
+
+        <h2>4. Data Sharing</h2>
+        <p>
+            We do not sell personal data. We may process data through trusted providers required to operate
+            the service (for example hosting, database, and WhatsApp Cloud API providers).
+        </p>
+
+        <h2>5. Your Rights</h2>
+        <p>
+            You may request access to, correction of, or deletion of your personal data. To request deletion,
+            use the <a href="{{ url_for('data_deletion') }}">Data Deletion Request page</a>.
+        </p>
+
+        <h2>6. Contact</h2>
+        <p>
+            For privacy inquiries, contact the service administrator through the support channel listed in your deployment.
+        </p>
+
+        {% if base_url %}
+        <h2>Public Legal URL</h2>
+        <p>This Privacy page is publicly available at: <a href="{{ base_url }}{{ url_for('privacy_policy') }}">{{ base_url }}{{ url_for('privacy_policy') }}</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

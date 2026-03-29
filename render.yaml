@@ -1,0 +1,79 @@
+services:
+  - type: web
+    name: gamma-chatbot
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: rewrite-main
+    buildCommand: pip install -r requirements_rag.txt
+    startCommand: gunicorn web.app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.1-8b-instant
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        sync: false
+      - key: SUPABASE_STORAGE_PREFIX
+        value: ""
+      - key: RAG_COLLECTION
+        value: ucu_docs
+      - key: RAG_EMBED_MODEL
+        value: all-MiniLM-L6-v2
+      - key: RAG_OCR_ENABLED
+        value: "false"
+      - key: RAG_TOP_K
+        value: "6"
+      - key: RAG_CHUNK_SIZE
+        value: "300"
+      - key: RAG_CHUNK_OVERLAP
+        value: "60"
+      - key: RAG_LEXICAL_TOP_N
+        value: "8"
+      - key: RAG_LEXICAL_MIN_HITS
+        value: "1"
+      - key: RAG_DATA_DIR
+        value: data
+      - key: RAG_DOCS_DIR
+        value: data/docs
+      - key: META_GRAPH_BASE_URL
+        value: https://graph.facebook.com
+      - key: META_GRAPH_API_VERSION
+        value: v20.0
+      - key: META_WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: META_WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: META_WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: META_WHATSAPP_WEBHOOK_TOKEN
+        sync: false
+      - key: SUNBIRD_API_KEY
+        sync: false
+      - key: SUNBIRD_BASE_URL
+        value: https://api.sunbird.ai
+      - key: SUNBIRD_TRANSLATE_ENDPOINT
+        value: /tasks/translate
+      - key: SUNBIRD_TTS_ENDPOINT
+        value: /tasks/modal/tts
+      - key: SUNBIRD_STT_ENDPOINT
+        value: /tasks/modal/stt
+      - key: SUNBIRD_TIMEOUT_SECONDS
+        value: "120"
