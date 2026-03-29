@@ -1,0 +1,10 @@
+chromadb
+flask
+flask-login
+gradio
+ollama
+pypdf
+pytesseract
+pdf2image
+sentence-transformers
+requests
