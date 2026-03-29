@@ -3,9 +3,12 @@ flask-login
 gunicorn
 groq
 python-dotenv
+psycopg[binary]
 pypdf
 pytesseract
 pdf2image
+chromadb
 qdrant-client
 sentence-transformers
+supabase
 requests
