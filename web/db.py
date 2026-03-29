@@ -210,6 +210,173 @@ def _ensure_postgres_auth_schema(pg_conn):
         )
 
 
+def _ensure_postgres_app_schema(pg_conn):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS chats (
+                id BIGSERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                username TEXT,
+                role TEXT,
+                question TEXT NOT NULL,
+                answer TEXT NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE INDEX IF NOT EXISTS idx_chats_user_created ON chats(user_id, created_at);
+            CREATE INDEX IF NOT EXISTS idx_chats_created ON chats(created_at);
+            """
+        )
+
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS interaction_events (
+                id BIGSERIAL PRIMARY KEY,
+                legacy_chat_id BIGINT,
+                channel TEXT NOT NULL,
+                user_ref TEXT,
+                question_text TEXT,
+                answer_text TEXT,
+                source_language TEXT NOT NULL DEFAULT 'eng',
+                translated_inbound INTEGER NOT NULL DEFAULT 0,
+                translated_outbound INTEGER NOT NULL DEFAULT 0,
+                success INTEGER NOT NULL DEFAULT 1,
+                fallback_used INTEGER NOT NULL DEFAULT 0,
+                latency_ms REAL,
+                error_type TEXT,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_created_at_pg ON interaction_events(created_at);
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_channel_created_pg ON interaction_events(channel, created_at);
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_success_created_pg ON interaction_events(success, created_at);
+            """
+        )
+
+
+def _load_all_chats_sqlite(conn):
+    rows = conn.execute(
+        "SELECT id, user_id, username, role, question, answer, created_at FROM chats"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _load_all_interactions_sqlite(conn):
+    rows = conn.execute(
+        """
+        SELECT legacy_chat_id, channel, user_ref, question_text, answer_text, source_language,
+               translated_inbound, translated_outbound, success, fallback_used, latency_ms, error_type, created_at
+        FROM interaction_events
+        """
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _insert_chats_postgres(pg_conn, chats):
+    inserted = 0
+    with pg_conn.cursor() as cur:
+        for row in chats:
+            cur.execute(
+                """
+                SELECT 1 FROM chats
+                WHERE user_id = %s AND TRIM(question) = TRIM(%s) AND TRIM(answer) = TRIM(%s) AND created_at = %s
+                LIMIT 1
+                """,
+                (
+                    row.get("user_id"),
+                    row.get("question"),
+                    row.get("answer"),
+                    row.get("created_at"),
+                ),
+            )
+            if cur.fetchone() is not None:
+                continue
+
+            cur.execute(
+                """
+                INSERT INTO chats (user_id, username, role, question, answer, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    row.get("user_id"),
+                    row.get("username"),
+                    _normalize_role(row.get("role")),
+                    row.get("question"),
+                    row.get("answer"),
+                    row.get("created_at"),
+                ),
+            )
+            inserted += 1 if cur.fetchone() else 0
+    return inserted
+
+
+def _insert_interactions_postgres(pg_conn, events):
+    inserted = 0
+    with pg_conn.cursor() as cur:
+        for row in events:
+            cur.execute(
+                """
+                SELECT 1 FROM interaction_events
+                WHERE TRIM(COALESCE(question_text,'')) = TRIM(COALESCE(%s,''))
+                  AND TRIM(COALESCE(answer_text,'')) = TRIM(COALESCE(%s,''))
+                  AND TRIM(COALESCE(user_ref,'')) = TRIM(COALESCE(%s,''))
+                  AND created_at = %s
+                LIMIT 1
+                """,
+                (
+                    row.get("question_text"),
+                    row.get("answer_text"),
+                    row.get("user_ref"),
+                    row.get("created_at"),
+                ),
+            )
+            if cur.fetchone() is not None:
+                continue
+
+            cur.execute(
+                """
+                INSERT INTO interaction_events (
+                    legacy_chat_id, channel, user_ref, question_text, answer_text, source_language,
+                    translated_inbound, translated_outbound, success, fallback_used, latency_ms, error_type, created_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    row.get("legacy_chat_id"),
+                    row.get("channel"),
+                    row.get("user_ref"),
+                    row.get("question_text"),
+                    row.get("answer_text"),
+                    row.get("source_language"),
+                    row.get("translated_inbound"),
+                    row.get("translated_outbound"),
+                    row.get("success"),
+                    row.get("fallback_used"),
+                    row.get("latency_ms"),
+                    row.get("error_type"),
+                    row.get("created_at"),
+                ),
+            )
+            inserted += 1 if cur.fetchone() else 0
+    return inserted
+
+
+def _migrate_sqlite_app_data_to_postgres(pg_conn):
+    if not Path(DB_PATH).exists():
+        return
+
+    conn = get_conn()
+    try:
+        chats = _load_all_chats_sqlite(conn)
+        events = _load_all_interactions_sqlite(conn)
+
+        _ensure_postgres_app_schema(pg_conn)
+
+        inserted_chats = _insert_chats_postgres(pg_conn, chats)
+        inserted_events = _insert_interactions_postgres(pg_conn, events)
+        pg_conn.commit()
+    finally:
+        conn.close()
 def _insert_missing_users_postgres(pg_conn, user_rows):
     inserted = 0
     with pg_conn.cursor() as cur:
@@ -1079,6 +1246,8 @@ def init_db():
                 _migrate_users_from_legacy_dbs_postgres(pg_conn)
                 _migrate_users_from_legacy_postgres_table(pg_conn)
                 _bootstrap_admin_from_env_postgres(pg_conn)
+                _ensure_postgres_app_schema(pg_conn)
+                _migrate_sqlite_app_data_to_postgres(pg_conn)
                 pg_conn.commit()
                 using_external_auth = True
             except Exception:
@@ -1214,6 +1383,25 @@ def _resolve_chat_user_id(user_id, username=None, role=None):
 
 
 def save_chat(user_id, question, answer, username=None, role=None):
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO chats (user_id, username, role, question, answer)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (user_id, username, _normalize_role(role), question, answer),
+                )
+                row = cur.fetchone()
+            pg_conn.commit()
+            return int(row["id"]) if row else None
+        finally:
+            pg_conn.close()
+
     chat_user_id = _resolve_chat_user_id(user_id, username=username, role=role)
     conn = get_conn()
     cur = conn.execute(
@@ -1227,6 +1415,26 @@ def save_chat(user_id, question, answer, username=None, role=None):
 
 
 def get_user_chats(user_id, limit=50, username=None, role=None):
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT question, answer, created_at
+                    FROM chats
+                    WHERE user_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT %s
+                    """,
+                    (user_id, int(limit)),
+                )
+                rows = cur.fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            pg_conn.close()
+
     chat_user_id = _resolve_chat_user_id(user_id, username=username, role=role)
     conn = get_conn()
     rows = conn.execute(
@@ -1245,6 +1453,17 @@ def get_total_users():
 
 
 def get_total_chats():
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) AS c FROM chats")
+                row = cur.fetchone()
+            return int(row["c"] or 0)
+        finally:
+            pg_conn.close()
+
     conn = get_conn()
     count = conn.execute("SELECT COUNT(*) FROM chats").fetchone()[0]
     conn.close()
@@ -1262,6 +1481,25 @@ def get_frequent_questions(limit=10):
 
 
 def get_recent_chats(limit=20):
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT question, answer, created_at, COALESCE(username, '') AS username
+                    FROM chats
+                    ORDER BY created_at DESC
+                    LIMIT %s
+                    """,
+                    (int(limit),),
+                )
+                rows = cur.fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            pg_conn.close()
+
     conn = get_conn()
     rows = conn.execute(
         """SELECT c.question, c.answer, c.created_at, u.username
@@ -1274,6 +1512,26 @@ def get_recent_chats(limit=20):
 
 
 def get_chats_per_day(days=14):
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT DATE(created_at) AS day, COUNT(*) AS count
+                    FROM chats
+                    WHERE created_at >= NOW() - INTERVAL '%s days'
+                    GROUP BY day
+                    ORDER BY day
+                    """,
+                    (int(days),),
+                )
+                rows = cur.fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            pg_conn.close()
+
     conn = get_conn()
     rows = conn.execute(
         """SELECT DATE(created_at) as day, COUNT(*) as count
@@ -1286,6 +1544,17 @@ def get_chats_per_day(days=14):
 
 
 def get_avg_answer_length():
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute("SELECT AVG(LENGTH(answer)) AS avg_len FROM chats")
+                row = cur.fetchone()
+            return round(float(row["avg_len"] or 0.0), 1)
+        finally:
+            pg_conn.close()
+
     conn = get_conn()
     result = conn.execute("SELECT AVG(LENGTH(answer)) FROM chats").fetchone()[0]
     conn.close()
@@ -1325,6 +1594,48 @@ def record_interaction(
         q = q[:1000]
     if len(a) > 4000:
         a = a[:4000]
+
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+            with pg_conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO interaction_events (
+                        legacy_chat_id,
+                        channel,
+                        user_ref,
+                        question_text,
+                        answer_text,
+                        source_language,
+                        translated_inbound,
+                        translated_outbound,
+                        success,
+                        fallback_used,
+                        latency_ms,
+                        error_type
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        int(legacy_chat_id) if legacy_chat_id is not None else None,
+                        (channel or "unknown").strip() or "unknown",
+                        (user_ref or "").strip(),
+                        q,
+                        a,
+                        (source_language or "eng").strip() or "eng",
+                        1 if translated_inbound else 0,
+                        1 if translated_outbound else 0,
+                        1 if success else 0,
+                        1 if fallback_used else 0,
+                        float(latency_ms) if latency_ms is not None else None,
+                        (error_type or "").strip(),
+                    ),
+                )
+            pg_conn.commit()
+        finally:
+            pg_conn.close()
+        return
 
     conn = get_conn()
     conn.execute(
@@ -1385,6 +1696,304 @@ def _safe_pct(part, total):
 
 
 def get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8):
+    if _external_auth_enabled():
+        pg_conn = _get_postgres_auth_conn()
+        try:
+            _ensure_postgres_app_schema(pg_conn)
+
+            day_window = f"{int(days)} days"
+            hour_window = f"{int(hours)} hours"
+
+            with pg_conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) AS c FROM interaction_events")
+                total_interactions = int(cur.fetchone()["c"] or 0)
+
+                cur.execute(
+                    "SELECT COUNT(*) AS c FROM interaction_events WHERE created_at >= NOW() - INTERVAL %s",
+                    (hour_window,),
+                )
+                recent_hour_count = int(cur.fetchone()["c"] or 0)
+
+                cur.execute(
+                    "SELECT COUNT(*) AS c FROM interaction_events WHERE created_at >= NOW() - INTERVAL %s",
+                    (day_window,),
+                )
+                recent_day_count = int(cur.fetchone()["c"] or 0)
+
+                use_historical_day_window = recent_day_count == 0 and total_interactions > 0
+                use_historical_hour_window = recent_hour_count == 0 and total_interactions > 0
+
+                cur.execute(
+                    """
+                    SELECT
+                        COUNT(*) AS interactions,
+                        SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS success_count,
+                        SUM(CASE WHEN fallback_used = 1 THEN 1 ELSE 0 END) AS fallback_count,
+                        COUNT(DISTINCT NULLIF(TRIM(COALESCE(user_ref, '')), '')) AS active_users,
+                        AVG(LENGTH(COALESCE(answer_text, ''))) AS avg_answer_len
+                    FROM interaction_events
+                    WHERE created_at >= NOW() - INTERVAL %s
+                    """,
+                    (hour_window,),
+                )
+                window_row = cur.fetchone()
+
+                cur.execute(
+                    """
+                    SELECT latency_ms
+                    FROM interaction_events
+                    WHERE created_at >= NOW() - INTERVAL %s
+                      AND latency_ms IS NOT NULL
+                    """,
+                    (hour_window,),
+                )
+                latencies = [row["latency_ms"] for row in cur.fetchall() if row["latency_ms"] is not None]
+
+                if use_historical_day_window:
+                    cur.execute("SELECT channel, COUNT(*) AS count FROM interaction_events GROUP BY channel ORDER BY count DESC")
+                    channel_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT source_language, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE TRIM(COALESCE(source_language, '')) != ''
+                        GROUP BY source_language
+                        ORDER BY count DESC
+                        LIMIT 10
+                        """
+                    )
+                    language_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT day, count FROM (
+                            SELECT CAST(created_at AS DATE) AS day, COUNT(*) AS count
+                            FROM interaction_events
+                            GROUP BY day
+                            ORDER BY day DESC
+                            LIMIT %s
+                        ) t ORDER BY day
+                        """,
+                        (int(days),),
+                    )
+                    daily_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE TRIM(COALESCE(question_text, '')) != ''
+                        GROUP BY LOWER(TRIM(question_text))
+                        ORDER BY count DESC
+                        LIMIT %s
+                        """,
+                        (int(top_n),),
+                    )
+                    top_questions_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT COALESCE(NULLIF(TRIM(error_type), ''), 'unknown') AS error_type, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE success = 0
+                        GROUP BY error_type
+                        ORDER BY count DESC
+                        LIMIT 8
+                        """
+                    )
+                    error_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT created_at, channel, error_type, question_text, latency_ms
+                        FROM interaction_events
+                        WHERE success = 0
+                        ORDER BY created_at DESC
+                        LIMIT 12
+                        """
+                    )
+                    recent_incidents_rows = cur.fetchall()
+                else:
+                    cur.execute(
+                        """
+                        SELECT channel, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                        GROUP BY channel
+                        ORDER BY count DESC
+                        """,
+                        (day_window,),
+                    )
+                    channel_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT source_language, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                          AND TRIM(COALESCE(source_language, '')) != ''
+                        GROUP BY source_language
+                        ORDER BY count DESC
+                        LIMIT 10
+                        """,
+                        (day_window,),
+                    )
+                    language_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT CAST(created_at AS DATE) AS day, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                        GROUP BY day
+                        ORDER BY day
+                        """,
+                        (day_window,),
+                    )
+                    daily_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                          AND TRIM(COALESCE(question_text, '')) != ''
+                        GROUP BY LOWER(TRIM(question_text))
+                        ORDER BY count DESC
+                        LIMIT %s
+                        """,
+                        (day_window, int(top_n)),
+                    )
+                    top_questions_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT COALESCE(NULLIF(TRIM(error_type), ''), 'unknown') AS error_type, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                          AND success = 0
+                        GROUP BY error_type
+                        ORDER BY count DESC
+                        LIMIT 8
+                        """,
+                        (day_window,),
+                    )
+                    error_rows = cur.fetchall()
+
+                    cur.execute(
+                        """
+                        SELECT created_at, channel, error_type, question_text, latency_ms
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                          AND success = 0
+                        ORDER BY created_at DESC
+                        LIMIT 12
+                        """,
+                        (day_window,),
+                    )
+                    recent_incidents_rows = cur.fetchall()
+
+                if use_historical_hour_window:
+                    cur.execute(
+                        """
+                        SELECT hour, count FROM (
+                            SELECT to_char(created_at, 'YYYY-MM-DD HH24:00') AS hour, COUNT(*) AS count
+                            FROM interaction_events
+                            GROUP BY hour
+                            ORDER BY hour DESC
+                            LIMIT %s
+                        ) t ORDER BY hour
+                        """,
+                        (int(hours),),
+                    )
+                    hourly_rows = cur.fetchall()
+                else:
+                    cur.execute(
+                        """
+                        SELECT to_char(created_at, 'YYYY-MM-DD HH24:00') AS hour, COUNT(*) AS count
+                        FROM interaction_events
+                        WHERE created_at >= NOW() - INTERVAL %s
+                        GROUP BY hour
+                        ORDER BY hour
+                        """,
+                        (hour_window,),
+                    )
+                    hourly_rows = cur.fetchall()
+
+                cur.execute(
+                    "SELECT COUNT(*) AS interactions_15m FROM interaction_events WHERE created_at >= NOW() - INTERVAL '15 minutes'"
+                )
+                pulse_row = cur.fetchone()
+
+            interactions_24h = int(window_row["interactions"] or 0)
+            success_24h = int(window_row["success_count"] or 0)
+            fallback_24h = int(window_row["fallback_count"] or 0)
+            active_users_24h = int(window_row["active_users"] or 0)
+            avg_answer_len_24h = round(float(window_row["avg_answer_len"] or 0.0), 1)
+
+            return {
+                "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                "time_windows": {
+                    "daily_mode": "historical_last_14_active_days"
+                    if use_historical_day_window
+                    else "recent_14d",
+                    "hourly_mode": "historical_last_24_active_hours"
+                    if use_historical_hour_window
+                    else "recent_24h",
+                },
+                "kpis": {
+                    "total_interactions": int(total_interactions or 0),
+                    "interactions_24h": interactions_24h,
+                    "active_users_24h": active_users_24h,
+                    "success_rate_24h": _safe_pct(success_24h, interactions_24h),
+                    "fallback_rate_24h": _safe_pct(fallback_24h, interactions_24h),
+                    "avg_answer_len_24h": avg_answer_len_24h,
+                    "median_latency_ms_24h": _percentile(latencies, 0.50),
+                    "p95_latency_ms_24h": _percentile(latencies, 0.95),
+                    "events_per_min_15m": round((int(pulse_row["interactions_15m"] or 0) / 15.0), 2),
+                },
+                "channels": [
+                    {"channel": row["channel"], "count": int(row["count"] or 0)}
+                    for row in channel_rows
+                ],
+                "languages": [
+                    {"language": row["source_language"], "count": int(row["count"] or 0)}
+                    for row in language_rows
+                ],
+                "daily_volume": [
+                    {"day": row["day"], "count": int(row["count"] or 0)}
+                    for row in daily_rows
+                ],
+                "hourly_volume": [
+                    {"hour": row["hour"], "count": int(row["count"] or 0)}
+                    for row in hourly_rows
+                ],
+                "top_questions": [
+                    {
+                        "question": (row["question"] or "(empty)")[:120],
+                        "count": int(row["count"] or 0),
+                    }
+                    for row in top_questions_rows
+                ],
+                "error_breakdown": [
+                    {"error_type": row["error_type"], "count": int(row["count"] or 0)}
+                    for row in error_rows
+                ],
+                "recent_incidents": [
+                    {
+                        "created_at": row["created_at"],
+                        "channel": row["channel"],
+                        "error_type": row["error_type"] or "unknown",
+                        "question": (row["question_text"] or "")[:120],
+                        "latency_ms": round(float(row["latency_ms"] or 0.0), 1),
+                    }
+                    for row in recent_incidents_rows
+                ],
+            }
+        finally:
+            pg_conn.close()
+
     day_window = f"-{int(days)} days"
     hour_window = f"-{int(hours)} hours"
 
