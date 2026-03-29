@@ -16,9 +16,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from web.db import (
     init_db, create_user, verify_user, get_user_by_id,
     save_chat, get_user_chats,
-    get_total_users, get_total_chats, get_frequent_questions,
-    get_recent_chats, get_chats_per_day, get_avg_answer_length,
     create_data_deletion_request,
+    record_interaction, get_dashboard_metrics_snapshot,
 )
 from rag.sunbird import SunbirdClient, SunbirdError
 from web.whatsapp_meta import (
@@ -151,6 +150,11 @@ def should_process_whatsapp_message(message_id: str) -> bool:
 
     _processed_whatsapp_message_ids[message_id] = now
     return True
+
+
+def is_fallback_response(answer: str) -> bool:
+    fallback_prefix = "i'm not fully confident in the answer based on the available documents"
+    return (answer or "").strip().lower().startswith(fallback_prefix)
 
 
 def get_pipeline():
@@ -330,6 +334,7 @@ def chat():
 @app.route("/api/ask", methods=["POST"])
 @login_required
 def api_ask():
+    request_started = time.perf_counter()
     data = request.get_json(silent=True) or {}
     original_question = (data.get("question") or "").strip()
     if not original_question:
@@ -353,7 +358,7 @@ def api_ask():
                         retrieval_question = translated_text
                 except SunbirdError:
                     app.logger.exception("Sunbird translation failed for inbound question (explicit lang)")
-            elif explicit_language: # Route all unsupported explicit languages through LLM
+            elif explicit_language:
                 source_language = explicit_language
                 from rag.generator import llm_translate
                 translated_text = llm_translate(original_question, "English")
@@ -371,7 +376,7 @@ def api_ask():
                         if translated_text:
                             retrieval_question = translated_text
                             source_language = translated_source
-                    else: # Route all other detected languages through LLM fallback
+                    else:
                         from rag.generator import llm_translate
                         translated_text = llm_translate(original_question, "English")
                         if translated_text:
@@ -380,10 +385,29 @@ def api_ask():
             except SunbirdError:
                 app.logger.exception("Sunbird language detection/translation failed for inbound question")
 
+    translated_inbound = retrieval_question.strip().lower() != original_question.strip().lower()
+
     try:
         answer = build_answer(retrieval_question)
     except Exception:
         app.logger.exception("Failed to generate answer for question")
+        latency_ms = round((time.perf_counter() - request_started) * 1000.0, 2)
+        try:
+            record_interaction(
+                channel="web",
+                user_ref=f"user:{current_user.id}",
+                question_text=original_question,
+                answer_text="",
+                source_language=source_language,
+                translated_inbound=translated_inbound,
+                translated_outbound=False,
+                success=False,
+                fallback_used=False,
+                latency_ms=latency_ms,
+                error_type="generation_error",
+            )
+        except Exception:
+            app.logger.exception("Failed to persist web interaction analytics")
         return jsonify({"error": "Could not generate an answer right now. Please try again."}), 503
 
     final_answer = answer
@@ -402,7 +426,7 @@ def api_ask():
                 translated_text = llm_translate(answer, target)
                 if translated_text:
                     final_answer = translated_text
-        else: # Route all other languages through LLM translation
+        else:
             from rag.generator import llm_translate
             lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole", "keo": "Kakwa"}
             target = lang_map.get(source_language, source_language)
@@ -410,13 +434,33 @@ def api_ask():
             if translated_text:
                 final_answer = translated_text
 
+    translated_outbound = final_answer != answer
+    fallback_used = is_fallback_response(answer)
+
     try:
         save_chat(current_user.id, original_question, final_answer)
     except Exception:
         app.logger.exception("Failed to persist chat history")
+
+    latency_ms = round((time.perf_counter() - request_started) * 1000.0, 2)
+    try:
+        record_interaction(
+            channel="web",
+            user_ref=f"user:{current_user.id}",
+            question_text=original_question,
+            answer_text=final_answer,
+            source_language=source_language,
+            translated_inbound=translated_inbound,
+            translated_outbound=translated_outbound,
+            success=True,
+            fallback_used=fallback_used,
+            latency_ms=latency_ms,
+            error_type="",
+        )
+    except Exception:
+        app.logger.exception("Failed to persist web interaction analytics")
+
     return jsonify({"answer": final_answer, "language": source_language})
-
-
 @app.route("/api/campus-info")
 def campus_info():
     """Return events and clubs data for the web slider / WhatsApp."""
@@ -592,7 +636,16 @@ def meta_whatsapp_webhook_receive():
             except Exception:
                 app.logger.exception("Failed to send WhatsApp interactive list")
 
-        answer = build_whatsapp_answer(question)
+        message_started = time.perf_counter()
+        answer_generation_failed = False
+        try:
+            answer = build_whatsapp_answer(question)
+        except Exception:
+            app.logger.exception("Failed to generate WhatsApp answer")
+            from rag.fallback import build_fallback_response
+
+            answer = build_fallback_response(question)
+            answer_generation_failed = True
 
         try:
             status_code, provider_response = send_whatsapp_text(recipient, answer)
@@ -600,12 +653,36 @@ def meta_whatsapp_webhook_receive():
             app.logger.exception("Failed to send WhatsApp answer")
             status_code, provider_response = 502, {"error": "Failed to send WhatsApp message"}
 
+        delivery_ok = 200 <= status_code < 300
+        error_type = ""
+        if answer_generation_failed:
+            error_type = "generation_error"
+        if not delivery_ok:
+            error_type = f"{error_type};delivery_failed" if error_type else "delivery_failed"
+
+        latency_ms = round((time.perf_counter() - message_started) * 1000.0, 2)
+        try:
+            record_interaction(
+                channel="whatsapp_meta",
+                user_ref=recipient,
+                question_text=question,
+                answer_text=answer,
+                source_language="eng",
+                translated_inbound=False,
+                translated_outbound=False,
+                success=(delivery_ok and not answer_generation_failed),
+                fallback_used=is_fallback_response(answer),
+                latency_ms=latency_ms,
+                error_type=error_type,
+            )
+        except Exception:
+            app.logger.exception("Failed to persist WhatsApp interaction analytics")
         processed.append(
             {
                 "id": message_id,
                 "to": recipient,
                 "status_code": status_code,
-                "ok": 200 <= status_code < 300,
+                "ok": delivery_ok,
                 "provider": provider_response,
             }
         )
@@ -621,15 +698,23 @@ def dashboard():
     if current_user.role != "admin":
         flash("Access denied.", "error")
         return redirect(url_for("chat"))
-    stats = {
-        "total_users": get_total_users(),
-        "total_chats": get_total_chats(),
-        "avg_answer_len": get_avg_answer_length(),
-        "faq": get_frequent_questions(10),
-        "recent": get_recent_chats(20),
-        "daily": get_chats_per_day(14),
-    }
-    return render_template("dashboard.html", stats=stats)
+
+    metrics = get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8)
+    return render_template("dashboard.html", metrics=metrics)
+
+
+@app.route("/api/dashboard/metrics")
+@login_required
+def dashboard_metrics():
+    if current_user.role != "admin":
+        return jsonify({"error": "Access denied."}), 403
+
+    try:
+        metrics = get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8)
+        return jsonify(metrics)
+    except Exception:
+        app.logger.exception("Failed to load dashboard metrics")
+        return jsonify({"error": "Could not load dashboard metrics right now."}), 503
 
 
 if __name__ == "__main__":
