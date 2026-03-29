@@ -13,6 +13,16 @@ services:
         value: 3.11.11
       - key: FLASK_SECRET_KEY
         generateValue: true
+      - key: GAMMA_DB_PATH
+        value: /var/data/gamma.db
+      - key: GAMMA_USERS_BACKUP_PATH
+        value: /var/data/users_backup.json
+      - key: GAMMA_LEGACY_DB_PATHS
+        value: data/gamma.db
+      - key: GAMMA_BOOTSTRAP_ADMIN_USERNAME
+        sync: false
+      - key: GAMMA_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
       - key: PUBLIC_BASE_URL
         sync: false
       - key: DATABASE_URL

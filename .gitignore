@@ -9,3 +9,5 @@ data/chroma/
 .env.*
 data/gamma.db
 data/gamma.db-*
+data/users_backup.json
+data/users_backup.json.tmp

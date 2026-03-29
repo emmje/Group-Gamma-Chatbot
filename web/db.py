@@ -1,80 +1,649 @@
 """SQLite database for users, chat history, and analytics."""
 
+import json
 import math
+import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from werkzeug.security import generate_password_hash, check_password_hash
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "gamma.db"
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+except Exception:
+    psycopg = None
+    dict_row = None
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def _resolve_storage_path(env_key, default_path):
+    configured = (os.getenv(env_key) or "").strip()
+    if not configured:
+        return default_path
+
+    candidate = Path(configured).expanduser()
+    if not candidate.is_absolute():
+        candidate = ROOT_DIR / candidate
+
+    resolved = candidate.resolve()
+    try:
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        return resolved
+    except OSError:
+        return default_path
+
+
+DEFAULT_DB_PATH = (ROOT_DIR / "data" / "gamma.db").resolve()
+DB_PATH = _resolve_storage_path("GAMMA_DB_PATH", DEFAULT_DB_PATH)
+
+DEFAULT_USERS_BACKUP_PATH = DB_PATH.with_name("users_backup.json")
+USERS_BACKUP_PATH = _resolve_storage_path("GAMMA_USERS_BACKUP_PATH", DEFAULT_USERS_BACKUP_PATH)
+AUTH_DATABASE_URL = (os.getenv("DATABASE_URL") or "").strip()
+
+FALLBACK_RESPONSE_PREFIX = "i'm not fully confident in the answer based on the available documents"
+
+
+def _external_auth_enabled():
+    return bool(AUTH_DATABASE_URL and psycopg is not None)
+
+
+def _get_postgres_auth_conn():
+    if not _external_auth_enabled():
+        return None
+
+    connect_kwargs = {"row_factory": dict_row}
+
+    explicit_sslmode = (os.getenv("DATABASE_SSLMODE") or "").strip()
+    if explicit_sslmode:
+        connect_kwargs["sslmode"] = explicit_sslmode
+    elif "sslmode=" not in AUTH_DATABASE_URL.lower():
+        connect_kwargs["sslmode"] = "require"
+
+    connect_timeout = (os.getenv("DATABASE_CONNECT_TIMEOUT_SECONDS") or "").strip()
+    if connect_timeout:
+        try:
+            connect_kwargs["connect_timeout"] = max(1, int(connect_timeout))
+        except ValueError:
+            pass
+
+    return psycopg.connect(AUTH_DATABASE_URL, **connect_kwargs)
+
+
+def _load_legacy_db_paths():
+    paths = []
+
+    configured = (os.getenv("GAMMA_LEGACY_DB_PATHS") or "").strip()
+    if configured:
+        for raw in configured.split(","):
+            candidate = raw.strip()
+            if not candidate:
+                continue
+            path = Path(candidate).expanduser()
+            if not path.is_absolute():
+                path = ROOT_DIR / path
+            paths.append(path.resolve())
+
+    # Keep the historical default path as a migration source.
+    paths.append(DEFAULT_DB_PATH)
+
+    unique = []
+    target = DB_PATH.resolve()
+    for path in paths:
+        resolved = path.resolve()
+        if resolved == target:
+            continue
+        if resolved in unique:
+            continue
+        unique.append(resolved)
+    return unique
+
+
+LEGACY_DB_PATHS = _load_legacy_db_paths()
 
 
 def get_conn():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     return conn
 
 
-def init_db():
-    conn = get_conn()
-    conn.executescript("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            role TEXT NOT NULL DEFAULT 'student',
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-        CREATE TABLE IF NOT EXISTS chats (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            question TEXT NOT NULL,
-            answer TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        );
-        CREATE TABLE IF NOT EXISTS data_deletion_requests (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
-            contact_email TEXT NOT NULL,
-            whatsapp_number TEXT,
-            details TEXT,
-            status TEXT NOT NULL DEFAULT 'pending',
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-        CREATE TABLE IF NOT EXISTS interaction_events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            channel TEXT NOT NULL,
-            user_ref TEXT,
-            question_text TEXT,
-            answer_text TEXT,
-            source_language TEXT NOT NULL DEFAULT 'eng',
-            translated_inbound INTEGER NOT NULL DEFAULT 0,
-            translated_outbound INTEGER NOT NULL DEFAULT 0,
-            success INTEGER NOT NULL DEFAULT 1,
-            fallback_used INTEGER NOT NULL DEFAULT 0,
-            latency_ms REAL,
-            error_type TEXT,
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-        CREATE INDEX IF NOT EXISTS idx_interaction_events_created_at
-            ON interaction_events(created_at);
-        CREATE INDEX IF NOT EXISTS idx_interaction_events_channel_created
-            ON interaction_events(channel, created_at);
-        CREATE INDEX IF NOT EXISTS idx_interaction_events_success_created
-            ON interaction_events(success, created_at);
-    """)
-    conn.commit()
-    conn.close()
+def _users_table_exists(conn):
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'users'"
+    ).fetchone()
+    return row is not None
 
 
-def create_user(username, password, role="student"):
+def _normalize_role(role):
+    normalized_role = (role or "student").strip().lower()
+    if normalized_role not in {"student", "admin"}:
+        return "student"
+    return normalized_role
+
+
+def _normalize_user_record(username, password_hash, role, created_at):
+    normalized_username = (username or "").strip()
+    normalized_hash = (password_hash or "").strip()
+    if not normalized_username or not normalized_hash:
+        return None
+
+    normalized_role = _normalize_role(role)
+
+    normalized_created_at = (created_at or "").strip() or datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+    return {
+        "username": normalized_username,
+        "password_hash": normalized_hash,
+        "role": normalized_role,
+        "created_at": normalized_created_at,
+    }
+
+
+def _insert_missing_users(conn, user_rows):
+    inserted = 0
+    for row in user_rows:
+        record = _normalize_user_record(
+            row.get("username"),
+            row.get("password_hash"),
+            row.get("role"),
+            row.get("created_at"),
+        )
+        if record is None:
+            continue
+
+        exists = conn.execute(
+            "SELECT id FROM users WHERE LOWER(username) = LOWER(?)",
+            (record["username"],),
+        ).fetchone()
+        if exists:
+            continue
+
+        conn.execute(
+            """
+            INSERT INTO users (username, password_hash, role, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                record["username"],
+                record["password_hash"],
+                record["role"],
+                record["created_at"],
+            ),
+        )
+        inserted += 1
+    return inserted
+
+
+def _ensure_postgres_auth_schema(pg_conn):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS auth_users (
+                id BIGSERIAL PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'student',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+            """
+        )
+        cur.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_auth_users_username_lower
+                ON auth_users(LOWER(username))
+            """
+        )
+
+
+def _insert_missing_users_postgres(pg_conn, user_rows):
+    inserted = 0
+    with pg_conn.cursor() as cur:
+        for row in user_rows:
+            record = _normalize_user_record(
+                row.get("username"),
+                row.get("password_hash"),
+                row.get("role"),
+                row.get("created_at"),
+            )
+            if record is None:
+                continue
+
+            cur.execute(
+                "SELECT id FROM auth_users WHERE LOWER(username) = LOWER(%s)",
+                (record["username"],),
+            )
+            if cur.fetchone() is not None:
+                continue
+
+            cur.execute(
+                """
+                INSERT INTO auth_users (username, password_hash, role, created_at)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    record["username"],
+                    record["password_hash"],
+                    record["role"],
+                    record["created_at"],
+                ),
+            )
+            inserted += 1
+    return inserted
+
+
+def _load_all_users_from_postgres(pg_conn):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, username, password_hash, role, created_at
+            FROM auth_users
+            ORDER BY id ASC
+            """
+        )
+        return cur.fetchall()
+
+
+def _load_users_from_backup():
+    if not USERS_BACKUP_PATH.exists():
+        return []
+
+    try:
+        payload = json.loads(USERS_BACKUP_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    if isinstance(payload, dict):
+        users = payload.get("users") or []
+    elif isinstance(payload, list):
+        users = payload
+    else:
+        return []
+
+    records = []
+    for item in users:
+        if not isinstance(item, dict):
+            continue
+        record = _normalize_user_record(
+            item.get("username"),
+            item.get("password_hash"),
+            item.get("role"),
+            item.get("created_at"),
+        )
+        if record is not None:
+            records.append(record)
+    return records
+
+
+def _restore_users_from_backup(conn):
+    records = _load_users_from_backup()
+    if not records:
+        return 0
+    return _insert_missing_users(conn, records)
+
+
+def _restore_users_from_backup_postgres(pg_conn):
+    records = _load_users_from_backup()
+    if not records:
+        return 0
+    return _insert_missing_users_postgres(pg_conn, records)
+
+
+def _collect_users_from_legacy_dbs():
+    collected = []
+    for path in LEGACY_DB_PATHS:
+        if not path.exists():
+            continue
+
+        source_conn = None
+        try:
+            source_conn = sqlite3.connect(str(path))
+            source_conn.row_factory = sqlite3.Row
+
+            if not _users_table_exists(source_conn):
+                continue
+
+            rows = source_conn.execute(
+                """
+                SELECT
+                    username,
+                    password_hash,
+                    COALESCE(role, 'student') AS role,
+                    COALESCE(created_at, datetime('now')) AS created_at
+                FROM users
+                """
+            ).fetchall()
+
+            collected.extend(
+                [
+                    {
+                        "username": row["username"],
+                        "password_hash": row["password_hash"],
+                        "role": row["role"],
+                        "created_at": row["created_at"],
+                    }
+                    for row in rows
+                ]
+            )
+        except Exception:
+            continue
+        finally:
+            if source_conn is not None:
+                source_conn.close()
+
+    return collected
+
+
+def _migrate_users_from_legacy_dbs(conn):
+    records = _collect_users_from_legacy_dbs()
+    if not records:
+        return 0
+    return _insert_missing_users(conn, records)
+
+
+def _migrate_users_from_legacy_dbs_postgres(pg_conn):
+    records = _collect_users_from_legacy_dbs()
+    if not records:
+        return 0
+    return _insert_missing_users_postgres(pg_conn, records)
+
+
+def _serialize_created_at(value):
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+    return str(value or "")
+
+
+def _write_users_backup(rows):
+    payload = {
+        "updated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "users": [
+            {
+                "id": int(row["id"]),
+                "username": row["username"],
+                "password_hash": row["password_hash"],
+                "role": row["role"],
+                "created_at": _serialize_created_at(row.get("created_at")),
+            }
+            for row in rows
+        ],
+    }
+
+    try:
+        USERS_BACKUP_PATH.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = USERS_BACKUP_PATH.with_suffix(USERS_BACKUP_PATH.suffix + ".tmp")
+        temp_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        temp_path.replace(USERS_BACKUP_PATH)
+    except Exception:
+        # Backup sync failures should not block the app from serving traffic.
+        return
+
+
+def _sync_users_backup_from_conn(conn):
+    if not _users_table_exists(conn):
+        return
+
+    rows = conn.execute(
+        """
+        SELECT id, username, password_hash, role, created_at
+        FROM users
+        ORDER BY id ASC
+        """
+    ).fetchall()
+
+    normalized_rows = [
+        {
+            "id": int(row["id"]),
+            "username": row["username"],
+            "password_hash": row["password_hash"],
+            "role": row["role"],
+            "created_at": row["created_at"],
+        }
+        for row in rows
+    ]
+    _write_users_backup(normalized_rows)
+
+
+def _sync_users_backup_from_postgres(pg_conn):
+    rows = _load_all_users_from_postgres(pg_conn)
+    normalized_rows = [
+        {
+            "id": int(row["id"]),
+            "username": row["username"],
+            "password_hash": row["password_hash"],
+            "role": row["role"],
+            "created_at": row.get("created_at"),
+        }
+        for row in rows
+    ]
+    _write_users_backup(normalized_rows)
+
+
+def _bootstrap_admin_credentials():
+    username = (os.getenv("GAMMA_BOOTSTRAP_ADMIN_USERNAME") or "").strip()
+    password = os.getenv("GAMMA_BOOTSTRAP_ADMIN_PASSWORD") or ""
+    if not username or not password:
+        return None
+    return username, password
+
+
+def _sync_users_backup():
+    if _external_auth_enabled():
+        pg_conn = None
+        try:
+            pg_conn = _get_postgres_auth_conn()
+            _ensure_postgres_auth_schema(pg_conn)
+            _sync_users_backup_from_postgres(pg_conn)
+            return
+        except Exception:
+            pass
+        finally:
+            if pg_conn is not None:
+                pg_conn.close()
+
+    conn = None
+    try:
+        conn = get_conn()
+        _sync_users_backup_from_conn(conn)
+    except Exception:
+        return
+    finally:
+        if conn is not None:
+            conn.close()
+
+
+def _bootstrap_admin_from_env(conn):
+    credentials = _bootstrap_admin_credentials()
+    if credentials is None:
+        return False
+    username, password = credentials
+
+    exists = conn.execute(
+        "SELECT id FROM users WHERE LOWER(username) = LOWER(?)",
+        (username,),
+    ).fetchone()
+    if exists:
+        return False
+
+    conn.execute(
+        """
+        INSERT INTO users (username, password_hash, role)
+        VALUES (?, ?, 'admin')
+        """,
+        (username, generate_password_hash(password)),
+    )
+    return True
+
+
+def _bootstrap_admin_from_env_postgres(pg_conn):
+    credentials = _bootstrap_admin_credentials()
+    if credentials is None:
+        return False
+    username, password = credentials
+
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            "SELECT id FROM auth_users WHERE LOWER(username) = LOWER(%s)",
+            (username,),
+        )
+        if cur.fetchone() is not None:
+            return False
+
+        cur.execute(
+            """
+            INSERT INTO auth_users (username, password_hash, role)
+            VALUES (%s, %s, 'admin')
+            """,
+            (username, generate_password_hash(password)),
+        )
+    return True
+
+def _table_columns(conn, table_name):
+    return {
+        row["name"]
+        for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+    }
+
+
+def _ensure_interaction_events_schema(conn):
+    columns = _table_columns(conn, "interaction_events")
+    if "legacy_chat_id" not in columns:
+        conn.execute("ALTER TABLE interaction_events ADD COLUMN legacy_chat_id INTEGER")
+
+    conn.execute(
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_interaction_events_legacy_chat_id
+            ON interaction_events(legacy_chat_id)
+            WHERE legacy_chat_id IS NOT NULL
+        """
+    )
+
+
+def _backfill_interaction_events_from_chats(conn):
+    # Pull legacy web chats into interaction_events so dashboard analytics include historical data.
+    conn.execute(
+        """
+        INSERT INTO interaction_events (
+            legacy_chat_id,
+            channel,
+            user_ref,
+            question_text,
+            answer_text,
+            source_language,
+            translated_inbound,
+            translated_outbound,
+            success,
+            fallback_used,
+            latency_ms,
+            error_type,
+            created_at
+        )
+        SELECT
+            c.id,
+            'web_legacy',
+            'user:' || c.user_id,
+            c.question,
+            c.answer,
+            'eng',
+            0,
+            0,
+            1,
+            CASE
+                WHEN LOWER(TRIM(COALESCE(c.answer, ''))) LIKE ? THEN 1
+                ELSE 0
+            END,
+            NULL,
+            '',
+            c.created_at
+        FROM chats c
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM interaction_events e
+            WHERE e.legacy_chat_id = c.id
+               OR (
+                    TRIM(COALESCE(e.question_text, '')) = TRIM(COALESCE(c.question, ''))
+                AND TRIM(COALESCE(e.answer_text, '')) = TRIM(COALESCE(c.answer, ''))
+                AND TRIM(COALESCE(e.user_ref, '')) = ('user:' || c.user_id)
+                AND ABS(strftime('%s', COALESCE(e.created_at, c.created_at)) - strftime('%s', c.created_at)) <= 120
+               )
+        )
+        """,
+        (f"{FALLBACK_RESPONSE_PREFIX}%",),
+    )
+
+
+def _candidate_passwords(password):
+    raw_password = password or ""
+    candidates = [raw_password]
+    stripped_password = raw_password.strip()
+    if stripped_password != raw_password:
+        candidates.append(stripped_password)
+    return candidates
+
+
+def _sqlite_rows_for_user_migration(conn):
+    rows = conn.execute(
+        """
+        SELECT username, password_hash, role, created_at
+        FROM users
+        """
+    ).fetchall()
+    return [
+        {
+            "username": row["username"],
+            "password_hash": row["password_hash"],
+            "role": row["role"],
+            "created_at": row["created_at"],
+        }
+        for row in rows
+    ]
+
+
+def _lookup_postgres_user_by_username(pg_conn, normalized_username):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, username, password_hash, role, created_at
+            FROM auth_users
+            WHERE username = %s
+            """,
+            (normalized_username,),
+        )
+        row = cur.fetchone()
+        if row is not None:
+            return row
+
+        cur.execute(
+            """
+            SELECT id, username, password_hash, role, created_at
+            FROM auth_users
+            WHERE LOWER(username) = LOWER(%s)
+            ORDER BY id ASC
+            """,
+            (normalized_username,),
+        )
+        rows = cur.fetchall()
+        if len(rows) == 1:
+            return rows[0]
+        return None
+
+
+def _create_user_sqlite(normalized_username, normalized_password, normalized_role):
     conn = get_conn()
     try:
+        existing = conn.execute(
+            "SELECT id FROM users WHERE LOWER(username) = LOWER(?)",
+            (normalized_username,),
+        ).fetchone()
+        if existing:
+            return None
+
         cur = conn.execute(
             "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
-            (username, generate_password_hash(password), role),
+            (normalized_username, generate_password_hash(normalized_password), normalized_role),
         )
         conn.commit()
         return cur.lastrowid
@@ -84,30 +653,338 @@ def create_user(username, password, role="student"):
         conn.close()
 
 
-def verify_user(username, password):
+def _create_user_postgres(normalized_username, normalized_password, normalized_role):
+    pg_conn = _get_postgres_auth_conn()
+    try:
+        _ensure_postgres_auth_schema(pg_conn)
+        with pg_conn.cursor() as cur:
+            cur.execute(
+                "SELECT id FROM auth_users WHERE LOWER(username) = LOWER(%s)",
+                (normalized_username,),
+            )
+            if cur.fetchone() is not None:
+                return None
+
+            cur.execute(
+                """
+                INSERT INTO auth_users (username, password_hash, role)
+                VALUES (%s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    normalized_username,
+                    generate_password_hash(normalized_password),
+                    normalized_role,
+                ),
+            )
+            inserted = cur.fetchone()
+
+        pg_conn.commit()
+        _sync_users_backup_from_postgres(pg_conn)
+        return int(inserted["id"]) if inserted else None
+    except Exception:
+        pg_conn.rollback()
+        raise
+    finally:
+        pg_conn.close()
+
+
+def _sync_single_user_to_postgres(user_record):
+    if not _external_auth_enabled() or not user_record:
+        return False
+
+    normalized = _normalize_user_record(
+        user_record.get("username"),
+        user_record.get("password_hash"),
+        user_record.get("role"),
+        user_record.get("created_at"),
+    )
+    if normalized is None:
+        return False
+
+    pg_conn = _get_postgres_auth_conn()
+    try:
+        _ensure_postgres_auth_schema(pg_conn)
+        inserted = _insert_missing_users_postgres(pg_conn, [normalized])
+        pg_conn.commit()
+        if inserted:
+            _sync_users_backup_from_postgres(pg_conn)
+        return inserted > 0
+    except Exception:
+        pg_conn.rollback()
+        return False
+    finally:
+        pg_conn.close()
+
+
+def _verify_user_sqlite(normalized_username, password):
     conn = get_conn()
-    row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
-    conn.close()
-    if row and check_password_hash(row["password_hash"], password):
-        return dict(row)
-    return None
+    try:
+        row = conn.execute("SELECT * FROM users WHERE username = ?", (normalized_username,)).fetchone()
+
+        if row is None:
+            matches = conn.execute(
+                "SELECT * FROM users WHERE LOWER(username) = LOWER(?)",
+                (normalized_username,),
+            ).fetchall()
+            if len(matches) == 1:
+                row = matches[0]
+
+        if row is None:
+            restored = _restore_users_from_backup(conn)
+            if restored:
+                row = conn.execute("SELECT * FROM users WHERE username = ?", (normalized_username,)).fetchone()
+                if row is None:
+                    matches = conn.execute(
+                        "SELECT * FROM users WHERE LOWER(username) = LOWER(?)",
+                        (normalized_username,),
+                    ).fetchall()
+                    if len(matches) == 1:
+                        row = matches[0]
+
+        if row is None:
+            return None
+
+        stored_hash = row["password_hash"] or ""
+        for candidate in _candidate_passwords(password):
+            try:
+                if check_password_hash(stored_hash, candidate):
+                    return dict(row)
+            except ValueError:
+                # Some legacy deployments may have plaintext values from older setups.
+                if stored_hash == candidate:
+                    conn.execute(
+                        "UPDATE users SET password_hash = ? WHERE id = ?",
+                        (generate_password_hash(candidate), row["id"]),
+                    )
+                    conn.commit()
+                    _sync_users_backup()
+                    return dict(row)
+
+        return None
+    finally:
+        conn.close()
+
+
+def _verify_user_postgres(normalized_username, password):
+    pg_conn = _get_postgres_auth_conn()
+    try:
+        _ensure_postgres_auth_schema(pg_conn)
+        row = _lookup_postgres_user_by_username(pg_conn, normalized_username)
+        if row is None:
+            return None
+
+        stored_hash = row.get("password_hash") or ""
+        for candidate in _candidate_passwords(password):
+            try:
+                if check_password_hash(stored_hash, candidate):
+                    return dict(row)
+            except ValueError:
+                if stored_hash == candidate:
+                    with pg_conn.cursor() as cur:
+                        cur.execute(
+                            "UPDATE auth_users SET password_hash = %s WHERE id = %s",
+                            (generate_password_hash(candidate), row["id"]),
+                        )
+                    pg_conn.commit()
+                    _sync_users_backup_from_postgres(pg_conn)
+                    return dict(row)
+
+        return None
+    finally:
+        pg_conn.close()
+
+
+def _get_user_by_id_sqlite(user_id):
+    conn = get_conn()
+    try:
+        row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def _get_user_by_id_postgres(user_id):
+    pg_conn = _get_postgres_auth_conn()
+    try:
+        _ensure_postgres_auth_schema(pg_conn)
+        with pg_conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, username, password_hash, role, created_at
+                FROM auth_users
+                WHERE id = %s
+                """,
+                (int(user_id),),
+            )
+            row = cur.fetchone()
+            return dict(row) if row else None
+    finally:
+        pg_conn.close()
+
+
+def init_db():
+    conn = get_conn()
+    pg_conn = None
+    using_external_auth = False
+    try:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'student',
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS chats (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                question TEXT NOT NULL,
+                answer TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
+            CREATE TABLE IF NOT EXISTS data_deletion_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                contact_email TEXT NOT NULL,
+                whatsapp_number TEXT,
+                details TEXT,
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS interaction_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                channel TEXT NOT NULL,
+                user_ref TEXT,
+                question_text TEXT,
+                answer_text TEXT,
+                source_language TEXT NOT NULL DEFAULT 'eng',
+                translated_inbound INTEGER NOT NULL DEFAULT 0,
+                translated_outbound INTEGER NOT NULL DEFAULT 0,
+                success INTEGER NOT NULL DEFAULT 1,
+                fallback_used INTEGER NOT NULL DEFAULT 0,
+                latency_ms REAL,
+                error_type TEXT,
+                legacy_chat_id INTEGER,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_users_username_nocase
+                ON users(username COLLATE NOCASE);
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_created_at
+                ON interaction_events(created_at);
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_channel_created
+                ON interaction_events(channel, created_at);
+            CREATE INDEX IF NOT EXISTS idx_interaction_events_success_created
+                ON interaction_events(success, created_at);
+        """)
+
+        _ensure_interaction_events_schema(conn)
+
+        if _external_auth_enabled():
+            try:
+                pg_conn = _get_postgres_auth_conn()
+                _ensure_postgres_auth_schema(pg_conn)
+                _restore_users_from_backup_postgres(pg_conn)
+                _insert_missing_users_postgres(pg_conn, _sqlite_rows_for_user_migration(conn))
+                _migrate_users_from_legacy_dbs_postgres(pg_conn)
+                _bootstrap_admin_from_env_postgres(pg_conn)
+                pg_conn.commit()
+                using_external_auth = True
+            except Exception:
+                if pg_conn is not None:
+                    pg_conn.rollback()
+                    pg_conn.close()
+                    pg_conn = None
+
+        if not using_external_auth:
+            _restore_users_from_backup(conn)
+            _migrate_users_from_legacy_dbs(conn)
+            _bootstrap_admin_from_env(conn)
+
+        _backfill_interaction_events_from_chats(conn)
+
+        conn.commit()
+        if using_external_auth and pg_conn is not None:
+            _sync_users_backup_from_postgres(pg_conn)
+        else:
+            _sync_users_backup_from_conn(conn)
+    finally:
+        conn.close()
+        if pg_conn is not None:
+            pg_conn.close()
+
+
+def create_user(username, password, role="student"):
+    normalized_username = (username or "").strip()
+    normalized_password = password or ""
+    normalized_role = _normalize_role(role)
+    if not normalized_username or not normalized_password:
+        return None
+
+    if _external_auth_enabled():
+        try:
+            return _create_user_postgres(normalized_username, normalized_password, normalized_role)
+        except Exception:
+            pass
+
+    user_id = _create_user_sqlite(normalized_username, normalized_password, normalized_role)
+    _sync_users_backup()
+    return user_id
+
+
+def verify_user(username, password):
+    normalized_username = (username or "").strip()
+    if not normalized_username:
+        return None
+
+    if _external_auth_enabled():
+        postgres_user = None
+        try:
+            postgres_user = _verify_user_postgres(normalized_username, password)
+            if postgres_user is not None:
+                return postgres_user
+        except Exception:
+            pass
+
+        sqlite_user = _verify_user_sqlite(normalized_username, password)
+        if sqlite_user is not None:
+            _sync_single_user_to_postgres(sqlite_user)
+            try:
+                postgres_user = _verify_user_postgres(normalized_username, password)
+                if postgres_user is not None:
+                    return postgres_user
+            except Exception:
+                pass
+            return sqlite_user
+
+        return None
+
+    return _verify_user_sqlite(normalized_username, password)
 
 
 def get_user_by_id(user_id):
-    conn = get_conn()
-    row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-    conn.close()
-    return dict(row) if row else None
+    if _external_auth_enabled():
+        try:
+            user = _get_user_by_id_postgres(user_id)
+            if user is not None:
+                return user
+        except Exception:
+            pass
+
+    return _get_user_by_id_sqlite(user_id)
 
 
 def save_chat(user_id, question, answer):
     conn = get_conn()
-    conn.execute(
+    cur = conn.execute(
         "INSERT INTO chats (user_id, question, answer) VALUES (?, ?, ?)",
         (user_id, question, answer),
     )
     conn.commit()
+    chat_id = cur.lastrowid
     conn.close()
+    return chat_id
 
 
 def get_user_chats(user_id, limit=50):
@@ -200,6 +1077,7 @@ def record_interaction(
     fallback_used=False,
     latency_ms=None,
     error_type="",
+    legacy_chat_id=None,
 ):
     q = (question_text or "").strip()
     a = (answer_text or "").strip()
@@ -212,6 +1090,7 @@ def record_interaction(
     conn.execute(
         """
         INSERT INTO interaction_events (
+            legacy_chat_id,
             channel,
             user_ref,
             question_text,
@@ -223,9 +1102,10 @@ def record_interaction(
             fallback_used,
             latency_ms,
             error_type
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
+            int(legacy_chat_id) if legacy_chat_id is not None else None,
             (channel or "unknown").strip() or "unknown",
             (user_ref or "").strip(),
             q,
@@ -274,6 +1154,27 @@ def get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8):
         "SELECT COUNT(*) FROM interaction_events"
     ).fetchone()[0]
 
+    recent_day_count = conn.execute(
+        """
+        SELECT COUNT(*)
+        FROM interaction_events
+        WHERE created_at >= datetime('now', ?)
+        """,
+        (day_window,),
+    ).fetchone()[0]
+
+    recent_hour_count = conn.execute(
+        """
+        SELECT COUNT(*)
+        FROM interaction_events
+        WHERE created_at >= datetime('now', ?)
+        """,
+        (hour_window,),
+    ).fetchone()[0]
+
+    use_historical_day_window = recent_day_count == 0 and total_interactions > 0
+    use_historical_hour_window = recent_hour_count == 0 and total_interactions > 0
+
     window_row = conn.execute(
         """
         SELECT
@@ -299,89 +1200,174 @@ def get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8):
     ).fetchall()
     latencies = [row[0] for row in latency_rows if row[0] is not None]
 
-    channel_rows = conn.execute(
-        """
-        SELECT channel, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-        GROUP BY channel
-        ORDER BY count DESC
-        """,
-        (day_window,),
-    ).fetchall()
+    if use_historical_day_window:
+        channel_rows = conn.execute(
+            """
+            SELECT channel, COUNT(*) AS count
+            FROM interaction_events
+            GROUP BY channel
+            ORDER BY count DESC
+            """
+        ).fetchall()
 
-    language_rows = conn.execute(
-        """
-        SELECT source_language, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-          AND TRIM(COALESCE(source_language, '')) != ''
-        GROUP BY source_language
-        ORDER BY count DESC
-        LIMIT 10
-        """,
-        (day_window,),
-    ).fetchall()
+        language_rows = conn.execute(
+            """
+            SELECT source_language, COUNT(*) AS count
+            FROM interaction_events
+            WHERE TRIM(COALESCE(source_language, '')) != ''
+            GROUP BY source_language
+            ORDER BY count DESC
+            LIMIT 10
+            """
+        ).fetchall()
 
-    daily_rows = conn.execute(
-        """
-        SELECT DATE(created_at) AS day, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-        GROUP BY day
-        ORDER BY day
-        """,
-        (day_window,),
-    ).fetchall()
+        daily_rows = conn.execute(
+            """
+            SELECT day, count
+            FROM (
+                SELECT DATE(created_at) AS day, COUNT(*) AS count
+                FROM interaction_events
+                GROUP BY day
+                ORDER BY day DESC
+                LIMIT ?
+            )
+            ORDER BY day
+            """,
+            (int(days),),
+        ).fetchall()
 
-    hourly_rows = conn.execute(
-        """
-        SELECT strftime('%Y-%m-%d %H:00', created_at) AS hour, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-        GROUP BY hour
-        ORDER BY hour
-        """,
-        (hour_window,),
-    ).fetchall()
+        top_questions_rows = conn.execute(
+            """
+            SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
+            FROM interaction_events
+            WHERE TRIM(COALESCE(question_text, '')) != ''
+            GROUP BY LOWER(TRIM(question_text))
+            ORDER BY count DESC
+            LIMIT ?
+            """,
+            (int(top_n),),
+        ).fetchall()
 
-    top_questions_rows = conn.execute(
-        """
-        SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-          AND TRIM(COALESCE(question_text, '')) != ''
-        GROUP BY LOWER(TRIM(question_text))
-        ORDER BY count DESC
-        LIMIT ?
-        """,
-        (day_window, int(top_n)),
-    ).fetchall()
+        error_rows = conn.execute(
+            """
+            SELECT COALESCE(NULLIF(TRIM(error_type), ''), 'unknown') AS error_type, COUNT(*) AS count
+            FROM interaction_events
+            WHERE success = 0
+            GROUP BY error_type
+            ORDER BY count DESC
+            LIMIT 8
+            """
+        ).fetchall()
 
-    error_rows = conn.execute(
-        """
-        SELECT COALESCE(NULLIF(TRIM(error_type), ''), 'unknown') AS error_type, COUNT(*) AS count
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-          AND success = 0
-        GROUP BY error_type
-        ORDER BY count DESC
-        LIMIT 8
-        """,
-        (day_window,),
-    ).fetchall()
+        recent_incidents_rows = conn.execute(
+            """
+            SELECT created_at, channel, error_type, question_text, latency_ms
+            FROM interaction_events
+            WHERE success = 0
+            ORDER BY created_at DESC
+            LIMIT 12
+            """
+        ).fetchall()
+    else:
+        channel_rows = conn.execute(
+            """
+            SELECT channel, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+            GROUP BY channel
+            ORDER BY count DESC
+            """,
+            (day_window,),
+        ).fetchall()
 
-    recent_incidents_rows = conn.execute(
-        """
-        SELECT created_at, channel, error_type, question_text, latency_ms
-        FROM interaction_events
-        WHERE created_at >= datetime('now', ?)
-          AND success = 0
-        ORDER BY created_at DESC
-        LIMIT 12
-        """,
-        (day_window,),
-    ).fetchall()
+        language_rows = conn.execute(
+            """
+            SELECT source_language, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+              AND TRIM(COALESCE(source_language, '')) != ''
+            GROUP BY source_language
+            ORDER BY count DESC
+            LIMIT 10
+            """,
+            (day_window,),
+        ).fetchall()
+
+        daily_rows = conn.execute(
+            """
+            SELECT DATE(created_at) AS day, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+            GROUP BY day
+            ORDER BY day
+            """,
+            (day_window,),
+        ).fetchall()
+
+        top_questions_rows = conn.execute(
+            """
+            SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+              AND TRIM(COALESCE(question_text, '')) != ''
+            GROUP BY LOWER(TRIM(question_text))
+            ORDER BY count DESC
+            LIMIT ?
+            """,
+            (day_window, int(top_n)),
+        ).fetchall()
+
+        error_rows = conn.execute(
+            """
+            SELECT COALESCE(NULLIF(TRIM(error_type), ''), 'unknown') AS error_type, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+              AND success = 0
+            GROUP BY error_type
+            ORDER BY count DESC
+            LIMIT 8
+            """,
+            (day_window,),
+        ).fetchall()
+
+        recent_incidents_rows = conn.execute(
+            """
+            SELECT created_at, channel, error_type, question_text, latency_ms
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+              AND success = 0
+            ORDER BY created_at DESC
+            LIMIT 12
+            """,
+            (day_window,),
+        ).fetchall()
+
+    if use_historical_hour_window:
+        hourly_rows = conn.execute(
+            """
+            SELECT hour, count
+            FROM (
+                SELECT strftime('%Y-%m-%d %H:00', created_at) AS hour, COUNT(*) AS count
+                FROM interaction_events
+                GROUP BY hour
+                ORDER BY hour DESC
+                LIMIT ?
+            )
+            ORDER BY hour
+            """,
+            (int(hours),),
+        ).fetchall()
+    else:
+        hourly_rows = conn.execute(
+            """
+            SELECT strftime('%Y-%m-%d %H:00', created_at) AS hour, COUNT(*) AS count
+            FROM interaction_events
+            WHERE created_at >= datetime('now', ?)
+            GROUP BY hour
+            ORDER BY hour
+            """,
+            (hour_window,),
+        ).fetchall()
 
     pulse_row = conn.execute(
         """
@@ -401,6 +1387,14 @@ def get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8):
 
     return {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "time_windows": {
+            "daily_mode": "historical_last_14_active_days"
+            if use_historical_day_window
+            else "recent_14d",
+            "hourly_mode": "historical_last_24_active_hours"
+            if use_historical_hour_window
+            else "recent_24h",
+        },
         "kpis": {
             "total_interactions": int(total_interactions or 0),
             "interactions_24h": interactions_24h,
