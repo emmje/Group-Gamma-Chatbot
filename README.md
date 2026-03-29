@@ -61,6 +61,7 @@ Render Free plan recommendation:
 - If your plan does not support disks, set `DATABASE_URL` to Supabase/Postgres.
 - Auth accounts (login/signup) will use Postgres as the primary store when `DATABASE_URL` is available.
 - On startup, local SQLite users and backup users are migrated into Postgres automatically.
+- Legacy Postgres `users` rows (when present) are also migrated into `auth_users` automatically.
 - If Postgres is temporarily unreachable, signup/login falls back to SQLite so the app remains usable.
 
 Public legal URLs become:

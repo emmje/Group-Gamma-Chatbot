@@ -247,6 +247,103 @@ def _load_all_users_from_postgres(pg_conn):
         return cur.fetchall()
 
 
+def _postgres_table_exists(pg_conn, table_name):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = %s
+            ) AS present
+            """,
+            (table_name,),
+        )
+        row = cur.fetchone() or {}
+        if isinstance(row, dict):
+            return bool(row.get("present"))
+        return bool(row[0])
+
+
+def _postgres_table_columns(pg_conn, table_name):
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = current_schema()
+              AND table_name = %s
+            """,
+            (table_name,),
+        )
+        rows = cur.fetchall()
+    names = set()
+    for row in rows:
+        if isinstance(row, dict):
+            names.add((row.get("column_name") or "").strip().lower())
+        else:
+            names.add((row[0] or "").strip().lower())
+    return names
+
+
+def _collect_users_from_legacy_postgres_table(pg_conn):
+    # Support environments that already store accounts in a generic Postgres "users" table.
+    if not _postgres_table_exists(pg_conn, "users"):
+        return []
+
+    columns = _postgres_table_columns(pg_conn, "users")
+    if "username" not in columns or "password_hash" not in columns:
+        return []
+
+    role_expr = "COALESCE(role, 'student')" if "role" in columns else "'student'"
+    created_expr = "COALESCE(created_at, NOW())" if "created_at" in columns else "NOW()"
+
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT
+                username,
+                password_hash,
+                {role_expr} AS role,
+                {created_expr} AS created_at
+            FROM users
+            WHERE username IS NOT NULL
+              AND password_hash IS NOT NULL
+            """
+        )
+        rows = cur.fetchall()
+
+    records = []
+    for row in rows:
+        if isinstance(row, dict):
+            records.append(
+                {
+                    "username": row.get("username"),
+                    "password_hash": row.get("password_hash"),
+                    "role": row.get("role"),
+                    "created_at": row.get("created_at"),
+                }
+            )
+        else:
+            records.append(
+                {
+                    "username": row[0],
+                    "password_hash": row[1],
+                    "role": row[2] if len(row) > 2 else "student",
+                    "created_at": row[3] if len(row) > 3 else None,
+                }
+            )
+    return records
+
+
+def _migrate_users_from_legacy_postgres_table(pg_conn):
+    records = _collect_users_from_legacy_postgres_table(pg_conn)
+    if not records:
+        return 0
+    return _insert_missing_users_postgres(pg_conn, records)
+
+
 def _load_users_from_backup():
     if not USERS_BACKUP_PATH.exists():
         return []
@@ -631,6 +728,50 @@ def _lookup_postgres_user_by_username(pg_conn, normalized_username):
         return None
 
 
+def _lookup_legacy_postgres_user_by_username(pg_conn, normalized_username):
+    columns = _postgres_table_columns(pg_conn, "users")
+    if "username" not in columns or "password_hash" not in columns:
+        return None
+
+    role_expr = "COALESCE(role, 'student')" if "role" in columns else "'student'"
+    created_expr = "COALESCE(created_at, NOW())" if "created_at" in columns else "NOW()"
+
+    with pg_conn.cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT
+                username,
+                password_hash,
+                {role_expr} AS role,
+                {created_expr} AS created_at
+            FROM users
+            WHERE username = %s
+            """,
+            (normalized_username,),
+        )
+        row = cur.fetchone()
+        if row is not None:
+            return row
+
+        cur.execute(
+            f"""
+            SELECT
+                username,
+                password_hash,
+                {role_expr} AS role,
+                {created_expr} AS created_at
+            FROM users
+            WHERE LOWER(username) = LOWER(%s)
+            ORDER BY username ASC
+            """,
+            (normalized_username,),
+        )
+        rows = cur.fetchall()
+        if len(rows) == 1:
+            return rows[0]
+        return None
+
+
 def _create_user_sqlite(normalized_username, normalized_password, normalized_role):
     conn = get_conn()
     try:
@@ -771,24 +912,61 @@ def _verify_user_postgres(normalized_username, password):
     try:
         _ensure_postgres_auth_schema(pg_conn)
         row = _lookup_postgres_user_by_username(pg_conn, normalized_username)
-        if row is None:
+        if row is not None:
+            stored_hash = row.get("password_hash") or ""
+            for candidate in _candidate_passwords(password):
+                try:
+                    if check_password_hash(stored_hash, candidate):
+                        return dict(row)
+                except ValueError:
+                    if stored_hash == candidate:
+                        with pg_conn.cursor() as cur:
+                            cur.execute(
+                                "UPDATE auth_users SET password_hash = %s WHERE id = %s",
+                                (generate_password_hash(candidate), row["id"]),
+                            )
+                        pg_conn.commit()
+                        _sync_users_backup_from_postgres(pg_conn)
+                        return dict(row)
+
+        # Legacy path: verify against a pre-existing Postgres `users` table, then migrate into auth_users.
+        if not _postgres_table_exists(pg_conn, "users"):
             return None
 
-        stored_hash = row.get("password_hash") or ""
+        legacy_row = _lookup_legacy_postgres_user_by_username(pg_conn, normalized_username)
+        if legacy_row is None:
+            return None
+
+        stored_hash = legacy_row.get("password_hash") or ""
         for candidate in _candidate_passwords(password):
+            verified = False
+            normalized_hash = stored_hash
+
             try:
-                if check_password_hash(stored_hash, candidate):
-                    return dict(row)
+                verified = check_password_hash(stored_hash, candidate)
             except ValueError:
                 if stored_hash == candidate:
-                    with pg_conn.cursor() as cur:
-                        cur.execute(
-                            "UPDATE auth_users SET password_hash = %s WHERE id = %s",
-                            (generate_password_hash(candidate), row["id"]),
-                        )
-                    pg_conn.commit()
-                    _sync_users_backup_from_postgres(pg_conn)
-                    return dict(row)
+                    verified = True
+                    normalized_hash = generate_password_hash(candidate)
+
+            if not verified:
+                continue
+
+            migration_record = {
+                "username": legacy_row.get("username"),
+                "password_hash": normalized_hash,
+                "role": legacy_row.get("role"),
+                "created_at": legacy_row.get("created_at"),
+            }
+            _insert_missing_users_postgres(pg_conn, [migration_record])
+            pg_conn.commit()
+
+            synced = _lookup_postgres_user_by_username(pg_conn, normalized_username)
+            if synced is not None:
+                _sync_users_backup_from_postgres(pg_conn)
+                return dict(synced)
+
+            return None
 
         return None
     finally:
@@ -888,6 +1066,7 @@ def init_db():
                 _restore_users_from_backup_postgres(pg_conn)
                 _insert_missing_users_postgres(pg_conn, _sqlite_rows_for_user_migration(conn))
                 _migrate_users_from_legacy_dbs_postgres(pg_conn)
+                _migrate_users_from_legacy_postgres_table(pg_conn)
                 _bootstrap_admin_from_env_postgres(pg_conn)
                 pg_conn.commit()
                 using_external_auth = True
