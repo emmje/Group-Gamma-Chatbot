@@ -270,13 +270,11 @@ def signup():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
         confirm = request.form.get("confirm", "")
-        role = request.form.get("role", "student")
+        role = "student"
         if not username or not password:
             flash("Username and password are required.", "error")
         elif password != confirm:
             flash("Passwords do not match.", "error")
-        elif role not in ("student", "admin"):
-            flash("Invalid role.", "error")
         else:
             user_id = create_user(username, password, role)
             if user_id:

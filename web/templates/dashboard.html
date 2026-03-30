@@ -32,10 +32,7 @@
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 5px;
-    background: linear-gradient(135deg, #7C3AED 0%, #E87A2D 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #7C3AED;
 }
 
 .dashboard-title p {
@@ -109,7 +106,7 @@
 .kpi-card:nth-child(2)  { border-top-color: #E87A2D; }
 .kpi-card:nth-child(3)  { border-top-color: #7C3AED; }
 .kpi-card:nth-child(4)  { border-top-color: #E87A2D; }
-.kpi-card:nth-child(5)  { border-top-color: #10B981; }
+.kpi-card:nth-child(5)  { border-top-color: #8B5CF6; }
 .kpi-card:nth-child(6)  { border-top-color: #EF4444; }
 .kpi-card:nth-child(7)  { border-top-color: #7C3AED; }
 .kpi-card:nth-child(8)  { border-top-color: #E87A2D; }
@@ -133,7 +130,7 @@
 .kpi-card:nth-child(2) .kpi-value { color: #E87A2D; }
 .kpi-card:nth-child(3) .kpi-value { color: #6D28D9; }
 .kpi-card:nth-child(4) .kpi-value { color: #C96A20; }
-.kpi-card:nth-child(5) .kpi-value { color: #059669; }
+.kpi-card:nth-child(5) .kpi-value { color: #8B5CF6; }
 .kpi-card:nth-child(6) .kpi-value { color: #DC2626; }
 .kpi-card:nth-child(7) .kpi-value { color: #7C3AED; }
 .kpi-card:nth-child(8) .kpi-value { color: #E87A2D; }
@@ -192,9 +189,9 @@
 
 .ph-purple { background: var(--purple-light); color: var(--purple); }
 .ph-orange { background: var(--orange-light); color: var(--orange); }
-.ph-green  { background: #DCFCE7; color: #16A34A; }
+.ph-green  { background: var(--purple-light); color: var(--purple); }
 .ph-red    { background: #FEE2E2; color: #DC2626; }
-.ph-blue   { background: #EFF6FF; color: #2563EB; }
+.ph-blue   { background: var(--orange-light); color: var(--orange); }
 
 .panel-subtitle {
     margin-top: 0;
@@ -240,7 +237,7 @@ canvas { width: 100% !important; }
 .success-fill  { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
 .fallback-fill { background: linear-gradient(90deg, #E87A2D, #FBB966); }
 .error-fill    { background: linear-gradient(90deg, #EF4444, #FCA5A5); }
-.transl-fill   { background: linear-gradient(90deg, #10B981, #6EE7B7); }
+.transl-fill   { background: linear-gradient(90deg, #E87A2D, #FBB966); }
 
 /* ── Compact bars / lists ──────────────────────────────── */
 .compact-list { display: flex; flex-direction: column; gap: 9px; }
@@ -292,7 +289,7 @@ canvas { width: 100% !important; }
 
 .badge-purple { background: var(--purple-light); color: var(--purple); }
 .badge-orange { background: var(--orange-light); color: var(--orange); }
-.badge-green  { background: #DCFCE7; color: #16A34A; }
+.badge-green  { background: var(--purple-light); color: var(--purple); }
 .badge-red    { background: #FEE2E2; color: #DC2626; }
 
 /* ── Stat rows  ────────────────────────────────────────── */
@@ -413,7 +410,7 @@ canvas { width: 100% !important; }
     <!-- Top bar -->
     <div class="dashboard-topbar">
         <div class="dashboard-title">
-            <h2>UCU Chatbot Analytics</h2>
+            <h2>Gamma Chatbot Analytics</h2>
             <p>Real-time cross-channel intelligence dashboard &mdash; 30-day operational window</p>
         </div>
         <div class="live-pill" id="livePill">
@@ -473,14 +470,14 @@ canvas { width: 100% !important; }
 
         <!-- Daily interaction volume (30d) -->
         <section class="panel span-8">
-            <h3><span class="ph-icon ph-purple">&#128200;</span> Daily Interaction Volume</h3>
+            <h3>Daily Interaction Volume</h3>
             <p class="panel-subtitle">Last 30 days &mdash; trend across all channels</p>
             <canvas id="dailyVolumeChart" class="chart-h-260"></canvas>
         </section>
 
         <!-- Cumulative growth -->
         <section class="panel span-4">
-            <h3><span class="ph-icon ph-orange">&#128640;</span> Cumulative Growth</h3>
+            <h3>Cumulative Growth</h3>
             <p class="panel-subtitle">Running total of all interactions</p>
             <canvas id="cumulativeChart" class="chart-h-260"></canvas>
         </section>
@@ -490,14 +487,14 @@ canvas { width: 100% !important; }
 
         <!-- Response quality over time (stacked bar chart) -->
         <section class="panel span-8">
-            <h3><span class="ph-icon ph-purple">&#127919;</span> Response Quality Over Time</h3>
+            <h3>Response Quality Over Time</h3>
             <p class="panel-subtitle">Daily breakdown: successful RAG answers vs fallbacks vs errors — key signal for system trust</p>
             <canvas id="qualityTrendChart" class="chart-h-260"></canvas>
         </section>
 
         <!-- Quality signals summary -->
         <section class="panel span-4">
-            <h3><span class="ph-icon ph-green">&#9989;</span> Quality Signals</h3>
+            <h3>Quality Signals</h3>
             <p class="panel-subtitle">30-day averages</p>
             <div class="quality-row">
                 <div class="quality-label"><span>Success Rate</span><strong id="qualitySuccessLabel">0%</strong></div>
@@ -532,7 +529,7 @@ canvas { width: 100% !important; }
 
         <!-- Peak-hour heatmap -->
         <section class="panel span-7">
-            <h3><span class="ph-icon ph-orange">&#128293;</span> Peak Usage Heatmap</h3>
+            <h3>Peak Usage Heatmap</h3>
             <p class="panel-subtitle">Hour-of-day × day-of-week over last 30 days &mdash; identify when users engage most to optimise infrastructure and staffing</p>
             <div class="heatmap-wrap">
                 <div id="heatmapContainer"></div>
@@ -541,7 +538,7 @@ canvas { width: 100% !important; }
 
         <!-- Channel breakdown (donut) -->
         <section class="panel span-5">
-            <h3><span class="ph-icon ph-purple">&#128241;</span> Channel Distribution</h3>
+            <h3>Channel Distribution</h3>
             <p class="panel-subtitle">Web vs WhatsApp — shows which deployment surface drives engagement</p>
             <canvas id="channelChart" class="chart-h-220"></canvas>
         </section>
@@ -551,14 +548,14 @@ canvas { width: 100% !important; }
 
         <!-- Language distribution bar chart -->
         <section class="panel span-6">
-            <h3><span class="ph-icon ph-purple">&#127760;</span> Language Distribution</h3>
+            <h3>Language Distribution</h3>
             <p class="panel-subtitle">Query language breakdown — validates multilingual NLP coverage; 7 languages supported</p>
             <canvas id="languageChart" class="chart-h-220"></canvas>
         </section>
 
         <!-- Translation analytics -->
         <section class="panel span-6">
-            <h3><span class="ph-icon ph-orange">&#128483;</span> Translation Analytics</h3>
+            <h3>Translation Analytics</h3>
             <p class="panel-subtitle">Inbound and outbound translation rates per language — assesses Sunbird AI + LLM fallback coverage</p>
             <canvas id="translationChart" class="chart-h-220"></canvas>
         </section>
@@ -568,21 +565,21 @@ canvas { width: 100% !important; }
 
         <!-- Top recurring questions -->
         <section class="panel span-6">
-            <h3><span class="ph-icon ph-purple">&#128172;</span> Top Recurring Questions</h3>
+            <h3>Top Recurring Questions</h3>
             <p class="panel-subtitle">Asked 2 or more times in last 30 days — reveals knowledge gaps and FAQ candidates for content improvement</p>
             <div id="topQuestionsList" class="compact-list"></div>
         </section>
 
         <!-- Error breakdown -->
         <section class="panel span-3">
-            <h3><span class="ph-icon ph-red">&#9888;</span> Error Breakdown</h3>
+            <h3>Error Breakdown</h3>
             <p class="panel-subtitle">Failure modes by type</p>
             <div id="errorList" class="compact-list"></div>
         </section>
 
         <!-- System summary stats -->
         <section class="panel span-3">
-            <h3><span class="ph-icon ph-green">&#128202;</span> System Summary</h3>
+            <h3>System Summary</h3>
             <p class="panel-subtitle">All-time aggregate</p>
             <div class="stat-row">
                 <span class="stat-label">Total questions answered</span>
@@ -611,7 +608,7 @@ canvas { width: 100% !important; }
 
         <!-- Recent incidents table -->
         <section class="panel span-12">
-            <h3><span class="ph-icon ph-red">&#128680;</span> Recent Operational Incidents</h3>
+            <h3>Recent Operational Incidents</h3>
             <p class="panel-subtitle">Failed or degraded responses in the last 30 days — for debugging and reliability review</p>
             <div class="table-wrap">
                 <table class="dash-table">
@@ -648,7 +645,7 @@ const PURPLE_LIGHT  = 'rgba(124,58,237,0.15)';
 const ORANGE        = '#E87A2D';
 const ORANGE_MID    = '#F59E0B';
 const ORANGE_LIGHT  = 'rgba(232,122,45,0.15)';
-const GREEN         = '#10B981';
+const GREEN         = '#8B5CF6';
 const RED           = '#EF4444';
 const BLUE          = '#3B82F6';
 
@@ -848,7 +845,7 @@ function chartChannel(m) {
             labels: ch.map(x => (x.channel||'unknown').replace(/_/g,' ').replace(/\b\w/g, l=>l.toUpperCase())),
             datasets: [{
                 data: ch.map(x => Number(x.count||0)),
-                backgroundColor: [PURPLE, ORANGE, GREEN, BLUE, RED],
+                backgroundColor: [PURPLE, ORANGE, PURPLE_MID, ORANGE_MID, '#C084FC'],
                 borderWidth: 3,
                 borderColor: '#fff',
                 hoverOffset: 8,
@@ -877,7 +874,7 @@ function chartLanguage(m) {
             datasets: [{
                 label: 'Queries',
                 data,
-                backgroundColor: [PURPLE, ORANGE, GREEN, BLUE, RED, '#F59E0B', '#06B6D4'],
+                backgroundColor: [PURPLE, ORANGE, PURPLE_MID, ORANGE_MID, '#C084FC', '#F97316', '#A855F7'],
                 borderRadius: 6,
                 borderSkipped: false,
             }],
