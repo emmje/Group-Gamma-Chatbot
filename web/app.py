@@ -909,9 +909,16 @@ def meta_whatsapp_webhook_receive():
             from rag.buildings import find_building_images
             building_imgs = find_building_images(question + " " + answer)
             base_url = os.getenv("RENDER_EXTERNAL_URL", request.url_root.rstrip("/"))
-            for bimg in building_imgs[:2]:
-                img_public_url = f"{base_url}{bimg['image_url']}"
-                send_whatsapp_image(recipient, img_public_url, caption=bimg["name"])
+            sent = 0
+            for bldg in building_imgs[:2]:
+                for img_url in bldg["images"][:2]:
+                    img_public_url = f"{base_url}{img_url}"
+                    send_whatsapp_image(recipient, img_public_url, caption=bldg["name"])
+                    sent += 1
+                    if sent >= 3:
+                        break
+                if sent >= 3:
+                    break
         except Exception:
             app.logger.debug("Could not send building images via WhatsApp")
         error_type = ""

@@ -10,3 +10,4 @@ data/gamma.db
 data/gamma.db-*
 data/users_backup.json
 data/users_backup.json.tmp
+web/static/images/buildings/my_buildings*
