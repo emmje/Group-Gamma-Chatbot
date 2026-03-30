@@ -657,38 +657,51 @@ def _row_val(row, key):
         return None
 
 
-def get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8):
+def get_dashboard_metrics_snapshot(days=30, top_n=15):
     if _USE_POSTGRES:
-        return _dashboard_pg(days, hours, top_n)
-    return _dashboard_sqlite(days, hours, top_n)
+        return _dashboard_pg(days, top_n)
+    return _dashboard_sqlite(days, top_n)
 
 
-def _dashboard_pg(days, hours, top_n):
+def _dashboard_pg(days, top_n):
     conn = _pg_conn()
     try:
         with conn.cursor() as cur:
+            # total users (registered)
+            cur.execute("SELECT COUNT(*) AS cnt FROM users")
+            total_users = (cur.fetchone() or {}).get("cnt", 0)
+
+            # all-time totals
             cur.execute("SELECT COUNT(*) AS cnt FROM interaction_events")
             total_interactions = (cur.fetchone() or {}).get("cnt", 0)
 
+            # 30-day window aggregate
             cur.execute(
                 """SELECT COUNT(*) AS interactions,
                           SUM(CASE WHEN success=1 THEN 1 ELSE 0 END) AS success_count,
                           SUM(CASE WHEN fallback_used=1 THEN 1 ELSE 0 END) AS fallback_count,
+                          SUM(CASE WHEN success=0 THEN 1 ELSE 0 END) AS error_count,
                           COUNT(DISTINCT CASE WHEN TRIM(COALESCE(user_ref,''))!='' THEN user_ref END) AS active_users,
-                          AVG(CASE WHEN answer_text IS NOT NULL THEN LENGTH(answer_text) END) AS avg_answer_len
+                          AVG(CASE WHEN answer_text IS NOT NULL THEN LENGTH(answer_text) END) AS avg_answer_len,
+                          SUM(CASE WHEN source_language != 'eng' THEN 1 ELSE 0 END) AS multilingual_count,
+                          SUM(CASE WHEN translated_inbound=1 OR translated_outbound=1 THEN 1 ELSE 0 END) AS translations,
+                          COUNT(DISTINCT NULLIF(TRIM(source_language),'')) AS distinct_languages,
+                          COUNT(DISTINCT NULLIF(TRIM(channel),'')) AS distinct_channels
                    FROM interaction_events
-                   WHERE created_at >= NOW() - make_interval(hours => %s)""",
-                (hours,),
+                   WHERE created_at >= NOW() - make_interval(days => %s)""",
+                (days,),
             )
             w = cur.fetchone() or {}
 
+            # latencies for percentiles (30d)
             cur.execute(
                 """SELECT latency_ms FROM interaction_events
-                   WHERE created_at >= NOW() - make_interval(hours => %s) AND latency_ms IS NOT NULL""",
-                (hours,),
+                   WHERE created_at >= NOW() - make_interval(days => %s) AND latency_ms IS NOT NULL""",
+                (days,),
             )
             latencies = [r["latency_ms"] for r in cur.fetchall() if r.get("latency_ms") is not None]
 
+            # channel breakdown
             cur.execute(
                 """SELECT channel, COUNT(*) AS count FROM interaction_events
                    WHERE created_at >= NOW() - make_interval(days => %s)
@@ -697,6 +710,7 @@ def _dashboard_pg(days, hours, top_n):
             )
             channel_rows = cur.fetchall()
 
+            # language breakdown
             cur.execute(
                 """SELECT source_language, COUNT(*) AS count FROM interaction_events
                    WHERE created_at >= NOW() - make_interval(days => %s)
@@ -706,6 +720,7 @@ def _dashboard_pg(days, hours, top_n):
             )
             language_rows = cur.fetchall()
 
+            # daily volume (30d)
             cur.execute(
                 """SELECT created_at::date AS day, COUNT(*) AS count FROM interaction_events
                    WHERE created_at >= NOW() - make_interval(days => %s)
@@ -714,15 +729,20 @@ def _dashboard_pg(days, hours, top_n):
             )
             daily_rows = cur.fetchall()
 
+            # quality trend: per-day success/fallback/error counts
             cur.execute(
-                """SELECT TO_CHAR(created_at, 'YYYY-MM-DD HH24:00') AS hour, COUNT(*) AS count
+                """SELECT created_at::date AS day,
+                          SUM(CASE WHEN success=1 AND fallback_used=0 THEN 1 ELSE 0 END) AS success_count,
+                          SUM(CASE WHEN fallback_used=1 THEN 1 ELSE 0 END) AS fallback_count,
+                          SUM(CASE WHEN success=0 THEN 1 ELSE 0 END) AS error_count
                    FROM interaction_events
-                   WHERE created_at >= NOW() - make_interval(hours => %s)
-                   GROUP BY hour ORDER BY hour""",
-                (hours,),
+                   WHERE created_at >= NOW() - make_interval(days => %s)
+                   GROUP BY day ORDER BY day""",
+                (days,),
             )
-            hourly_rows = cur.fetchall()
+            quality_trend_rows = cur.fetchall()
 
+            # top recurring questions (all, frontend filters count >= 2)
             cur.execute(
                 """SELECT MIN(TRIM(question_text)) AS question, COUNT(*) AS count
                    FROM interaction_events
@@ -734,6 +754,7 @@ def _dashboard_pg(days, hours, top_n):
             )
             top_q_rows = cur.fetchall()
 
+            # error breakdown
             cur.execute(
                 """SELECT COALESCE(NULLIF(TRIM(error_type),''),'unknown') AS error_type, COUNT(*) AS count
                    FROM interaction_events
@@ -743,57 +764,105 @@ def _dashboard_pg(days, hours, top_n):
             )
             error_rows = cur.fetchall()
 
+            # incidents (with source_language for table)
             cur.execute(
-                """SELECT created_at, channel, error_type, question_text, latency_ms
+                """SELECT created_at, channel, error_type, question_text, latency_ms, source_language
                    FROM interaction_events
                    WHERE created_at >= NOW() - make_interval(days => %s) AND success=0
-                   ORDER BY created_at DESC LIMIT 12""",
+                   ORDER BY created_at DESC LIMIT 15""",
                 (days,),
             )
             incident_rows = cur.fetchall()
 
+            # throughput pulse (15 min)
             cur.execute(
                 "SELECT COUNT(*) AS cnt FROM interaction_events WHERE created_at >= NOW() - INTERVAL '15 minutes'"
             )
             pulse = (cur.fetchone() or {}).get("cnt", 0)
 
-        interactions_h = int(w.get("interactions") or 0)
-        success_h = int(w.get("success_count") or 0)
-        fallback_h = int(w.get("fallback_count") or 0)
-        active_users_h = int(w.get("active_users") or 0)
+            # heatmap: day-of-week (0=Mon) x hour-of-day over last 30 days
+            cur.execute(
+                """SELECT EXTRACT(DOW FROM created_at)::int AS dow_raw,
+                          EXTRACT(HOUR FROM created_at)::int AS hour,
+                          COUNT(*) AS count
+                   FROM interaction_events
+                   WHERE created_at >= NOW() - make_interval(days => %s)
+                   GROUP BY dow_raw, hour""",
+                (days,),
+            )
+            heatmap_raw = cur.fetchall()
+
+            # translation stats per language
+            cur.execute(
+                """SELECT source_language AS language,
+                          SUM(CASE WHEN translated_inbound=1 THEN 1 ELSE 0 END) AS inbound,
+                          SUM(CASE WHEN translated_outbound=1 THEN 1 ELSE 0 END) AS outbound
+                   FROM interaction_events
+                   WHERE created_at >= NOW() - make_interval(days => %s)
+                     AND source_language != 'eng'
+                     AND TRIM(COALESCE(source_language,''))!=''
+                   GROUP BY source_language ORDER BY inbound DESC""",
+                (days,),
+            )
+            translation_rows = cur.fetchall()
+
+        interactions_d = int(w.get("interactions") or 0)
+        success_d = int(w.get("success_count") or 0)
+        fallback_d = int(w.get("fallback_count") or 0)
+        error_d = int(w.get("error_count") or 0)
+        active_users_d = int(w.get("active_users") or 0)
         avg_ans_len = round(float(w.get("avg_answer_len") or 0), 1)
+        multilingual_d = int(w.get("multilingual_count") or 0)
+        translations_d = int(w.get("translations") or 0)
+        distinct_langs = int(w.get("distinct_languages") or 0)
+        distinct_channels = int(w.get("distinct_channels") or 0)
+
+        # Normalize DOW: postgres DOW 0=Sun, we want 0=Mon
+        heatmap_rows = []
+        for r in heatmap_raw:
+            dow_raw = int(_row_val(r, "dow_raw") or 0)
+            dow = (dow_raw - 1) % 7  # Sun(0)->6, Mon(1)->0 ... Sat(6)->5
+            heatmap_rows.append({"dow": dow, "hour": int(_row_val(r, "hour") or 0), "count": int(_row_val(r, "count") or 0)})
 
         return _build_snapshot(
-            total_interactions, interactions_h, success_h, fallback_h,
-            active_users_h, avg_ans_len, latencies, pulse,
-            channel_rows, language_rows, daily_rows, hourly_rows,
-            top_q_rows, error_rows, incident_rows,
+            total_users, total_interactions,
+            interactions_d, success_d, fallback_d, error_d,
+            active_users_d, avg_ans_len, multilingual_d, translations_d,
+            distinct_langs, distinct_channels,
+            latencies, pulse,
+            channel_rows, language_rows, daily_rows, quality_trend_rows,
+            top_q_rows, error_rows, incident_rows, heatmap_rows, translation_rows,
         )
     finally:
         conn.close()
 
 
-def _dashboard_sqlite(days, hours, top_n):
+def _dashboard_sqlite(days, top_n):
     day_window = f"-{int(days)} days"
-    hour_window = f"-{int(hours)} hours"
 
     conn = _sqlite_conn()
 
+    total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     total_interactions = conn.execute("SELECT COUNT(*) FROM interaction_events").fetchone()[0]
 
     w = conn.execute(
         """SELECT COUNT(*) AS interactions,
                   SUM(CASE WHEN success=1 THEN 1 ELSE 0 END) AS success_count,
                   SUM(CASE WHEN fallback_used=1 THEN 1 ELSE 0 END) AS fallback_count,
+                  SUM(CASE WHEN success=0 THEN 1 ELSE 0 END) AS error_count,
                   COUNT(DISTINCT CASE WHEN TRIM(COALESCE(user_ref,''))!='' THEN user_ref END) AS active_users,
-                  AVG(CASE WHEN answer_text IS NOT NULL THEN LENGTH(answer_text) END) AS avg_answer_len
+                  AVG(CASE WHEN answer_text IS NOT NULL THEN LENGTH(answer_text) END) AS avg_answer_len,
+                  SUM(CASE WHEN source_language != 'eng' THEN 1 ELSE 0 END) AS multilingual_count,
+                  SUM(CASE WHEN translated_inbound=1 OR translated_outbound=1 THEN 1 ELSE 0 END) AS translations,
+                  COUNT(DISTINCT NULLIF(TRIM(source_language),'')) AS distinct_languages,
+                  COUNT(DISTINCT NULLIF(TRIM(channel),'')) AS distinct_channels
            FROM interaction_events WHERE created_at >= datetime('now', ?)""",
-        (hour_window,),
+        (day_window,),
     ).fetchone()
 
     lat_rows = conn.execute(
         "SELECT latency_ms FROM interaction_events WHERE created_at >= datetime('now', ?) AND latency_ms IS NOT NULL",
-        (hour_window,),
+        (day_window,),
     ).fetchall()
     latencies = [r[0] for r in lat_rows if r[0] is not None]
 
@@ -812,9 +881,14 @@ def _dashboard_sqlite(days, hours, top_n):
         (day_window,),
     ).fetchall()
 
-    hourly_rows = conn.execute(
-        "SELECT strftime('%%Y-%%m-%%d %%H:00', created_at) AS hour, COUNT(*) AS count FROM interaction_events WHERE created_at >= datetime('now', ?) GROUP BY hour ORDER BY hour",
-        (hour_window,),
+    quality_trend_rows = conn.execute(
+        """SELECT DATE(created_at) AS day,
+                  SUM(CASE WHEN success=1 AND fallback_used=0 THEN 1 ELSE 0 END) AS success_count,
+                  SUM(CASE WHEN fallback_used=1 THEN 1 ELSE 0 END) AS fallback_count,
+                  SUM(CASE WHEN success=0 THEN 1 ELSE 0 END) AS error_count
+           FROM interaction_events WHERE created_at >= datetime('now', ?)
+           GROUP BY day ORDER BY day""",
+        (day_window,),
     ).fetchall()
 
     top_q_rows = conn.execute(
@@ -828,7 +902,7 @@ def _dashboard_sqlite(days, hours, top_n):
     ).fetchall()
 
     incident_rows = conn.execute(
-        "SELECT created_at, channel, error_type, question_text, latency_ms FROM interaction_events WHERE created_at >= datetime('now', ?) AND success=0 ORDER BY created_at DESC LIMIT 12",
+        "SELECT created_at, channel, error_type, question_text, latency_ms, source_language FROM interaction_events WHERE created_at >= datetime('now', ?) AND success=0 ORDER BY created_at DESC LIMIT 15",
         (day_window,),
     ).fetchall()
 
@@ -836,44 +910,89 @@ def _dashboard_sqlite(days, hours, top_n):
         "SELECT COUNT(*) FROM interaction_events WHERE created_at >= datetime('now', '-15 minutes')"
     ).fetchone()[0]
 
+    heatmap_raw = conn.execute(
+        """SELECT CAST(strftime('%w', created_at) AS INTEGER) AS dow_raw,
+                  CAST(strftime('%H', created_at) AS INTEGER) AS hour,
+                  COUNT(*) AS count
+           FROM interaction_events WHERE created_at >= datetime('now', ?)
+           GROUP BY dow_raw, hour""",
+        (day_window,),
+    ).fetchall()
+
+    translation_rows = conn.execute(
+        """SELECT source_language AS language,
+                  SUM(CASE WHEN translated_inbound=1 THEN 1 ELSE 0 END) AS inbound,
+                  SUM(CASE WHEN translated_outbound=1 THEN 1 ELSE 0 END) AS outbound
+           FROM interaction_events WHERE created_at >= datetime('now', ?)
+             AND source_language != 'eng' AND TRIM(COALESCE(source_language,''))!=''
+           GROUP BY source_language ORDER BY inbound DESC""",
+        (day_window,),
+    ).fetchall()
+
     conn.close()
 
-    interactions_h = int(w["interactions"] or 0)
-    success_h = int(w["success_count"] or 0)
-    fallback_h = int(w["fallback_count"] or 0)
-    active_users_h = int(w["active_users"] or 0)
+    interactions_d = int(w["interactions"] or 0)
+    success_d = int(w["success_count"] or 0)
+    fallback_d = int(w["fallback_count"] or 0)
+    error_d = int(w["error_count"] or 0)
+    active_users_d = int(w["active_users"] or 0)
     avg_ans_len = round(float(w["avg_answer_len"] or 0), 1)
+    multilingual_d = int(w["multilingual_count"] or 0)
+    translations_d = int(w["translations"] or 0)
+    distinct_langs = int(w["distinct_languages"] or 0)
+    distinct_channels = int(w["distinct_channels"] or 0)
+
+    # SQLite strftime %w: 0=Sun, 1=Mon ... 6=Sat → convert to Mon=0
+    heatmap_rows = []
+    for r in heatmap_raw:
+        dow_raw = int(r["dow_raw"] or 0)
+        dow = (dow_raw - 1) % 7
+        heatmap_rows.append({"dow": dow, "hour": int(r["hour"] or 0), "count": int(r["count"] or 0)})
 
     return _build_snapshot(
-        total_interactions, interactions_h, success_h, fallback_h,
-        active_users_h, avg_ans_len, latencies, pulse,
+        total_users, total_interactions,
+        interactions_d, success_d, fallback_d, error_d,
+        active_users_d, avg_ans_len, multilingual_d, translations_d,
+        distinct_langs, distinct_channels,
+        latencies, pulse,
         [dict(r) for r in channel_rows],
         [dict(r) for r in language_rows],
         [dict(r) for r in daily_rows],
-        [dict(r) for r in hourly_rows],
+        [dict(r) for r in quality_trend_rows],
         [dict(r) for r in top_q_rows],
         [dict(r) for r in error_rows],
         [dict(r) for r in incident_rows],
+        heatmap_rows,
+        [dict(r) for r in translation_rows],
     )
 
 
 def _build_snapshot(
-    total_interactions, interactions_h, success_h, fallback_h,
-    active_users_h, avg_ans_len, latencies, pulse_15m,
-    channel_rows, language_rows, daily_rows, hourly_rows,
-    top_q_rows, error_rows, incident_rows,
+    total_users, total_interactions,
+    interactions_d, success_d, fallback_d, error_d,
+    active_users_d, avg_ans_len, multilingual_d, translations_d,
+    distinct_langs, distinct_channels,
+    latencies, pulse_15m,
+    channel_rows, language_rows, daily_rows, quality_trend_rows,
+    top_q_rows, error_rows, incident_rows, heatmap_rows, translation_rows,
 ):
     return {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "kpis": {
+            "total_users": int(total_users or 0),
             "total_interactions": int(total_interactions or 0),
-            "interactions_24h": interactions_h,
-            "active_users_24h": active_users_h,
-            "success_rate_24h": _safe_pct(success_h, interactions_h),
-            "fallback_rate_24h": _safe_pct(fallback_h, interactions_h),
-            "avg_answer_len_24h": avg_ans_len,
-            "median_latency_ms_24h": _percentile(latencies, 0.50),
-            "p95_latency_ms_24h": _percentile(latencies, 0.95),
+            "interactions_30d": interactions_d,
+            "active_users_30d": active_users_d,
+            "success_rate_30d": _safe_pct(success_d, interactions_d),
+            "fallback_rate_30d": _safe_pct(fallback_d, interactions_d),
+            "error_rate_30d": _safe_pct(error_d, interactions_d),
+            "avg_answer_len_30d": avg_ans_len,
+            "multilingual_queries_30d": multilingual_d,
+            "total_translations": translations_d,
+            "distinct_languages": distinct_langs,
+            "distinct_channels": distinct_channels,
+            "median_latency_ms_30d": _percentile(latencies, 0.50),
+            "p95_latency_ms_30d": _percentile(latencies, 0.95),
             "events_per_min_15m": round(int(pulse_15m or 0) / 15.0, 2),
         },
         "channels": [
@@ -888,9 +1007,14 @@ def _build_snapshot(
             {"day": str(_row_val(r, "day")), "count": int(_row_val(r, "count") or 0)}
             for r in daily_rows
         ],
-        "hourly_volume": [
-            {"hour": _row_val(r, "hour"), "count": int(_row_val(r, "count") or 0)}
-            for r in hourly_rows
+        "quality_trend": [
+            {
+                "day": str(_row_val(r, "day")),
+                "success_count": int(_row_val(r, "success_count") or 0),
+                "fallback_count": int(_row_val(r, "fallback_count") or 0),
+                "error_count": int(_row_val(r, "error_count") or 0),
+            }
+            for r in quality_trend_rows
         ],
         "top_questions": [
             {"question": (_row_val(r, "question") or "(empty)")[:120], "count": int(_row_val(r, "count") or 0)}
@@ -905,9 +1029,19 @@ def _build_snapshot(
                 "created_at": str(_row_val(r, "created_at") or ""),
                 "channel": _row_val(r, "channel"),
                 "error_type": _row_val(r, "error_type") or "unknown",
+                "source_language": _row_val(r, "source_language") or "eng",
                 "question": (_row_val(r, "question_text") or "")[:120],
                 "latency_ms": round(float(_row_val(r, "latency_ms") or 0), 1),
             }
             for r in incident_rows
+        ],
+        "heatmap": heatmap_rows,
+        "translation_stats": [
+            {
+                "language": _row_val(r, "language"),
+                "inbound": int(_row_val(r, "inbound") or 0),
+                "outbound": int(_row_val(r, "outbound") or 0),
+            }
+            for r in translation_rows
         ],
     }

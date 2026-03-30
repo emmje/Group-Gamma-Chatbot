@@ -2,66 +2,79 @@
 {% block title %}Analytics Dashboard – Gamma Chatbot{% endblock %}
 
 {% block extra_style %}
+:root {
+    --purple: #7C3AED;
+    --purple-dark: #5B21B6;
+    --purple-mid: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --orange: #E87A2D;
+    --orange-dark: #C96A20;
+    --orange-light: #FFF3EB;
+}
+
 .dashboard-shell {
-    padding: 24px 32px 40px;
-    max-width: 1400px;
+    padding: 24px 32px 48px;
+    max-width: 1440px;
     margin: 0 auto;
 }
 
+/* ── Top bar ───────────────────────────────────────────── */
 .dashboard-topbar {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .dashboard-title h2 {
-    font-size: 28px;
+    font-size: 26px;
+    font-weight: 800;
     line-height: 1.1;
-    margin-bottom: 6px;
-    color: #E87A2D;
+    margin-bottom: 5px;
+    background: linear-gradient(135deg, #7C3AED 0%, #E87A2D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .dashboard-title p {
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .live-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--purple-light);
     background: var(--card);
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--purple);
+    white-space: nowrap;
 }
 
 .live-pill .dot {
-    width: 8px;
-    height: 8px;
+    width: 8px; height: 8px;
     border-radius: 50%;
-    background: #E87A2D;
-    box-shadow: 0 0 0 0 rgba(232, 122, 45, 0.35);
+    background: var(--purple);
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
     animation: pulse-live 1.8s infinite;
 }
 
-.live-pill.degraded .dot {
-    background: #EF4444;
-    box-shadow: none;
-    animation: none;
-}
+.live-pill.degraded .dot { background: #EF4444; box-shadow: none; animation: none; }
+.live-pill.degraded { color: #EF4444; border-color: #FEE2E2; }
 
 @keyframes pulse-live {
-    0% { box-shadow: 0 0 0 0 rgba(232, 122, 45, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(232, 122, 45, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(232, 122, 45, 0); }
+    0%   { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.4); }
+    70%  { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);   }
+    100% { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0);    }
 }
 
+/* ── KPI grid ──────────────────────────────────────────── */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -72,161 +85,175 @@
 .kpi-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    border-top: 3px solid var(--orange);
+    border-radius: 14px;
+    padding: 18px 16px 14px;
+    border-top: 3px solid;
     transition: box-shadow 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
 }
 
-.kpi-card:hover {
-    box-shadow: 0 4px 16px rgba(232, 122, 45, 0.12);
-    transform: translateY(-2px);
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+    background: currentColor;
 }
 
-.kpi-card:nth-child(1) { border-top-color: #E87A2D; }
-.kpi-card:nth-child(2) { border-top-color: #F59E0B; }
-.kpi-card:nth-child(3) { border-top-color: #10B981; }
-.kpi-card:nth-child(4) { border-top-color: #3B82F6; }
-.kpi-card:nth-child(5) { border-top-color: #10B981; }
-.kpi-card:nth-child(6) { border-top-color: #F59E0B; }
-.kpi-card:nth-child(7) { border-top-color: #8B5CF6; }
-.kpi-card:nth-child(8) { border-top-color: #8B5CF6; }
+.kpi-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+.kpi-card:nth-child(1)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(2)  { border-top-color: #E87A2D; }
+.kpi-card:nth-child(3)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(4)  { border-top-color: #E87A2D; }
+.kpi-card:nth-child(5)  { border-top-color: #10B981; }
+.kpi-card:nth-child(6)  { border-top-color: #EF4444; }
+.kpi-card:nth-child(7)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(8)  { border-top-color: #E87A2D; }
 
 .kpi-label {
     font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.7px;
     margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .kpi-value {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 30px;
+    font-weight: 800;
     line-height: 1;
-    color: var(--text);
 }
 
-.kpi-card:nth-child(1) .kpi-value { color: #E87A2D; }
-.kpi-card:nth-child(2) .kpi-value { color: #D97706; }
-.kpi-card:nth-child(3) .kpi-value { color: #059669; }
-.kpi-card:nth-child(4) .kpi-value { color: #2563EB; }
+.kpi-card:nth-child(1) .kpi-value { color: #7C3AED; }
+.kpi-card:nth-child(2) .kpi-value { color: #E87A2D; }
+.kpi-card:nth-child(3) .kpi-value { color: #6D28D9; }
+.kpi-card:nth-child(4) .kpi-value { color: #C96A20; }
 .kpi-card:nth-child(5) .kpi-value { color: #059669; }
-.kpi-card:nth-child(6) .kpi-value { color: #D97706; }
+.kpi-card:nth-child(6) .kpi-value { color: #DC2626; }
 .kpi-card:nth-child(7) .kpi-value { color: #7C3AED; }
-.kpi-card:nth-child(8) .kpi-value { color: #7C3AED; }
+.kpi-card:nth-child(8) .kpi-value { color: #E87A2D; }
 
 .kpi-sub {
     margin-top: 8px;
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--text-muted);
 }
 
+.kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+/* ── Analytics grid ────────────────────────────────────── */
 .analytics-grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
 }
 
 .panel {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 14px;
+    padding: 16px;
     transition: box-shadow 0.2s;
 }
 
-.panel:hover {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-}
+.panel:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.06); }
 
 .panel h3 {
-    font-size: 14px;
-    margin-bottom: 12px;
-    color: #E87A2D;
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-.panel h3::before {
-    content: '';
-    width: 4px;
-    height: 16px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #E87A2D, #F59E0B);
+.panel h3 .ph-icon {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
     flex-shrink: 0;
 }
 
+.ph-purple { background: var(--purple-light); color: var(--purple); }
+.ph-orange { background: var(--orange-light); color: var(--orange); }
+.ph-green  { background: #DCFCE7; color: #16A34A; }
+.ph-red    { background: #FEE2E2; color: #DC2626; }
+.ph-blue   { background: #EFF6FF; color: #2563EB; }
+
 .panel-subtitle {
-    margin-top: -6px;
-    margin-bottom: 12px;
+    margin-top: 0;
+    margin-bottom: 14px;
     font-size: 12px;
     color: var(--text-muted);
 }
 
-.span-6 { grid-column: span 6; }
-.span-4 { grid-column: span 4; }
-.span-8 { grid-column: span 8; }
+.span-3  { grid-column: span 3;  }
+.span-4  { grid-column: span 4;  }
+.span-5  { grid-column: span 5;  }
+.span-6  { grid-column: span 6;  }
+.span-7  { grid-column: span 7;  }
+.span-8  { grid-column: span 8;  }
 .span-12 { grid-column: span 12; }
 
-canvas {
-    width: 100% !important;
-    height: 280px !important;
-}
+canvas { width: 100% !important; }
+.chart-h-260 { height: 260px !important; }
+.chart-h-220 { height: 220px !important; }
+.chart-h-180 { height: 180px !important; }
+.chart-h-320 { height: 320px !important; }
 
-.quality-row {
-    margin-bottom: 10px;
-}
-
-.quality-row:last-child {
-    margin-bottom: 0;
-}
+/* ── Progress bars ─────────────────────────────────────── */
+.quality-row { margin-bottom: 12px; }
+.quality-row:last-child { margin-bottom: 0; }
 
 .quality-label {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: var(--text-muted);
 }
 
 .progress-track {
-    width: 100%;
-    height: 10px;
+    width: 100%; height: 10px;
     border-radius: 999px;
     background: #F3F4F6;
     overflow: hidden;
 }
 
-.progress-fill {
-    height: 100%;
-    border-radius: 999px;
-}
+.progress-fill { height: 100%; border-radius: 999px; }
+.success-fill  { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+.fallback-fill { background: linear-gradient(90deg, #E87A2D, #FBB966); }
+.error-fill    { background: linear-gradient(90deg, #EF4444, #FCA5A5); }
+.transl-fill   { background: linear-gradient(90deg, #10B981, #6EE7B7); }
 
-.success-fill { background: linear-gradient(90deg, #10B981, #34D399); }
-.fallback-fill { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
-
-.progress-track {
-    background: #F3F4F6;
-    border-radius: 999px;
-}
-
-.compact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+/* ── Compact bars / lists ──────────────────────────────── */
+.compact-list { display: flex; flex-direction: column; gap: 9px; }
 
 .compact-item {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
 }
 
 .compact-item .label {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
@@ -237,214 +264,363 @@ canvas {
     font-size: 12px;
     color: var(--text-muted);
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .bar-mini {
     grid-column: span 2;
-    height: 6px;
+    height: 5px;
     border-radius: 999px;
     background: #F3F4F6;
     overflow: hidden;
 }
 
 .bar-mini > span {
-    display: block;
-    height: 100%;
-    background: linear-gradient(90deg, #E87A2D, #F59E0B);
+    display: block; height: 100%;
+    background: linear-gradient(90deg, #7C3AED, #E87A2D);
+    border-radius: 999px;
 }
 
-.table-wrap {
-    overflow-x: auto;
+/* ── Badge chips ───────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
 }
 
-.dash-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-orange { background: var(--orange-light); color: var(--orange); }
+.badge-green  { background: #DCFCE7; color: #16A34A; }
+.badge-red    { background: #FEE2E2; color: #DC2626; }
+
+/* ── Stat rows  ────────────────────────────────────────── */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
 }
+
+.stat-row:last-child { border-bottom: none; }
+.stat-row .stat-label { color: var(--text-muted); }
+.stat-row .stat-value { font-weight: 700; color: var(--text); }
+
+/* ── Table ─────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+
+.dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 
 .dash-table th {
     text-align: left;
-    padding: 10px 8px;
-    border-bottom: 2px solid #E87A2D;
-    color: #C96A20;
-    font-weight: 600;
+    padding: 9px 10px;
+    border-bottom: 2px solid var(--purple);
+    color: var(--purple-dark);
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    background: #FFF7F0;
+    background: var(--purple-light);
+    font-size: 11px;
 }
 
 .dash-table td {
-    padding: 10px 8px;
+    padding: 9px 10px;
     border-bottom: 1px solid var(--border);
     vertical-align: top;
 }
 
-.dash-table tr:last-child td {
-    border-bottom: none;
+.dash-table tr:last-child td { border-bottom: none; }
+.dash-table tr:hover td { background: #FAFAFA; }
+
+/* ── Heatmap ───────────────────────────────────────────── */
+.heatmap-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
 }
 
-.mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+.heatmap-table {
+    border-collapse: separate;
+    border-spacing: 3px;
+    font-size: 10px;
+    min-width: 580px;
 }
 
-.empty-state {
-    font-size: 13px;
+.heatmap-table th {
+    font-weight: 600;
     color: var(--text-muted);
+    padding: 2px 4px;
+    text-align: center;
 }
 
-@media (max-width: 1080px) {
-    .kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .span-6, .span-8, .span-4 {
-        grid-column: span 12;
-    }
+.heatmap-table td.hm-cell {
+    width: 28px; height: 22px;
+    border-radius: 4px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: default;
+    transition: transform 0.1s;
+}
+
+.heatmap-table td.hm-cell:hover { transform: scale(1.15); }
+
+.hm-day-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-right: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── Mono ──────────────────────────────────────────────── */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; }
+
+.empty-state { font-size: 13px; color: var(--text-muted); padding: 12px 0; }
+
+/* ── Section divider label ──────────────────────────────── */
+.section-label {
+    grid-column: span 12;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--purple);
+    padding: 4px 0 2px;
+    border-bottom: 2px solid var(--purple-light);
+    margin-bottom: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .span-3,.span-4,.span-5,.span-6,.span-7,.span-8 { grid-column: span 12; }
 }
 
 @media (max-width: 640px) {
-    .dashboard-shell {
-        padding: 16px 14px 28px;
-    }
-    .kpi-grid {
-        grid-template-columns: 1fr;
-    }
-    .dashboard-title h2 {
-        font-size: 22px;
-    }
+    .dashboard-shell { padding: 14px 12px 32px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .dashboard-title h2 { font-size: 20px; }
 }
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-shell">
+
+    <!-- Top bar -->
     <div class="dashboard-topbar">
         <div class="dashboard-title">
-            <h2>Operational Analytics</h2>
-            <p>Cross-channel live insights for performance monitoring and decision support.</p>
+            <h2>UCU Chatbot Analytics</h2>
+            <p>Real-time cross-channel intelligence dashboard &mdash; 30-day operational window</p>
         </div>
         <div class="live-pill" id="livePill">
             <span class="dot"></span>
-            <span id="liveStatusText">Live updates every 8s</span>
+            <span id="liveStatusText">Live &bull; refreshes every 8s</span>
         </div>
     </div>
 
+    <!-- KPI row -->
     <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Users</div>
+            <div class="kpi-value" id="kpiTotalUsers">0</div>
+            <div class="kpi-sub">All-time distinct registered users</div>
+        </div>
         <div class="kpi-card">
             <div class="kpi-label">Total Interactions</div>
             <div class="kpi-value" id="kpiTotalInteractions">0</div>
             <div class="kpi-sub">All channels, all time</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Interactions (24h)</div>
-            <div class="kpi-value" id="kpiInteractions24h">0</div>
-            <div class="kpi-sub">Traffic in last 24 hours</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Active Users (24h)</div>
+            <div class="kpi-label">Active Users (30d)</div>
             <div class="kpi-value" id="kpiActiveUsers">0</div>
-            <div class="kpi-sub">Distinct user references</div>
+            <div class="kpi-sub">Distinct users last 30 days</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Throughput</div>
-            <div class="kpi-value" id="kpiThroughput">0.00</div>
-            <div class="kpi-sub">Events/min over last 15 minutes</div>
+            <div class="kpi-label">Interactions (30d)</div>
+            <div class="kpi-value" id="kpiInteractions30d">0</div>
+            <div class="kpi-sub">Conversations in last 30 days</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Success Rate (24h)</div>
+            <div class="kpi-label">Success Rate (30d)</div>
             <div class="kpi-value" id="kpiSuccessRate">0%</div>
-            <div class="kpi-sub">Successful responses delivered</div>
+            <div class="kpi-sub">RAG retrievals delivered successfully</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Fallback Rate (24h)</div>
+            <div class="kpi-label">Fallback Rate (30d)</div>
             <div class="kpi-value" id="kpiFallbackRate">0%</div>
-            <div class="kpi-sub">Low-confidence or fallback answers</div>
+            <div class="kpi-sub">Low-confidence / fallback responses</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Median Latency (24h)</div>
+            <div class="kpi-label">Median Latency (30d)</div>
             <div class="kpi-value" id="kpiMedianLatency">0 ms</div>
             <div class="kpi-sub">p50 end-to-end answer latency</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">P95 Latency (24h)</div>
+            <div class="kpi-label">P95 Latency (30d)</div>
             <div class="kpi-value" id="kpiP95Latency">0 ms</div>
-            <div class="kpi-sub">Tail latency under load</div>
+            <div class="kpi-sub">Tail latency — worst-case UX signal</div>
         </div>
     </div>
 
     <div class="analytics-grid">
-        <section class="panel span-6">
-            <h3>Daily Interaction Volume</h3>
-            <p class="panel-subtitle" id="dailyVolumeSubtitle">Last 14 days</p>
-            <canvas id="dailyVolumeChart"></canvas>
-        </section>
 
-        <section class="panel span-6">
-            <h3>Hourly Interaction Volume</h3>
-            <p class="panel-subtitle" id="hourlyVolumeSubtitle">Last 24 hours</p>
-            <canvas id="hourlyVolumeChart"></canvas>
-        </section>
+        <!-- Section: Volume & Growth -->
+        <div class="section-label">&#9654; Volume &amp; Growth</div>
 
-        <section class="panel span-4">
-            <h3>Channel Mix</h3>
-            <p class="panel-subtitle">Share of interactions by channel</p>
-            <canvas id="channelMixChart"></canvas>
-        </section>
-
-        <section class="panel span-4">
-            <h3>Quality Signals</h3>
-            <div class="quality-row">
-                <div class="quality-label">
-                    <span>Success Rate (24h)</span>
-                    <strong id="qualitySuccessLabel">0%</strong>
-                </div>
-                <div class="progress-track"><div class="progress-fill success-fill" id="qualitySuccessBar"></div></div>
-            </div>
-            <div class="quality-row">
-                <div class="quality-label">
-                    <span>Fallback Rate (24h)</span>
-                    <strong id="qualityFallbackLabel">0%</strong>
-                </div>
-                <div class="progress-track"><div class="progress-fill fallback-fill" id="qualityFallbackBar"></div></div>
-            </div>
-            <div class="quality-row" style="margin-top:14px;">
-                <div class="quality-label">
-                    <span>Average Answer Length (24h)</span>
-                    <strong id="qualityAnswerLen">0 chars</strong>
-                </div>
-            </div>
-            <div class="quality-row">
-                <div class="quality-label">
-                    <span>Last updated</span>
-                    <strong class="mono" id="lastUpdatedTs">-</strong>
-                </div>
-            </div>
-        </section>
-
-        <section class="panel span-4">
-            <h3>Language Distribution</h3>
-            <div id="languageList" class="compact-list"></div>
-        </section>
-
+        <!-- Daily interaction volume (30d) -->
         <section class="panel span-8">
-            <h3>Top Recurring Questions</h3>
-            <p class="panel-subtitle">Aggregated, not full conversation logs</p>
+            <h3><span class="ph-icon ph-purple">&#128200;</span> Daily Interaction Volume</h3>
+            <p class="panel-subtitle">Last 30 days &mdash; trend across all channels</p>
+            <canvas id="dailyVolumeChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Cumulative growth -->
+        <section class="panel span-4">
+            <h3><span class="ph-icon ph-orange">&#128640;</span> Cumulative Growth</h3>
+            <p class="panel-subtitle">Running total of all interactions</p>
+            <canvas id="cumulativeChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Section: Response Quality -->
+        <div class="section-label">&#9654; Response Quality &amp; System Health</div>
+
+        <!-- Response quality over time (stacked bar chart) -->
+        <section class="panel span-8">
+            <h3><span class="ph-icon ph-purple">&#127919;</span> Response Quality Over Time</h3>
+            <p class="panel-subtitle">Daily breakdown: successful RAG answers vs fallbacks vs errors — key signal for system trust</p>
+            <canvas id="qualityTrendChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Quality signals summary -->
+        <section class="panel span-4">
+            <h3><span class="ph-icon ph-green">&#9989;</span> Quality Signals</h3>
+            <p class="panel-subtitle">30-day averages</p>
+            <div class="quality-row">
+                <div class="quality-label"><span>Success Rate</span><strong id="qualitySuccessLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill success-fill" id="qualitySuccessBar" style="width:0%"></div></div>
+            </div>
+            <div class="quality-row">
+                <div class="quality-label"><span>Fallback Rate</span><strong id="qualityFallbackLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill fallback-fill" id="qualityFallbackBar" style="width:0%"></div></div>
+            </div>
+            <div class="quality-row">
+                <div class="quality-label"><span>Error Rate</span><strong id="qualityErrorLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill error-fill" id="qualityErrorBar" style="width:0%"></div></div>
+            </div>
+            <div class="quality-row" style="margin-top:16px;">
+                <div class="stat-row">
+                    <span class="stat-label">Avg Answer Length</span>
+                    <span class="stat-value" id="qualityAnswerLen">0 chars</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Multilingual Queries</span>
+                    <span class="stat-value" id="qualityMultilingual">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Last refreshed</span>
+                    <span class="stat-value mono" id="lastUpdatedTs" style="font-size:11px;">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Usage Patterns -->
+        <div class="section-label">&#9654; Usage Patterns &amp; Behaviour</div>
+
+        <!-- Peak-hour heatmap -->
+        <section class="panel span-7">
+            <h3><span class="ph-icon ph-orange">&#128293;</span> Peak Usage Heatmap</h3>
+            <p class="panel-subtitle">Hour-of-day × day-of-week over last 30 days &mdash; identify when users engage most to optimise infrastructure and staffing</p>
+            <div class="heatmap-wrap">
+                <div id="heatmapContainer"></div>
+            </div>
+        </section>
+
+        <!-- Channel breakdown (donut) -->
+        <section class="panel span-5">
+            <h3><span class="ph-icon ph-purple">&#128241;</span> Channel Distribution</h3>
+            <p class="panel-subtitle">Web vs WhatsApp — shows which deployment surface drives engagement</p>
+            <canvas id="channelChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Section: Multilingual Intelligence -->
+        <div class="section-label">&#9654; Multilingual Intelligence</div>
+
+        <!-- Language distribution bar chart -->
+        <section class="panel span-6">
+            <h3><span class="ph-icon ph-purple">&#127760;</span> Language Distribution</h3>
+            <p class="panel-subtitle">Query language breakdown — validates multilingual NLP coverage; 7 languages supported</p>
+            <canvas id="languageChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Translation analytics -->
+        <section class="panel span-6">
+            <h3><span class="ph-icon ph-orange">&#128483;</span> Translation Analytics</h3>
+            <p class="panel-subtitle">Inbound and outbound translation rates per language — assesses Sunbird AI + LLM fallback coverage</p>
+            <canvas id="translationChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Section: Content Intelligence -->
+        <div class="section-label">&#9654; Content Intelligence</div>
+
+        <!-- Top recurring questions -->
+        <section class="panel span-6">
+            <h3><span class="ph-icon ph-purple">&#128172;</span> Top Recurring Questions</h3>
+            <p class="panel-subtitle">Asked 2 or more times in last 30 days — reveals knowledge gaps and FAQ candidates for content improvement</p>
             <div id="topQuestionsList" class="compact-list"></div>
         </section>
 
-        <section class="panel span-4">
-            <h3>Error Breakdown</h3>
+        <!-- Error breakdown -->
+        <section class="panel span-3">
+            <h3><span class="ph-icon ph-red">&#9888;</span> Error Breakdown</h3>
+            <p class="panel-subtitle">Failure modes by type</p>
             <div id="errorList" class="compact-list"></div>
         </section>
 
+        <!-- System summary stats -->
+        <section class="panel span-3">
+            <h3><span class="ph-icon ph-green">&#128202;</span> System Summary</h3>
+            <p class="panel-subtitle">All-time aggregate</p>
+            <div class="stat-row">
+                <span class="stat-label">Total questions answered</span>
+                <span class="stat-value" id="summTotalInteractions">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Languages detected</span>
+                <span class="stat-value" id="summLanguages">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Translations performed</span>
+                <span class="stat-value" id="summTranslations">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Channels active</span>
+                <span class="stat-value" id="summChannels">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Throughput (15min)</span>
+                <span class="stat-value" id="summThroughput">0/min</span>
+            </div>
+        </section>
+
+        <!-- Section: Operational Log -->
+        <div class="section-label">&#9654; Operational Incident Log</div>
+
+        <!-- Recent incidents table -->
         <section class="panel span-12">
-            <h3>Recent Operational Incidents</h3>
+            <h3><span class="ph-icon ph-red">&#128680;</span> Recent Operational Incidents</h3>
+            <p class="panel-subtitle">Failed or degraded responses in the last 30 days — for debugging and reliability review</p>
             <div class="table-wrap">
                 <table class="dash-table">
                     <thead>
                         <tr>
-                            <th>Time</th>
+                            <th>Timestamp</th>
                             <th>Channel</th>
-                            <th>Error</th>
+                            <th>Error Type</th>
+                            <th>Language</th>
                             <th>Question Snapshot</th>
                             <th>Latency</th>
                         </tr>
@@ -453,247 +629,444 @@ canvas {
                 </table>
             </div>
         </section>
-    </div>
-</div>
+
+    </div><!-- /.analytics-grid -->
+</div><!-- /.dashboard-shell -->
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
 const INITIAL_METRICS = {{ metrics|tojson }};
-let dailyChart = null;
-let hourlyChart = null;
-let channelChart = null;
 
-function formatNumber(value) {
-    return Number(value || 0).toLocaleString();
-}
+// Chart instances
+const _charts = {};
 
-function formatRate(value) {
-    return `${Number(value || 0).toFixed(2)}%`;
-}
+const PURPLE        = '#7C3AED';
+const PURPLE_MID    = '#8B5CF6';
+const PURPLE_LIGHT  = 'rgba(124,58,237,0.15)';
+const ORANGE        = '#E87A2D';
+const ORANGE_MID    = '#F59E0B';
+const ORANGE_LIGHT  = 'rgba(232,122,45,0.15)';
+const GREEN         = '#10B981';
+const RED           = '#EF4444';
+const BLUE          = '#3B82F6';
 
-function formatLatency(value) {
-    return `${Number(value || 0).toFixed(1)} ms`;
-}
+const LANG_NAMES = {
+    eng:'English', lug:'Luganda', ach:'Acholi', teo:'Ateso',
+    lgg:'Lugbara', nyn:'Runyankole', swa:'Swahili'
+};
 
-function setLiveStatus(isHealthy) {
+function fmt(v)    { return Number(v||0).toLocaleString(); }
+function fmtPct(v) { return `${Number(v||0).toFixed(1)}%`; }
+function fmtMs(v)  { return `${Number(v||0).toFixed(0)} ms`; }
+function fmtLang(code) { return LANG_NAMES[code] || code || 'Unknown'; }
+
+function setLiveStatus(ok) {
     const pill = document.getElementById('livePill');
-    const text = document.getElementById('liveStatusText');
-    if (isHealthy) {
-        pill.classList.remove('degraded');
-        text.textContent = 'Live updates every 8s';
-    } else {
-        pill.classList.add('degraded');
-        text.textContent = 'Live feed degraded';
-    }
+    const txt  = document.getElementById('liveStatusText');
+    pill.classList.toggle('degraded', !ok);
+    txt.textContent = ok ? 'Live \u2022 refreshes every 8s' : 'Feed degraded \u2014 retrying\u2026';
 }
 
-function updateKpis(metrics) {
-    const kpis = (metrics && metrics.kpis) || {};
-
-    document.getElementById('kpiTotalInteractions').textContent = formatNumber(kpis.total_interactions);
-    document.getElementById('kpiInteractions24h').textContent = formatNumber(kpis.interactions_24h);
-    document.getElementById('kpiActiveUsers').textContent = formatNumber(kpis.active_users_24h);
-    document.getElementById('kpiThroughput').textContent = Number(kpis.events_per_min_15m || 0).toFixed(2);
-    document.getElementById('kpiSuccessRate').textContent = formatRate(kpis.success_rate_24h);
-    document.getElementById('kpiFallbackRate').textContent = formatRate(kpis.fallback_rate_24h);
-    document.getElementById('kpiMedianLatency').textContent = formatLatency(kpis.median_latency_ms_24h);
-    document.getElementById('kpiP95Latency').textContent = formatLatency(kpis.p95_latency_ms_24h);
-
-    document.getElementById('qualitySuccessLabel').textContent = formatRate(kpis.success_rate_24h);
-    document.getElementById('qualityFallbackLabel').textContent = formatRate(kpis.fallback_rate_24h);
-    document.getElementById('qualityAnswerLen').textContent = `${Number(kpis.avg_answer_len_24h || 0).toFixed(1)} chars`;
-
-    const successWidth = Math.max(0, Math.min(100, Number(kpis.success_rate_24h || 0)));
-    const fallbackWidth = Math.max(0, Math.min(100, Number(kpis.fallback_rate_24h || 0)));
-    document.getElementById('qualitySuccessBar').style.width = `${successWidth}%`;
-    document.getElementById('qualityFallbackBar').style.width = `${fallbackWidth}%`;
-
-    const generatedAt = metrics && metrics.generated_at ? metrics.generated_at : new Date().toISOString();
-    document.getElementById('lastUpdatedTs').textContent = generatedAt.replace('T', ' ').replace('Z', ' UTC');
+/* ── Build / update a chart, destroying old instance if data keys change ── */
+function upsertChart(id, config) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return null;
+    if (_charts[id]) {
+        try {
+            _charts[id].data    = config.data;
+            _charts[id].options = config.options;
+            _charts[id].update('active');
+            return _charts[id];
+        } catch(e) {
+            _charts[id].destroy();
+        }
+    }
+    _charts[id] = new Chart(canvas, config);
+    return _charts[id];
 }
 
-function updateWindowSubtitles(metrics) {
-    const windows = (metrics && metrics.time_windows) || {};
-
-    const dailySubtitle = document.getElementById('dailyVolumeSubtitle');
-    if (dailySubtitle) {
-        dailySubtitle.textContent = windows.daily_mode === 'historical_last_14_active_days'
-            ? 'Last 14 active days (historical fallback)'
-            : 'Last 14 days';
-    }
-
-    const hourlySubtitle = document.getElementById('hourlyVolumeSubtitle');
-    if (hourlySubtitle) {
-        hourlySubtitle.textContent = windows.hourly_mode === 'historical_last_24_active_hours'
-            ? 'Last 24 active hours (historical fallback)'
-            : 'Last 24 hours';
-    }
+/* ── Default scale options ── */
+function yScale(opts={}) {
+    return Object.assign({ beginAtZero:true, ticks:{ precision:0, color:'#9CA3AF', font:{size:11} }, grid:{ color:'rgba(0,0,0,0.04)' } }, opts);
+}
+function xScale(opts={}) {
+    return Object.assign({ grid:{ display:false }, ticks:{ color:'#9CA3AF', font:{size:11} } }, opts);
 }
 
-function buildOrUpdateChart(existingChart, chartId, config) {
-    if (existingChart) {
-        existingChart.data = config.data;
-        existingChart.options = config.options;
-        existingChart.update();
-        return existingChart;
-    }
-    const ctx = document.getElementById(chartId);
-    if (!ctx || typeof Chart === 'undefined') return null;
-    return new Chart(ctx, config);
+/* ── KPIs ── */
+function updateKpis(m) {
+    const k = (m && m.kpis) || {};
+    document.getElementById('kpiTotalUsers').textContent          = fmt(k.total_users);
+    document.getElementById('kpiTotalInteractions').textContent   = fmt(k.total_interactions);
+    document.getElementById('kpiActiveUsers').textContent         = fmt(k.active_users_30d);
+    document.getElementById('kpiInteractions30d').textContent     = fmt(k.interactions_30d);
+    document.getElementById('kpiSuccessRate').textContent         = fmtPct(k.success_rate_30d);
+    document.getElementById('kpiFallbackRate').textContent        = fmtPct(k.fallback_rate_30d);
+    document.getElementById('kpiMedianLatency').textContent       = fmtMs(k.median_latency_ms_30d);
+    document.getElementById('kpiP95Latency').textContent          = fmtMs(k.p95_latency_ms_30d);
+
+    // Quality panel
+    const sr = Math.min(100, Number(k.success_rate_30d||0));
+    const fr = Math.min(100, Number(k.fallback_rate_30d||0));
+    const er = Math.min(100, Number(k.error_rate_30d||0));
+    document.getElementById('qualitySuccessLabel').textContent    = fmtPct(k.success_rate_30d);
+    document.getElementById('qualityFallbackLabel').textContent   = fmtPct(k.fallback_rate_30d);
+    document.getElementById('qualityErrorLabel').textContent      = fmtPct(k.error_rate_30d);
+    document.getElementById('qualitySuccessBar').style.width      = `${sr}%`;
+    document.getElementById('qualityFallbackBar').style.width     = `${fr}%`;
+    document.getElementById('qualityErrorBar').style.width        = `${er}%`;
+    document.getElementById('qualityAnswerLen').textContent       = `${Number(k.avg_answer_len_30d||0).toFixed(0)} chars`;
+    document.getElementById('qualityMultilingual').textContent    = fmt(k.multilingual_queries_30d);
+
+    const ts = m && m.generated_at ? m.generated_at : new Date().toISOString();
+    document.getElementById('lastUpdatedTs').textContent          = ts.replace('T',' ').replace('Z',' UTC');
+
+    // System summary
+    document.getElementById('summTotalInteractions').textContent  = fmt(k.total_interactions);
+    document.getElementById('summLanguages').textContent          = fmt(k.distinct_languages);
+    document.getElementById('summTranslations').textContent       = fmt(k.total_translations);
+    document.getElementById('summChannels').textContent           = fmt(k.distinct_channels);
+    document.getElementById('summThroughput').textContent         = `${Number(k.events_per_min_15m||0).toFixed(2)}/min`;
 }
 
-function updateCharts(metrics) {
-    const daily = metrics.daily_volume || [];
-    const hourly = metrics.hourly_volume || [];
-    const channels = metrics.channels || [];
-
-    dailyChart = buildOrUpdateChart(dailyChart, 'dailyVolumeChart', {
+/* ── Daily volume line chart (30d) ── */
+function chartDailyVolume(m) {
+    const daily = m.daily_volume || [];
+    upsertChart('dailyVolumeChart', {
         type: 'line',
         data: {
-            labels: daily.map(x => (x.day || '').slice(5)),
+            labels: daily.map(x => (x.day||'').slice(5)),
             datasets: [{
                 label: 'Interactions',
-                data: daily.map(x => Number(x.count || 0)),
-                borderColor: '#E87A2D',
-                backgroundColor: 'rgba(232, 122, 45, 0.15)',
-                fill: true,
-                tension: 0.25,
-                pointRadius: 3,
+                data: daily.map(x => Number(x.count||0)),
+                borderColor: PURPLE,
+                backgroundColor: PURPLE_LIGHT,
+                fill: true, tension: 0.3,
+                pointRadius: 4, pointHoverRadius: 7,
+                pointBackgroundColor: PURPLE,
+                borderWidth: 2,
             }],
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } },
-                x: { grid: { display: false } },
-            },
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false },
+                tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y} interactions` } } },
+            scales:{ y: yScale(), x: xScale() },
         },
     });
+}
 
-    hourlyChart = buildOrUpdateChart(hourlyChart, 'hourlyVolumeChart', {
+/* ── Cumulative growth ── */
+function chartCumulative(m) {
+    const daily = m.daily_volume || [];
+    let running = 0;
+    const cumData = daily.map(x => { running += Number(x.count||0); return running; });
+    const baseTotal = Number(((m.kpis||{}).total_interactions||0)) - (cumData[cumData.length-1]||0);
+    const absData = cumData.map(v => v + Math.max(0, baseTotal));
+
+    upsertChart('cumulativeChart', {
+        type: 'line',
+        data: {
+            labels: daily.map(x => (x.day||'').slice(5)),
+            datasets: [{
+                label: 'Cumulative interactions',
+                data: absData,
+                borderColor: ORANGE,
+                backgroundColor: ORANGE_LIGHT,
+                fill: true, tension: 0.2,
+                pointRadius: 2, borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{ y: yScale(), x: xScale({ ticks:{ maxTicksLimit:6 } }) },
+        },
+    });
+}
+
+/* ── Response Quality Over Time (stacked bar) ── */
+function chartQualityTrend(m) {
+    const qt = m.quality_trend || [];
+    upsertChart('qualityTrendChart', {
         type: 'bar',
         data: {
-            labels: hourly.map(x => (x.hour || '').slice(11, 16)),
-            datasets: [{
-                label: 'Interactions',
-                data: hourly.map(x => Number(x.count || 0)),
-                backgroundColor: '#F59E0B',
-                borderRadius: 6,
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } },
-                x: { grid: { display: false } },
-            },
-        },
-    });
-
-    channelChart = buildOrUpdateChart(channelChart, 'channelMixChart', {
-        type: 'doughnut',
-        data: {
-            labels: channels.map(x => x.channel || 'unknown'),
-            datasets: [{
-                data: channels.map(x => Number(x.count || 0)),
-                backgroundColor: ['#E87A2D', '#10B981', '#3B82F6', '#8B5CF6', '#EF4444'],
-                borderWidth: 0,
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { usePointStyle: true, boxWidth: 8 },
+            labels: qt.map(x => (x.day||'').slice(5)),
+            datasets: [
+                {
+                    label: 'Successful',
+                    data: qt.map(x => Number(x.success_count||0)),
+                    backgroundColor: PURPLE,
+                    borderRadius: 4,
+                    stack: 'q',
                 },
+                {
+                    label: 'Fallback',
+                    data: qt.map(x => Number(x.fallback_count||0)),
+                    backgroundColor: ORANGE,
+                    borderRadius: 4,
+                    stack: 'q',
+                },
+                {
+                    label: 'Error',
+                    data: qt.map(x => Number(x.error_count||0)),
+                    backgroundColor: RED,
+                    borderRadius: 4,
+                    stack: 'q',
+                },
+            ],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:8, font:{size:11} } },
+                tooltip:{
+                    callbacks:{
+                        footer: items => {
+                            const total = items.reduce((s,i) => s + i.parsed.y, 0);
+                            return `Total: ${total}`;
+                        }
+                    }
+                }
+            },
+            scales:{
+                y: yScale({ stacked:true }),
+                x: xScale({ stacked:true }),
             },
         },
     });
 }
 
-function renderCompactBars(containerId, items, labelKey, countKey) {
+/* ── Channel distribution donut ── */
+function chartChannel(m) {
+    const ch = m.channels || [];
+    upsertChart('channelChart', {
+        type: 'doughnut',
+        data: {
+            labels: ch.map(x => (x.channel||'unknown').replace(/_/g,' ').replace(/\b\w/g, l=>l.toUpperCase())),
+            datasets: [{
+                data: ch.map(x => Number(x.count||0)),
+                backgroundColor: [PURPLE, ORANGE, GREEN, BLUE, RED],
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:9, font:{size:11} } },
+                tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} queries` } },
+            },
+            cutout: '62%',
+        },
+    });
+}
+
+/* ── Language distribution horizontal bar chart ── */
+function chartLanguage(m) {
+    const langs = m.languages || [];
+    const labels = langs.map(x => fmtLang(x.language));
+    const data   = langs.map(x => Number(x.count||0));
+    upsertChart('languageChart', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Queries',
+                data,
+                backgroundColor: [PURPLE, ORANGE, GREEN, BLUE, RED, '#F59E0B', '#06B6D4'],
+                borderRadius: 6,
+                borderSkipped: false,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{
+                x: xScale({ grid:{ display:true, color:'rgba(0,0,0,0.04)' }, beginAtZero:true }),
+                y: { grid:{ display:false }, ticks:{ color:'#374151', font:{size:12,weight:'600'} } },
+            },
+        },
+    });
+}
+
+/* ── Translation analytics grouped bar ── */
+function chartTranslation(m) {
+    const tl = m.translation_stats || [];
+    const labels   = tl.map(x => fmtLang(x.language));
+    const inbound  = tl.map(x => Number(x.inbound||0));
+    const outbound = tl.map(x => Number(x.outbound||0));
+    upsertChart('translationChart', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label:'Inbound (→ English)', data:inbound,  backgroundColor:PURPLE, borderRadius:4 },
+                { label:'Outbound (→ lang)',   data:outbound, backgroundColor:ORANGE, borderRadius:4 },
+            ],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:8, font:{size:11} } } },
+            scales:{
+                y: yScale(),
+                x: xScale(),
+            },
+        },
+    });
+}
+
+/* ── Heatmap: hour-of-day × day-of-week ── */
+function renderHeatmap(m) {
+    const container = document.getElementById('heatmapContainer');
+    if (!container) return;
+    const cells = m.heatmap || [];
+
+    const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const HOURS = Array.from({length:24}, (_,i) => i);
+
+    // Build lookup  day:hour → count
+    const lookup = {};
+    let maxVal = 1;
+    for (const c of cells) {
+        const key = `${c.dow}:${c.hour}`;
+        lookup[key] = Number(c.count||0);
+        if (lookup[key] > maxVal) maxVal = lookup[key];
+    }
+
+    function heatColor(v) {
+        if (!v) return '#F3F4F6';
+        const t = v / maxVal;
+        if (t < 0.2) return `rgba(124,58,237,${0.1 + t * 1.5})`;
+        if (t < 0.6) return `rgba(124,58,237,${0.3 + t * 0.8})`;
+        return `rgba(124,58,237,${0.55 + t * 0.45})`;
+    }
+
+    function textColor(v) {
+        const t = v / maxVal;
+        return t > 0.45 ? '#fff' : '#6B7280';
+    }
+
+    let html = '<table class="heatmap-table"><thead><tr><th></th>';
+    for (const h of HOURS) {
+        html += `<th>${h.toString().padStart(2,'0')}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let d = 0; d < 7; d++) {
+        html += `<tr><td class="hm-day-label">${DAYS[d]}</td>`;
+        for (const h of HOURS) {
+            const v = lookup[`${d}:${h}`] || 0;
+            const bg = heatColor(v);
+            const fg = textColor(v);
+            const title = `${DAYS[d]} ${h.toString().padStart(2,'0')}:00 — ${v} interactions`;
+            html += `<td class="hm-cell" style="background:${bg};color:${fg}" title="${title}">${v||''}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+/* ── Top recurring questions (count ≥ 2) ── */
+function renderTopQuestions(m) {
+    const container = document.getElementById('topQuestionsList');
+    if (!container) return;
+    const items = (m.top_questions || []).filter(x => Number(x.count||0) >= 2);
+    if (!items.length) {
+        container.innerHTML = '<div class="empty-state">No question asked twice yet &mdash; check back after more interactions.</div>';
+        return;
+    }
+    const max = Math.max(...items.map(x => Number(x.count||0)), 1);
+    container.innerHTML = items.map(item => {
+        const label = String(item.question||'(unknown)');
+        const count = Number(item.count||0);
+        const w = Math.max(4, Math.round((count/max)*100));
+        const escaped = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `<div class="compact-item">
+            <div class="label" title="${escaped}">${escaped}</div>
+            <div class="count"><span class="badge badge-purple">${count}×</span></div>
+            <div class="bar-mini"><span style="width:${w}%"></span></div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Compact list (errors / languages text list) ── */
+function renderCompactBars(containerId, items, labelKey, countKey, labelFn) {
     const container = document.getElementById(containerId);
     if (!container) return;
-
     if (!items || !items.length) {
         container.innerHTML = '<div class="empty-state">No data yet.</div>';
         return;
     }
-
-    const max = Math.max(...items.map(x => Number(x[countKey] || 0)), 1);
+    const max = Math.max(...items.map(x => Number(x[countKey]||0)), 1);
     container.innerHTML = items.map(item => {
-        const label = String(item[labelKey] || '(unknown)');
-        const count = Number(item[countKey] || 0);
-        const width = Math.max(3, Math.round((count / max) * 100));
-        return `
-            <div class="compact-item">
-                <div class="label" title="${label.replace(/"/g, '&quot;')}">${label}</div>
-                <div class="count">${count}</div>
-                <div class="bar-mini"><span style="width:${width}%"></span></div>
-            </div>
-        `;
+        const rawLabel = String(item[labelKey]||'(unknown)');
+        const label = labelFn ? labelFn(rawLabel) : rawLabel;
+        const count = Number(item[countKey]||0);
+        const w = Math.max(3, Math.round((count/max)*100));
+        const escaped = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `<div class="compact-item">
+            <div class="label" title="${escaped}">${escaped}</div>
+            <div class="count">${count}</div>
+            <div class="bar-mini"><span style="width:${w}%"></span></div>
+        </div>`;
     }).join('');
 }
 
-function renderIncidents(metrics) {
-    const incidents = metrics.recent_incidents || [];
+/* ── Incidents table ── */
+function renderIncidents(m) {
     const tbody = document.getElementById('incidentTableBody');
     if (!tbody) return;
-
+    const incidents = m.recent_incidents || [];
     if (!incidents.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No incidents detected in the selected window.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="padding:14px 10px;">No incidents detected in the last 30 days.</td></tr>';
         return;
     }
-
     tbody.innerHTML = incidents.map(item => {
-        const q = String(item.question || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        const latency = Number(item.latency_ms || 0).toFixed(1);
-        return `
-            <tr>
-                <td class="mono">${item.created_at || '-'}</td>
-                <td>${item.channel || '-'}</td>
-                <td>${item.error_type || '-'}</td>
-                <td title="${q}">${q || '-'}</td>
-                <td>${latency} ms</td>
-            </tr>
-        `;
+        const q = String(item.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const latency = Number(item.latency_ms||0).toFixed(0);
+        const chanClass = (item.channel||'').includes('whatsapp') ? 'badge-orange' : 'badge-purple';
+        return `<tr>
+            <td class="mono" style="white-space:nowrap;font-size:11px;">${item.created_at||'-'}</td>
+            <td><span class="badge ${chanClass}">${item.channel||'-'}</span></td>
+            <td><span class="badge badge-red">${item.error_type||'unknown'}</span></td>
+            <td>${fmtLang(item.source_language||'')}</td>
+            <td title="${q}" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q||'-'}</td>
+            <td class="mono">${latency} ms</td>
+        </tr>`;
     }).join('');
 }
 
-function renderDashboard(metrics) {
-    updateKpis(metrics);
-    updateWindowSubtitles(metrics);
-    updateCharts(metrics);
-    renderCompactBars('topQuestionsList', metrics.top_questions || [], 'question', 'count');
-    renderCompactBars('languageList', metrics.languages || [], 'language', 'count');
-    renderCompactBars('errorList', metrics.error_breakdown || [], 'error_type', 'count');
-    renderIncidents(metrics);
+/* ── Master render ── */
+function renderDashboard(m) {
+    updateKpis(m);
+    chartDailyVolume(m);
+    chartCumulative(m);
+    chartQualityTrend(m);
+    chartChannel(m);
+    chartLanguage(m);
+    chartTranslation(m);
+    renderHeatmap(m);
+    renderTopQuestions(m);
+    renderCompactBars('errorList', m.error_breakdown||[], 'error_type', 'count');
+    renderIncidents(m);
 }
 
+/* ── Live polling ── */
 async function fetchLiveMetrics() {
     try {
-        const response = await fetch('/api/dashboard/metrics', {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' },
-            cache: 'no-store',
-        });
-        if (!response.ok) {
-            throw new Error('Request failed');
-        }
-        const metrics = await response.json();
-        renderDashboard(metrics);
+        const r = await fetch('/api/dashboard/metrics', { cache:'no-store', headers:{ Accept:'application/json' } });
+        if (!r.ok) throw new Error('bad response');
+        renderDashboard(await r.json());
         setLiveStatus(true);
-    } catch (error) {
+    } catch(e) {
         setLiveStatus(false);
-        console.error('Dashboard update error:', error);
+        console.error('Dashboard poll error:', e);
     }
 }
 
