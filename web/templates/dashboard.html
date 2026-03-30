@@ -353,11 +353,12 @@ canvas { width: 100% !important; }
 .incident-card {
     background: #fff; border: 1px solid var(--border); border-radius: 6px;
     padding: 10px 14px; margin: 4px 0; font-size: 12px;
-    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: start;
 }
-.incident-card .inc-time { font-family: 'SF Mono', monospace; font-size: 11px; color: #666; white-space: nowrap; }
+.incident-card .inc-time { font-family: 'SF Mono', monospace; font-size: 11px; color: #666; white-space: nowrap; padding-top: 2px; }
 .incident-card .inc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.incident-card .inc-latency { font-family: 'SF Mono', monospace; font-size: 11px; color: #888; white-space: nowrap; }
+.incident-card .inc-question { font-size: 12px; color: #444; margin-top: 3px; line-height: 1.35; word-break: break-word; grid-column: 2 / -1; }
+.incident-card .inc-latency { font-family: 'SF Mono', monospace; font-size: 11px; color: #888; white-space: nowrap; padding-top: 2px; }
 
 /* ── Heatmap ───────────────────────────────────────────── */
 .heatmap-wrap {
@@ -1051,6 +1052,7 @@ function renderIncidents(m) {
             const timeStr = ((item.created_at||'').split('T')[1] || (item.created_at||'').split(' ')[1] || '').replace(/\+.*/, '').slice(0,8);
             const chanClass = (item.channel||'').includes('whatsapp') ? 'badge-orange' : 'badge-purple';
             const latency = Number(item.latency_ms||0).toFixed(0);
+            const question = (item.question||'').slice(0, 100) || '-';
             return `<div class="incident-card">
                 <span class="inc-time">${timeStr||'-'}</span>
                 <span class="inc-meta">
@@ -1059,6 +1061,7 @@ function renderIncidents(m) {
                     <span>${fmtLang(item.source_language||'')}</span>
                 </span>
                 <span class="inc-latency">${latency} ms</span>
+                <span class="inc-question">${question}</span>
             </div>`;
         }).join('');
         return `<div class="incident-date-group">
