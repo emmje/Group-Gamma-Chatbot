@@ -667,8 +667,15 @@ def _dashboard_pg(days, top_n):
     conn = _pg_conn()
     try:
         with conn.cursor() as cur:
-            # total users (registered)
-            cur.execute("SELECT COUNT(*) AS cnt FROM users")
+            # total unique users (registered + WhatsApp + any channel)
+            cur.execute(
+                """SELECT COUNT(*) AS cnt FROM (
+                       SELECT user_id::text AS uid FROM users
+                       UNION
+                       SELECT user_ref AS uid FROM interaction_events
+                       WHERE TRIM(COALESCE(user_ref,'')) != ''
+                   ) AS all_users"""
+            )
             total_users = (cur.fetchone() or {}).get("cnt", 0)
 
             # all-time totals
@@ -842,7 +849,14 @@ def _dashboard_sqlite(days, top_n):
 
     conn = _sqlite_conn()
 
-    total_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+    total_users = conn.execute(
+        """SELECT COUNT(*) FROM (
+               SELECT CAST(user_id AS TEXT) AS uid FROM users
+               UNION
+               SELECT user_ref AS uid FROM interaction_events
+               WHERE TRIM(COALESCE(user_ref,'')) != ''
+           )"""
+    ).fetchone()[0]
     total_interactions = conn.execute("SELECT COUNT(*) FROM interaction_events").fetchone()[0]
 
     w = conn.execute(
