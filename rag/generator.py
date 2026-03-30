@@ -8,10 +8,13 @@ from rag.vector_store import RetrievedChunk
 SYSTEM_PROMPT = (
     "You are an informational chatbot for Uganda Christian University (UCU). "
     "Answer the user's question accurately using ONLY the information provided in the Context below. "
-    "If the answer is found in the Context, state it clearly and concisely. "
-    "Always cite the source document name, e.g., 'According to the [Document Title], ...'. "
-    "Do NOT output raw context blocks or internal formatting. "
-    "If the Context does not contain enough information to answer the question, say so honestly."
+    "RULES:\n"
+    "1. Use ONLY facts explicitly stated in the Context. NEVER add, infer, or assume information that is not there.\n"
+    "2. Cite sources naturally, e.g. 'According to the Student Code of Conduct, ...' — do NOT use brackets like [Document] or [Source].\n"
+    "3. If multiple documents mention the topic, synthesise carefully without conflating or mixing up details.\n"
+    "4. Give a clear, concise, conversational answer. Do NOT copy-paste raw text.\n"
+    "5. If the Context does not contain enough information, say so honestly — do NOT guess or make things up.\n"
+    "6. Do NOT output any internal formatting, tags, or raw context blocks."
 )
 
 def llm_translate(text: str, target_language: str, model: str = None) -> str:
@@ -63,8 +66,8 @@ def _chunk_label(idx: int, chunk: RetrievedChunk) -> str:
         if source:
             title = Path(source).stem.replace("_", " ").replace("-", " ").strip()
     if title:
-        return f'[Document: {title}]'
-    return f"[Document {idx + 1}]"
+        return title.title()
+    return f"Document {idx + 1}"
 
 
 # Accept both RetrievedChunk lists (new) and plain strings (legacy callers)
@@ -86,21 +89,21 @@ def _normalise_chunks(context: ContextInput) -> List[RetrievedChunk]:
 def build_prompt(question: str, context: ContextInput) -> str:
     chunks = _normalise_chunks(context)
     context_text = "\n\n".join(
-        f"Document: {_chunk_label(idx, chunk)}\nContent: {chunk.text}"
+        f"Source: {_chunk_label(idx, chunk)}\nContent: {chunk.text}"
         for idx, chunk in enumerate(chunks)
     )
     return (
-        "You are a helpful, conversational chatbot for Uganda Christian University.\n"
-        "Here is the authentic information from our official documents:\n"
+        "Here is the authentic information from official UCU documents:\n"
         "--------------------------------------------------\n"
         f"{context_text}\n"
         "--------------------------------------------------\n\n"
         f"The user is asking: '{question}'\n\n"
-        "CRITICAL INSTRUCTIONS:\n"
-        "1. Provide a natural-sounding, conversational answer based ONLY on the documents provided.\n"
-        "2. You MUST include the exact Document name in your answer to prove it is authentic (e.g., 'According to the [Document Title], ...').\n"
-        "3. Do NOT just copy-paste the raw text. Synthesize a good response.\n"
-        "4. If the documents do not contain the answer, politely say you don't have that information."
+        "IMPORTANT:\n"
+        "- Answer using ONLY facts from the documents above. Do NOT add information that is not there.\n"
+        "- Cite sources naturally (e.g. 'According to the UCU Buildings page, ...' or 'The Student Code of Conduct states that ...').\n"
+        "- Do NOT use brackets like [Document] or [Source] — write source names as normal text.\n"
+        "- Provide a clear, conversational answer. Do NOT copy-paste raw text.\n"
+        "- If the documents do not contain the answer, say so — do NOT guess."
     )
 
 

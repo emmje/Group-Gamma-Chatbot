@@ -27,6 +27,7 @@ from web.whatsapp_meta import (
     is_whatsapp_configured,
     load_whatsapp_config,
     send_whatsapp_text,
+    send_whatsapp_image,
     send_whatsapp_interactive_list,
 )
 
@@ -902,6 +903,17 @@ def meta_whatsapp_webhook_receive():
             status_code, provider_response = 502, {"error": "Failed to send WhatsApp message"}
 
         delivery_ok = 200 <= status_code < 300
+
+        # Send building images if the answer mentions any UCU buildings
+        try:
+            from rag.buildings import find_building_images
+            building_imgs = find_building_images(question + " " + answer)
+            base_url = os.getenv("RENDER_EXTERNAL_URL", request.url_root.rstrip("/"))
+            for bimg in building_imgs[:2]:
+                img_public_url = f"{base_url}{bimg['image_url']}"
+                send_whatsapp_image(recipient, img_public_url, caption=bimg["name"])
+        except Exception:
+            app.logger.debug("Could not send building images via WhatsApp")
         error_type = ""
         if answer_generation_failed:
             error_type = "generation_error"

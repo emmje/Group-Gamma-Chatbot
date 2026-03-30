@@ -67,6 +67,51 @@ def send_whatsapp_text(to_number: str, text: str) -> tuple[int, dict[str, Any]]:
         return response.status_code, {"raw": response.text}
 
 
+def send_whatsapp_image(
+    to_number: str,
+    image_url: str,
+    caption: str = "",
+) -> tuple[int, dict[str, Any]]:
+    """
+    Send an outbound WhatsApp image message using a public URL.
+
+    The image_url must be publicly accessible (https).
+    Returns: (status_code, response_json_or_error)
+    """
+    cfg = load_whatsapp_config()
+    if not cfg["access_token"] or not cfg["phone_number_id"]:
+        return 500, {"error": "WhatsApp integration is not configured."}
+
+    endpoint = (
+        f"{cfg['base_url']}/{cfg['api_version']}/"
+        f"{cfg['phone_number_id']}/messages"
+    )
+    headers = {
+        "Authorization": f"Bearer {cfg['access_token']}",
+        "Content-Type": "application/json",
+    }
+    image_obj: dict[str, Any] = {"link": image_url}
+    if caption:
+        image_obj["caption"] = caption
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "recipient_type": "individual",
+        "to": to_number,
+        "type": "image",
+        "image": image_obj,
+    }
+
+    try:
+        response = requests.post(endpoint, json=payload, headers=headers, timeout=30)
+        data = response.json() if response.content else {}
+        return response.status_code, data
+    except requests.RequestException as exc:
+        return 502, {"error": f"Failed to call Meta WhatsApp API: {exc}"}
+    except ValueError:
+        return response.status_code, {"raw": response.text}
+
+
 def extract_inbound_text_messages(payload: dict[str, Any]) -> list[dict[str, str]]:
     """
     Parse Meta WhatsApp webhook payload and return text messages.
