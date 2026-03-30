@@ -667,7 +667,7 @@ def _dashboard_pg(days, top_n):
     conn = _pg_conn()
     try:
         with conn.cursor() as cur:
-            # total unique users (registered + WhatsApp + any channel)
+            # total users = everyone who has ever used the chatbot (registered + WhatsApp + any channel)
             cur.execute(
                 """SELECT COUNT(*) AS cnt FROM (
                        SELECT user_id::text AS uid FROM users
@@ -677,6 +677,10 @@ def _dashboard_pg(days, top_n):
                    ) AS all_users"""
             )
             total_users = (cur.fetchone() or {}).get("cnt", 0)
+
+            # active (registered) users
+            cur.execute("SELECT COUNT(*) AS cnt FROM users")
+            registered_users = (cur.fetchone() or {}).get("cnt", 0)
 
             # all-time totals
             cur.execute("SELECT COUNT(*) AS cnt FROM interaction_events")
@@ -832,7 +836,7 @@ def _dashboard_pg(days, top_n):
             heatmap_rows.append({"dow": dow, "hour": int(_row_val(r, "hour") or 0), "count": int(_row_val(r, "count") or 0)})
 
         return _build_snapshot(
-            total_users, total_interactions,
+            total_users, registered_users, total_interactions,
             interactions_d, success_d, fallback_d, error_d,
             active_users_d, avg_ans_len, multilingual_d, translations_d,
             distinct_langs, distinct_channels,
@@ -857,6 +861,7 @@ def _dashboard_sqlite(days, top_n):
                WHERE TRIM(COALESCE(user_ref,'')) != ''
            )"""
     ).fetchone()[0]
+    registered_users = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     total_interactions = conn.execute("SELECT COUNT(*) FROM interaction_events").fetchone()[0]
 
     w = conn.execute(
@@ -964,7 +969,7 @@ def _dashboard_sqlite(days, top_n):
         heatmap_rows.append({"dow": dow, "hour": int(r["hour"] or 0), "count": int(r["count"] or 0)})
 
     return _build_snapshot(
-        total_users, total_interactions,
+        total_users, registered_users, total_interactions,
         interactions_d, success_d, fallback_d, error_d,
         active_users_d, avg_ans_len, multilingual_d, translations_d,
         distinct_langs, distinct_channels,
@@ -982,7 +987,7 @@ def _dashboard_sqlite(days, top_n):
 
 
 def _build_snapshot(
-    total_users, total_interactions,
+    total_users, registered_users, total_interactions,
     interactions_d, success_d, fallback_d, error_d,
     active_users_d, avg_ans_len, multilingual_d, translations_d,
     distinct_langs, distinct_channels,
@@ -994,6 +999,7 @@ def _build_snapshot(
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "kpis": {
             "total_users": int(total_users or 0),
+            "registered_users": int(registered_users or 0),
             "total_interactions": int(total_interactions or 0),
             "interactions_30d": interactions_d,
             "active_users_30d": active_users_d,

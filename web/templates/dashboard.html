@@ -234,10 +234,10 @@ canvas { width: 100% !important; }
 }
 
 .progress-fill { height: 100%; border-radius: 999px; }
-.success-fill  { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
-.fallback-fill { background: linear-gradient(90deg, #E87A2D, #FBB966); }
-.error-fill    { background: linear-gradient(90deg, #EF4444, #FCA5A5); }
-.transl-fill   { background: linear-gradient(90deg, #E87A2D, #FBB966); }
+.success-fill  { background: #7C3AED; }
+.fallback-fill { background: #E87A2D; }
+.error-fill    { background: #EF4444; }
+.transl-fill   { background: #E87A2D; }
 
 /* ── Compact bars / lists ──────────────────────────────── */
 .compact-list { display: flex; flex-direction: column; gap: 9px; }
@@ -274,7 +274,7 @@ canvas { width: 100% !important; }
 
 .bar-mini > span {
     display: block; height: 100%;
-    background: linear-gradient(90deg, #7C3AED, #E87A2D);
+    background: #7C3AED;
     border-radius: 999px;
 }
 
@@ -452,7 +452,7 @@ canvas { width: 100% !important; }
         <div class="kpi-card">
             <div class="kpi-label">Total Users</div>
             <div class="kpi-value" id="kpiTotalUsers">0</div>
-            <div class="kpi-sub">All-time distinct registered users</div>
+            <div class="kpi-sub">Everyone who has ever used the chatbot</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-label">Total Interactions</div>
@@ -460,9 +460,9 @@ canvas { width: 100% !important; }
             <div class="kpi-sub">All channels, all time</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Active Users (30d)</div>
+            <div class="kpi-label">Registered Users</div>
             <div class="kpi-value" id="kpiActiveUsers">0</div>
-            <div class="kpi-sub">Distinct users last 30 days</div>
+            <div class="kpi-sub">Users with accounts in the system</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-label">Interactions (30d)</div>
@@ -711,7 +711,7 @@ function updateKpis(m) {
     const k = (m && m.kpis) || {};
     document.getElementById('kpiTotalUsers').textContent          = fmt(k.total_users);
     document.getElementById('kpiTotalInteractions').textContent   = fmt(k.total_interactions);
-    document.getElementById('kpiActiveUsers').textContent         = fmt(k.active_users_30d);
+    document.getElementById('kpiActiveUsers').textContent         = fmt(k.registered_users);
     document.getElementById('kpiInteractions30d').textContent     = fmt(k.interactions_30d);
     document.getElementById('kpiSuccessRate').textContent         = fmtPct(k.success_rate_30d);
     document.getElementById('kpiFallbackRate').textContent        = fmtPct(k.fallback_rate_30d);
@@ -753,8 +753,8 @@ function chartDailyVolume(m) {
                 label: 'Interactions',
                 data: daily.map(x => Number(x.count||0)),
                 borderColor: PURPLE,
-                backgroundColor: PURPLE_LIGHT,
-                fill: true, tension: 0.3,
+                backgroundColor: 'transparent',
+                fill: false, tension: 0.3,
                 pointRadius: 4, pointHoverRadius: 7,
                 pointBackgroundColor: PURPLE,
                 borderWidth: 2,
@@ -785,8 +785,8 @@ function chartCumulative(m) {
                 label: 'Cumulative interactions',
                 data: absData,
                 borderColor: ORANGE,
-                backgroundColor: ORANGE_LIGHT,
-                fill: true, tension: 0.2,
+                backgroundColor: 'transparent',
+                fill: false, tension: 0.2,
                 pointRadius: 2, borderWidth: 2,
             }],
         },
