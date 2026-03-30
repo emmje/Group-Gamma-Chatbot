@@ -155,7 +155,24 @@ def should_process_whatsapp_message(message_id: str) -> bool:
 
 
 def is_fallback_response(answer: str) -> bool:
-    return (answer or "").strip().lower().startswith(FALLBACK_PREFIX)
+    text = (answer or "").strip().lower()
+    if text.startswith(FALLBACK_PREFIX):
+        return True
+    _FALLBACK_PHRASES = [
+        "i don't have enough information",
+        "i do not have enough information",
+        "does not provide information",
+        "does not contain enough information",
+        "no information provided",
+        "i'm not able to understand",
+        "i'm not sure what",
+        "not appear to be a question",
+        "there is no information about",
+        "there is no context about",
+        "unfortunately, the provided context",
+        "unfortunately, there is no information",
+    ]
+    return any(phrase in text for phrase in _FALLBACK_PHRASES)
 
 
 def get_pipeline():
@@ -449,7 +466,7 @@ def api_ask():
             source_language=source_language,
             translated_inbound=translated_inbound,
             translated_outbound=translated_outbound,
-            success=True,
+            success=not fallback_used,
             fallback_used=fallback_used,
             latency_ms=latency_ms,
             error_type="generation_fallback" if fallback_used else "",
