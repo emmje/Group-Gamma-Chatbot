@@ -22,6 +22,8 @@ from web.db import (
 from rag.sunbird import SunbirdClient, SunbirdError
 from web.whatsapp_meta import (
     extract_inbound_text_messages,
+    extract_inbound_image_messages,
+    download_whatsapp_media,
     is_whatsapp_configured,
     load_whatsapp_config,
     send_whatsapp_text,
@@ -477,6 +479,82 @@ def api_ask():
     return jsonify({"answer": final_answer, "language": source_language})
 
 
+
+@app.route("/api/ask-image", methods=["POST"])
+@login_required
+def api_ask_image():
+    """Handle image + question uploads for vision-based Q&A."""
+    request_started = time.perf_counter()
+
+    question = (request.form.get("question") or "").strip()
+    if not question:
+        question = "What can you tell me about this image?"
+
+    image_file = request.files.get("image")
+    if not image_file or not image_file.filename:
+        return jsonify({"error": "No image uploaded"}), 400
+
+    # Validate mime type
+    allowed_mime = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+    mime = image_file.content_type or "image/jpeg"
+    if mime not in allowed_mime:
+        return jsonify({"error": f"Unsupported image type: {mime}"}), 400
+
+    # Read image (limit 10MB)
+    image_bytes = image_file.read(10 * 1024 * 1024 + 1)
+    if len(image_bytes) > 10 * 1024 * 1024:
+        return jsonify({"error": "Image too large (max 10MB)"}), 400
+
+    from rag.vision import analyse_image, detect_scenario, get_rag_context_for_scenario
+
+    scenario = detect_scenario(question)
+
+    # Get relevant RAG context to ground the vision response
+    try:
+        pip = get_pipeline()
+    except Exception:
+        pip = None
+    rag_context = get_rag_context_for_scenario(scenario, question, pip)
+
+    try:
+        answer = analyse_image(
+            image_bytes=image_bytes,
+            question=question,
+            rag_context=rag_context,
+            scenario=scenario,
+            mime_type=mime,
+        )
+    except Exception:
+        app.logger.exception("Vision analysis failed")
+        answer = "I wasn\'t able to analyse the image right now. Please try again later."
+
+    fallback_used = is_fallback_response(answer)
+
+    try:
+        save_chat(current_user.id, f"[Image] {question}", answer)
+    except Exception:
+        app.logger.exception("Failed to persist image chat history")
+
+    latency_ms = round((time.perf_counter() - request_started) * 1000.0, 2)
+    try:
+        record_interaction(
+            channel="web",
+            user_ref=f"user:{current_user.id}",
+            question_text=f"[Image] {question}",
+            answer_text=answer,
+            source_language="eng",
+            translated_inbound=False,
+            translated_outbound=False,
+            success=not fallback_used,
+            fallback_used=fallback_used,
+            latency_ms=latency_ms,
+            error_type="vision_error" if "wasn\'t able to analyse" in answer else "",
+        )
+    except Exception:
+        app.logger.exception("Failed to persist image interaction analytics")
+
+    return jsonify({"answer": answer, "scenario": scenario})
+
 @app.route("/api/campus-info")
 def campus_info():
     """Return events and clubs data for the web slider / WhatsApp."""
@@ -624,10 +702,86 @@ def meta_whatsapp_webhook_receive():
 
     payload = request.get_json(silent=True) or {}
     inbound = extract_inbound_text_messages(payload)
-    if not inbound:
-        return jsonify({"status": "ignored", "reason": "no text messages"}), 200
+    inbound_images = extract_inbound_image_messages(payload)
+    if not inbound and not inbound_images:
+        return jsonify({"status": "ignored", "reason": "no text or image messages"}), 200
 
     processed = []
+
+    # ── Process image messages ──
+    for msg in inbound_images:
+        message_id = msg.get("id", "")
+        if not should_process_whatsapp_message(message_id):
+            processed.append({"id": message_id, "to": msg.get("from", ""), "status_code": 200, "ok": True, "provider": {"status": "duplicate_ignored"}})
+            continue
+
+        recipient = msg["from"]
+        caption = msg.get("caption", "") or "What is in this image?"
+        mime_type = msg.get("mime_type", "image/jpeg")
+        media_id = msg["media_id"]
+
+        # Send welcome on first contact
+        is_first_contact = recipient not in _known_whatsapp_contacts
+        if is_first_contact:
+            _known_whatsapp_contacts.add(recipient)
+            try:
+                send_whatsapp_text(recipient, WELCOME_MESSAGE)
+            except Exception:
+                app.logger.exception("Failed to send WhatsApp welcome message")
+
+        message_started = time.perf_counter()
+
+        # Download image from Meta
+        image_bytes, downloaded_mime = download_whatsapp_media(media_id)
+        if not image_bytes:
+            reply = "Sorry, I couldn't download that image. Please try sending it again."
+            try:
+                status_code, provider_response = send_whatsapp_text(recipient, reply)
+            except Exception:
+                status_code, provider_response = 502, {"error": "send failed"}
+            processed.append({"id": message_id, "to": recipient, "status_code": status_code, "ok": 200 <= status_code < 300, "provider": provider_response})
+            continue
+
+        # Analyse image with vision module
+        try:
+            from rag.vision import analyse_image, detect_scenario, get_rag_context_for_scenario
+            scenario = detect_scenario(caption)
+            rag_context = get_rag_context_for_scenario(scenario, caption)
+            answer = analyse_image(image_bytes, caption, rag_context=rag_context, scenario=scenario, mime_type=downloaded_mime or mime_type)
+        except Exception:
+            app.logger.exception("Vision analysis failed for WhatsApp image")
+            answer = "Sorry, I couldn't analyse that image right now. Please try again later."
+
+        fallback_used = is_fallback_response(answer)
+        latency_ms = round((time.perf_counter() - message_started) * 1000.0, 2)
+
+        try:
+            status_code, provider_response = send_whatsapp_text(recipient, answer)
+        except Exception:
+            app.logger.exception("Failed to send WhatsApp image answer")
+            status_code, provider_response = 502, {"error": "Failed to send"}
+
+        delivery_ok = 200 <= status_code < 300
+        try:
+            record_interaction(
+                channel="whatsapp_meta",
+                user_ref=recipient,
+                question_text=f"[Image] {caption}",
+                answer_text=answer,
+                source_language="eng",
+                translated_inbound=False,
+                translated_outbound=False,
+                success=(delivery_ok and not fallback_used),
+                fallback_used=fallback_used,
+                latency_ms=latency_ms,
+                error_type="" if delivery_ok else "delivery_failed",
+            )
+        except Exception:
+            app.logger.exception("Failed to persist WhatsApp image interaction analytics")
+
+        processed.append({"id": message_id, "to": recipient, "status_code": status_code, "ok": delivery_ok, "provider": provider_response})
+
+    # ── Process text messages ──
     for msg in inbound:
         message_id = msg.get("id", "")
         if not should_process_whatsapp_message(message_id):

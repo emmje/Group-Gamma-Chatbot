@@ -112,6 +112,100 @@ def extract_inbound_text_messages(payload: dict[str, Any]) -> list[dict[str, str
     return messages
 
 
+def extract_inbound_image_messages(payload: dict[str, Any]) -> list[dict[str, str]]:
+    """
+    Parse Meta WhatsApp webhook payload and return image messages.
+
+    Output rows: {"id": "<message-id>", "from": "<phone>",
+                  "media_id": "<media-id>", "mime_type": "image/jpeg",
+                  "caption": "<optional caption>"}
+    """
+    messages: list[dict[str, str]] = []
+    entries = payload.get("entry")
+    if not isinstance(entries, list):
+        return messages
+
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        changes = entry.get("changes")
+        if not isinstance(changes, list):
+            continue
+
+        for change in changes:
+            if not isinstance(change, dict):
+                continue
+            value = change.get("value")
+            if not isinstance(value, dict):
+                continue
+            inbound = value.get("messages")
+            if not isinstance(inbound, list):
+                continue
+
+            for message in inbound:
+                if not isinstance(message, dict):
+                    continue
+                if message.get("type") != "image":
+                    continue
+                message_id = str(message.get("id", "")).strip()
+                from_number = str(message.get("from", "")).strip()
+                image_obj = message.get("image")
+                if not isinstance(image_obj, dict):
+                    continue
+                media_id = str(image_obj.get("id", "")).strip()
+                mime_type = str(image_obj.get("mime_type", "image/jpeg")).strip()
+                caption = str(image_obj.get("caption", "")).strip()
+                if from_number and media_id:
+                    messages.append({
+                        "id": message_id,
+                        "from": from_number,
+                        "media_id": media_id,
+                        "mime_type": mime_type,
+                        "caption": caption,
+                    })
+
+    return messages
+
+
+def download_whatsapp_media(media_id: str) -> tuple[bytes | None, str]:
+    """
+    Download media from Meta WhatsApp Cloud API.
+
+    1. GET /media_id to get the download URL
+    2. GET the download URL to get the binary data
+
+    Returns: (image_bytes_or_None, mime_type)
+    """
+    cfg = load_whatsapp_config()
+    if not cfg["access_token"]:
+        return None, ""
+
+    headers = {"Authorization": f"Bearer {cfg['access_token']}"}
+
+    # Step 1: Get media URL
+    media_url_endpoint = f"{cfg['base_url']}/{cfg['api_version']}/{media_id}"
+    try:
+        resp = requests.get(media_url_endpoint, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None, ""
+        data = resp.json()
+        download_url = data.get("url", "")
+        mime_type = data.get("mime_type", "image/jpeg")
+        if not download_url:
+            return None, ""
+    except (requests.RequestException, ValueError):
+        return None, ""
+
+    # Step 2: Download the actual media
+    try:
+        resp = requests.get(download_url, headers=headers, timeout=30)
+        if resp.status_code != 200:
+            return None, ""
+        return resp.content, mime_type
+    except requests.RequestException:
+        return None, ""
+
+
 def send_whatsapp_interactive_list(
     to_number: str,
     header_text: str = "Explore UCU Campus",
