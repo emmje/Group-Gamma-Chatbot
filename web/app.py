@@ -479,7 +479,7 @@ def api_ask():
 
     # Check for building images to include
     from rag.buildings import find_building_images
-    building_images = find_building_images(question + " " + final_answer)
+    building_images = find_building_images(original_question + " " + final_answer)
 
     response = {"answer": final_answer, "language": source_language}
     if building_images:
