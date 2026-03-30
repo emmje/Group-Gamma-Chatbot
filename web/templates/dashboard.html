@@ -487,7 +487,7 @@ canvas { width: 100% !important; }
         <div class="kpi-card">
             <div class="kpi-label">P95 Latency (30d)</div>
             <div class="kpi-value" id="kpiP95Latency">0 ms</div>
-            <div class="kpi-sub">Tail latency — worst-case UX signal</div>
+            <div class="kpi-sub">Tail latency, worst-case UX signal</div>
         </div>
     </div>
 
@@ -516,7 +516,7 @@ canvas { width: 100% !important; }
         <!-- Response quality over time (stacked bar chart) -->
         <section class="panel span-8">
             <h3>Response Quality Over Time</h3>
-            <p class="panel-subtitle">Daily breakdown: successful RAG answers vs fallbacks vs errors — key signal for system trust</p>
+            <p class="panel-subtitle">Daily breakdown: successful RAG answers vs fallbacks vs errors, key signal for system trust</p>
             <canvas id="qualityTrendChart" class="chart-h-260"></canvas>
         </section>
 
@@ -567,7 +567,7 @@ canvas { width: 100% !important; }
         <!-- Channel breakdown (donut) -->
         <section class="panel span-5">
             <h3>Channel Distribution</h3>
-            <p class="panel-subtitle">Web vs WhatsApp — shows which deployment surface drives engagement</p>
+            <p class="panel-subtitle">Web vs WhatsApp: shows which deployment surface drives engagement</p>
             <canvas id="channelChart" class="chart-h-220"></canvas>
         </section>
 
@@ -577,14 +577,14 @@ canvas { width: 100% !important; }
         <!-- Language distribution bar chart -->
         <section class="panel span-6">
             <h3>Language Distribution</h3>
-            <p class="panel-subtitle">Query language breakdown — validates multilingual NLP coverage; 7 languages supported</p>
+            <p class="panel-subtitle">Query language breakdown: validates multilingual NLP coverage; 7 languages supported</p>
             <canvas id="languageChart" class="chart-h-220"></canvas>
         </section>
 
         <!-- Translation analytics -->
         <section class="panel span-6">
             <h3>Translation Analytics</h3>
-            <p class="panel-subtitle">Inbound and outbound translation rates per language — assesses Sunbird AI + LLM fallback coverage</p>
+            <p class="panel-subtitle">Inbound and outbound translation rates per language: assesses Sunbird AI + LLM fallback coverage</p>
             <canvas id="translationChart" class="chart-h-220"></canvas>
         </section>
 
@@ -594,7 +594,7 @@ canvas { width: 100% !important; }
         <!-- Top recurring questions -->
         <section class="panel span-6">
             <h3>Top Recurring Questions</h3>
-            <p class="panel-subtitle">Asked 2 or more times in last 30 days — reveals knowledge gaps and FAQ candidates for content improvement</p>
+            <p class="panel-subtitle">Asked 2 or more times in last 30 days: reveals knowledge gaps and FAQ candidates for content improvement</p>
             <div id="topQuestionsList" class="compact-list"></div>
         </section>
 
@@ -637,7 +637,7 @@ canvas { width: 100% !important; }
         <!-- Recent incidents – collapsible by date -->
         <section class="panel span-12">
             <h3>Recent Operational Incidents</h3>
-            <p class="panel-subtitle">Failed or degraded responses in the last 30 days — grouped by date</p>
+            <p class="panel-subtitle">Failed or degraded responses in the last 30 days, grouped by date</p>
             <div id="incidentAccordion" class="incident-accordion"></div>
         </section>
 
@@ -974,7 +974,7 @@ function renderHeatmap(m) {
             const v = lookup[`${d}:${h}`] || 0;
             const bg = heatColor(v);
             const fg = textColor(v);
-            const title = `${DAYS[d]} ${h.toString().padStart(2,'0')}:00 — ${v} interactions`;
+            const title = `${DAYS[d]} ${h.toString().padStart(2,'0')}:00: ${v} interactions`;
             html += `<td class="hm-cell" style="background:${bg};color:${fg}" title="${title}">${v||''}</td>`;
         }
         html += '</tr>';
@@ -1041,7 +1041,8 @@ function renderIncidents(m) {
     // Group by date
     const groups = {};
     incidents.forEach(item => {
-        const dateStr = (item.created_at||'').split('T')[0] || (item.created_at||'').split(' ')[0] || 'Unknown';
+        const raw = item.created_at || '';
+        const dateStr = (raw.includes('T') ? raw.split('T')[0] : raw.split(' ')[0]) || 'Unknown';
         if (!groups[dateStr]) groups[dateStr] = [];
         groups[dateStr].push(item);
     });
