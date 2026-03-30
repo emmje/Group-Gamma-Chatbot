@@ -60,8 +60,8 @@ _processed_whatsapp_message_ids: dict[str, float] = {}
 _known_whatsapp_contacts: set[str] = set()
 
 WELCOME_MESSAGE = (
-    "Hello! \U0001F44B I can answer questions about UCU using a verified knowledge base "
-    "and official university documents. What would you like to know?"
+    "Hello! I can answer questions about UCU using official university documents. "
+    "What would you like to know?"
 )
 
 FALLBACK_PREFIX = "i'm not fully confident in the answer based on the available documents"

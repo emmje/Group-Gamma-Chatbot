@@ -172,6 +172,7 @@ def init_db():
         conn.close()
 
     _bootstrap_admin()
+    _backfill_interaction_events()
 
 
 # ---------------------------------------------------------------------------
@@ -212,6 +213,61 @@ def _bootstrap_admin():
                 (username, generate_password_hash(password)),
             )
             conn.commit()
+        finally:
+            conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Backfill interaction_events from historical chats
+# ---------------------------------------------------------------------------
+
+def _backfill_interaction_events():
+    """Seed interaction_events from the chats table for any chats that
+    were recorded before the analytics system was introduced.  Only inserts
+    rows when the interaction_events table is empty so this is safe to call
+    on every startup."""
+    if _USE_POSTGRES:
+        conn = _pg_conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) AS cnt FROM interaction_events")
+                if (cur.fetchone() or {}).get("cnt", 0) > 0:
+                    return
+                cur.execute(
+                    """INSERT INTO interaction_events
+                       (channel, user_ref, question_text, answer_text,
+                        source_language, translated_inbound, translated_outbound,
+                        success, fallback_used, latency_ms, error_type, created_at)
+                       SELECT 'web', 'user:' || c.user_id::text, c.question, c.answer,
+                              'eng', 0, 0, 1, 0, NULL, '', c.created_at
+                       FROM chats c
+                       ORDER BY c.created_at"""
+                )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+        finally:
+            conn.close()
+    else:
+        conn = _sqlite_conn()
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM interaction_events").fetchone()[0]
+            if count > 0:
+                conn.close()
+                return
+            conn.execute(
+                """INSERT INTO interaction_events
+                   (channel, user_ref, question_text, answer_text,
+                    source_language, translated_inbound, translated_outbound,
+                    success, fallback_used, latency_ms, error_type, created_at)
+                   SELECT 'web', 'user:' || CAST(c.user_id AS TEXT), c.question, c.answer,
+                          'eng', 0, 0, 1, 0, NULL, '', c.created_at
+                   FROM chats c
+                   ORDER BY c.created_at"""
+            )
+            conn.commit()
+        except Exception:
+            pass
         finally:
             conn.close()
 

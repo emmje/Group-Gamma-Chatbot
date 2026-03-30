@@ -76,6 +76,27 @@
             border: 1px solid #FECACA;
         }
 
+        .legal-footer {
+            border-top: 1px solid var(--border);
+            margin: 24px 0 0;
+            padding: 16px 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .ai-disclaimer {
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
         {% block extra_style %}{% endblock %}
     </style>
 </head>
@@ -103,6 +124,12 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+    <footer class="legal-footer">
+        <span class="ai-disclaimer">Gamma can make mistakes. Double-check important information.</span>
+        <a href="{{ url_for('terms_of_service') }}">Terms of Service</a>
+        <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+        <a href="{{ url_for('data_deletion') }}">Data Deletion Request</a>
+    </footer>
     {% block scripts %}{% endblock %}
 </body>
 </html>
