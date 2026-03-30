@@ -476,7 +476,14 @@ def api_ask():
     except Exception:
         app.logger.exception("Failed to persist web interaction analytics")
 
-    return jsonify({"answer": final_answer, "language": source_language})
+    # Check for building images to include
+    from rag.buildings import find_building_images
+    building_images = find_building_images(question + " " + final_answer)
+
+    response = {"answer": final_answer, "language": source_language}
+    if building_images:
+        response["images"] = building_images
+    return jsonify(response)
 
 
 
@@ -553,7 +560,13 @@ def api_ask_image():
     except Exception:
         app.logger.exception("Failed to persist image interaction analytics")
 
-    return jsonify({"answer": answer, "scenario": scenario})
+    from rag.buildings import find_building_images
+    building_images = find_building_images(question + " " + answer)
+
+    response = {"answer": answer, "scenario": scenario}
+    if building_images:
+        response["images"] = building_images
+    return jsonify(response)
 
 @app.route("/api/campus-info")
 def campus_info():

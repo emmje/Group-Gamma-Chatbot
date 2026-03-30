@@ -325,6 +325,36 @@
     margin-bottom: 6px;
     object-fit: cover;
 }
+
+/* ── Building image gallery ── */
+.building-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 0 4px;
+}
+.building-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 220px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.building-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+.building-caption {
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--purple);
+    text-align: center;
+}
 {% endblock %}
 
 {% block content %}
@@ -581,7 +611,7 @@ function addMessage(text, cls) {
     return div;
 }
 
-function addBotMessage(text) {
+function addBotMessage(text, images) {
     const wrap = document.createElement('div');
     wrap.className = 'msg-bot-wrap';
 
@@ -589,6 +619,27 @@ function addBotMessage(text) {
     msgDiv.className = 'msg msg-bot';
     msgDiv.textContent = text;
     wrap.appendChild(msgDiv);
+
+    // Render building images if provided
+    if (images && images.length > 0) {
+        const gallery = document.createElement('div');
+        gallery.className = 'building-gallery';
+        images.forEach(img => {
+            const card = document.createElement('div');
+            card.className = 'building-card';
+            const photo = document.createElement('img');
+            photo.src = img.image_url;
+            photo.alt = img.name;
+            photo.loading = 'lazy';
+            card.appendChild(photo);
+            const caption = document.createElement('div');
+            caption.className = 'building-caption';
+            caption.textContent = img.name;
+            card.appendChild(caption);
+            gallery.appendChild(card);
+        });
+        wrap.appendChild(gallery);
+    }
 
     // Add TTS button
     if (sunbirdConfigured) {
@@ -749,7 +800,7 @@ function sendMessage() {
     })
     .then((data) => {
         chatMessages.removeChild(typing);
-        addBotMessage(data.answer || 'No response returned.');
+        addBotMessage(data.answer || 'No response returned.', data.images);
         sendBtn.disabled = false;
         addToSidebar(q || '📷 Image question');
     })

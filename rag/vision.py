@@ -65,7 +65,18 @@ _SYSTEM_BUILDING = (
     "2. Provide its name, purpose, and location on campus.\n"
     "3. If you cannot identify it with certainty, describe what you see and suggest "
     "   which UCU buildings it might be based on the Context.\n"
-    "4. Offer helpful directions or related information."
+    "4. Offer helpful directions or related information.\n\n"
+    "Known UCU buildings:\n"
+    "- Bishop Tucker Building (Vice Chancellor's office, chapel, Theology & Divinity)\n"
+    "- Hamu Mukasa Library (3-level library with reading rooms & computer labs)\n"
+    "- Nkoyoyo Hall (community gathering hall, named after Archbishop Nkoyoyo)\n"
+    "- K-Block / Bishop Festo Kivengere Lecture Block\n"
+    "- M-Block / Bishop Eliphazi Maari Lecture Block\n"
+    "- N-Block / Stephen & Peggy Noll Lecture Block\n"
+    "- Janan Luwum Dining Hall (feeds 2500+ students daily)\n"
+    "- Sabiiti & Nsibambi Halls (female residence halls)\n"
+    "- Allan Galpin Health Centre (student & community clinic)\n"
+    "- Misaeri Kawuma Block (Academics Department offices)"
 )
 
 _SYSTEM_DOCUMENT = (
