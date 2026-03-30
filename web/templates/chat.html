@@ -457,6 +457,13 @@ micBtn.addEventListener('click', async function() {
                 if (resp.ok && result.text) {
                     questionInput.value = result.text;
                     questionInput.placeholder = 'Type your question...';
+                    // Auto-select detected language so the reply comes back in the same language
+                    if (result.language && result.language !== 'eng') {
+                        const langOpt = languageSelect.querySelector('option[value="' + result.language + '"]');
+                        if (langOpt) {
+                            languageSelect.value = result.language;
+                        }
+                    }
                 } else {
                     questionInput.placeholder = 'Type your question...';
                     addBotMessage('Could not transcribe audio: ' + (result.error || 'Unknown error'));

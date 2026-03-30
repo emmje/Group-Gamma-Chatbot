@@ -572,7 +572,14 @@ def sunbird_stt():
             whisper=whisper,
             recognise_speakers=recognise_speakers,
         )
-        return jsonify({"text": result["text"], "raw": result["raw"]})
+        transcript = result.get("text") or ""
+        detected_lang = ""
+        if transcript and sunbird.is_configured():
+            try:
+                detected_lang = sunbird.detect_language(transcript)
+            except SunbirdError:
+                app.logger.debug("Language detection failed for STT transcript")
+        return jsonify({"text": transcript, "language": detected_lang, "raw": result["raw"]})
     except SunbirdError as exc:
         return jsonify({"error": str(exc)}), 502
 
@@ -637,17 +644,77 @@ def meta_whatsapp_webhook_receive():
                 app.logger.exception("Failed to send WhatsApp interactive list")
 
         message_started = time.perf_counter()
+
+        # ── Multilingual: detect, translate inbound, generate, translate outbound ──
+        wa_source_language = "eng"
+        wa_retrieval_question = question
+        wa_translated_inbound = False
+        wa_translated_outbound = False
+
+        if sunbird.is_configured():
+            try:
+                detected = sunbird.detect_language(question)
+                if detected and detected != "eng":
+                    translated_source = SUNBIRD_DETECTED_LANGUAGE_REMAP.get(detected, detected)
+                    if translated_source in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+                        try:
+                            translated = sunbird.translate(question, translated_source, "eng")
+                            translated_text = (translated.get("text") or "").strip()
+                            if translated_text:
+                                wa_retrieval_question = translated_text
+                                wa_source_language = translated_source
+                                wa_translated_inbound = True
+                        except SunbirdError:
+                            app.logger.exception("Sunbird inbound translation failed for WhatsApp")
+                    elif translated_source in SUPPORTED_LLM_TRANSLATION_LANGS or detected:
+                        from rag.generator import llm_translate
+                        translated_text = llm_translate(question, "English")
+                        if translated_text:
+                            wa_retrieval_question = translated_text
+                            wa_source_language = detected
+                            wa_translated_inbound = True
+            except SunbirdError:
+                app.logger.exception("Sunbird language detection failed for WhatsApp")
+
         answer_generation_failed = False
         try:
-            answer = build_whatsapp_answer(question)
+            answer = build_whatsapp_answer(wa_retrieval_question)
         except Exception:
             app.logger.exception("Failed to generate WhatsApp answer")
             from rag.fallback import build_fallback_response
-            answer = build_fallback_response(question)
+            answer = build_fallback_response(wa_retrieval_question)
             answer_generation_failed = True
 
+        # Translate answer back to the user's language
+        final_wa_answer = answer
+        if wa_source_language != "eng" and not answer_generation_failed:
+            if sunbird.is_configured() and wa_source_language in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
+                try:
+                    translated_answer = sunbird.translate(answer, "eng", wa_source_language)
+                    translated_text = (translated_answer.get("text") or "").strip()
+                    if translated_text:
+                        final_wa_answer = translated_text
+                        wa_translated_outbound = True
+                except SunbirdError:
+                    app.logger.warning("Sunbird outbound translation failed for WhatsApp (%s)", wa_source_language)
+                    from rag.generator import llm_translate
+                    lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole"}
+                    target = lang_map.get(wa_source_language, wa_source_language)
+                    translated_text = llm_translate(answer, target)
+                    if translated_text:
+                        final_wa_answer = translated_text
+                        wa_translated_outbound = True
+            else:
+                from rag.generator import llm_translate
+                lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole"}
+                target = lang_map.get(wa_source_language, wa_source_language)
+                translated_text = llm_translate(answer, target)
+                if translated_text:
+                    final_wa_answer = translated_text
+                    wa_translated_outbound = True
+
         try:
-            status_code, provider_response = send_whatsapp_text(recipient, answer)
+            status_code, provider_response = send_whatsapp_text(recipient, final_wa_answer)
         except Exception:
             app.logger.exception("Failed to send WhatsApp answer")
             status_code, provider_response = 502, {"error": "Failed to send WhatsApp message"}
@@ -665,10 +732,10 @@ def meta_whatsapp_webhook_receive():
                 channel="whatsapp_meta",
                 user_ref=recipient,
                 question_text=question,
-                answer_text=answer,
-                source_language="eng",
-                translated_inbound=False,
-                translated_outbound=False,
+                answer_text=final_wa_answer,
+                source_language=wa_source_language,
+                translated_inbound=wa_translated_inbound,
+                translated_outbound=wa_translated_outbound,
                 success=(delivery_ok and not answer_generation_failed),
                 fallback_used=is_fallback_response(answer),
                 latency_ms=latency_ms,
