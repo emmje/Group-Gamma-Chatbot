@@ -370,6 +370,12 @@ def api_ask():
     if not original_question:
         return jsonify({"error": "Empty question"}), 400
 
+    # Fast path: frontend just needs building images for a history item
+    if data.get("history_only"):
+        from rag.buildings import find_building_images
+        imgs = find_building_images(original_question)
+        return jsonify({"images": imgs})
+
     # The frontend may pass an explicit language code (e.g. "lug", "ach")
     explicit_language = (data.get("language") or "").strip().lower()
 

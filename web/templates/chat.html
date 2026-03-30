@@ -42,14 +42,14 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.4;
 }
 .sidebar-item .stime {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
+    display: none;
 }
 .sidebar-empty {
     padding: 24px 16px;
@@ -451,9 +451,8 @@
         <div class="sidebar-list" id="sidebarList">
             {% if history %}
                 {% for item in history %}
-                <div class="sidebar-item" onclick="showHistoryItem('{{ item.question|e }}', '{{ item.answer|e }}')">
-                    <div class="sq">{{ item.question }}</div>
-                    <div class="stime">{{ item.created_at }}</div>
+                <div class="sidebar-item" onclick="showHistoryItem(this)" data-question="{{ item.question|e }}" data-answer="{{ item.answer|e }}">
+                    <div class="sq">{{ item.question[:60] }}</div>
                 </div>
                 {% endfor %}
             {% else %}
@@ -728,12 +727,6 @@ function addBotMessage(text, images) {
                 photo.alt = building.name;
                 photo.loading = 'lazy';
                 card.appendChild(photo);
-                if (urls.length > 1) {
-                    const caption = document.createElement('div');
-                    caption.className = 'building-caption';
-                    caption.textContent = `Photo ${i + 1}`;
-                    card.appendChild(caption);
-                }
                 row.appendChild(card);
             });
             gallery.appendChild(row);
@@ -939,7 +932,7 @@ function sendMessage() {
         chatMessages.removeChild(typing);
         addBotMessage(data.answer || 'No response returned.', data.images);
         sendBtn.disabled = false;
-        addToSidebar(q || '📷 Image question');
+        addToSidebar(q || 'Image question', data.answer || '');
     })
     .catch(err => {
         chatMessages.removeChild(typing);
@@ -948,18 +941,47 @@ function sendMessage() {
     });
 }
 
-function addToSidebar(question) {
+function summarizeTitle(text) {
+    if (!text) return 'New chat';
+    // Remove image prefix markers
+    let t = text.replace(/^\[Image\]\s*/i, '').trim();
+    // Capitalise first letter, truncate to ~50 chars at word boundary
+    t = t.charAt(0).toUpperCase() + t.slice(1);
+    if (t.length > 50) t = t.slice(0, 50).replace(/\s+\S*$/, '') + '...';
+    return t || 'New chat';
+}
+
+function addToSidebar(question, answer) {
     const empty = sidebarList.querySelector('.sidebar-empty');
     if (empty) empty.remove();
     const div = document.createElement('div');
     div.className = 'sidebar-item';
-    div.innerHTML = '<div class="sq">' + question + '</div><div class="stime">Just now</div>';
+    div.setAttribute('data-question', question);
+    div.setAttribute('data-answer', answer || '');
+    div.onclick = function() { showHistoryItem(this); };
+    div.innerHTML = '<div class="sq">' + summarizeTitle(question) + '</div>';
     sidebarList.prepend(div);
 }
 
-function showHistoryItem(question, answer) {
+function showHistoryItem(el) {
+    const question = el.getAttribute('data-question');
+    const answer = el.getAttribute('data-answer');
+    // Clear chat area
+    chatMessages.innerHTML = '';
     addMessage(question, 'msg msg-user');
-    addBotMessage(answer);
+    // Re-derive building images from stored answer
+    fetch('/api/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ question: question, history_only: true })
+    })
+    .then(r => r.json())
+    .then(data => {
+        addBotMessage(answer, data.images);
+    })
+    .catch(() => {
+        addBotMessage(answer);
+    });
 }
 </script>
 {% endblock %}
