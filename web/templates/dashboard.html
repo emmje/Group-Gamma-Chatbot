@@ -324,13 +324,13 @@ canvas {
     <div class="analytics-grid">
         <section class="panel span-6">
             <h3>Daily Interaction Volume</h3>
-            <p class="panel-subtitle">Last 14 days</p>
+            <p class="panel-subtitle" id="dailyVolumeSubtitle">Last 14 days</p>
             <canvas id="dailyVolumeChart"></canvas>
         </section>
 
         <section class="panel span-6">
             <h3>Hourly Interaction Volume</h3>
-            <p class="panel-subtitle">Last 24 hours</p>
+            <p class="panel-subtitle" id="hourlyVolumeSubtitle">Last 24 hours</p>
             <canvas id="hourlyVolumeChart"></canvas>
         </section>
 
@@ -462,6 +462,24 @@ function updateKpis(metrics) {
 
     const generatedAt = metrics && metrics.generated_at ? metrics.generated_at : new Date().toISOString();
     document.getElementById('lastUpdatedTs').textContent = generatedAt.replace('T', ' ').replace('Z', ' UTC');
+}
+
+function updateWindowSubtitles(metrics) {
+    const windows = (metrics && metrics.time_windows) || {};
+
+    const dailySubtitle = document.getElementById('dailyVolumeSubtitle');
+    if (dailySubtitle) {
+        dailySubtitle.textContent = windows.daily_mode === 'historical_last_14_active_days'
+            ? 'Last 14 active days (historical fallback)'
+            : 'Last 14 days';
+    }
+
+    const hourlySubtitle = document.getElementById('hourlyVolumeSubtitle');
+    if (hourlySubtitle) {
+        hourlySubtitle.textContent = windows.hourly_mode === 'historical_last_24_active_hours'
+            ? 'Last 24 active hours (historical fallback)'
+            : 'Last 24 hours';
+    }
 }
 
 function buildOrUpdateChart(existingChart, chartId, config) {
@@ -602,6 +620,7 @@ function renderIncidents(metrics) {
 
 function renderDashboard(metrics) {
     updateKpis(metrics);
+    updateWindowSubtitles(metrics);
     updateCharts(metrics);
     renderCompactBars('topQuestionsList', metrics.top_questions || [], 'question', 'count');
     renderCompactBars('languageList', metrics.languages || [], 'language', 'count');

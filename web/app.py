@@ -64,6 +64,8 @@ WELCOME_MESSAGE = (
     "and official university documents. What would you like to know?"
 )
 
+FALLBACK_PREFIX = "i'm not fully confident in the answer based on the available documents"
+
 # ── Campus information (events & clubs) used by web slider and WhatsApp ──
 CAMPUS_INFO = {
     "events": {
@@ -153,8 +155,7 @@ def should_process_whatsapp_message(message_id: str) -> bool:
 
 
 def is_fallback_response(answer: str) -> bool:
-    fallback_prefix = "i'm not fully confident in the answer based on the available documents"
-    return (answer or "").strip().lower().startswith(fallback_prefix)
+    return (answer or "").strip().lower().startswith(FALLBACK_PREFIX)
 
 
 def get_pipeline():
@@ -356,10 +357,9 @@ def api_ask():
 
     retrieval_question = original_question
     source_language = "eng"
-    translated_inbound = False
 
     if sunbird.is_configured():
-        # If the user explicitly chose a non-English language, use it directly.
+        # If the user explicitly chose a non-English language, use it directly
         if explicit_language and explicit_language != "eng":
             if explicit_language in SUPPORTED_SUNBIRD_TRANSLATION_LANGS:
                 source_language = explicit_language
@@ -370,15 +370,14 @@ def api_ask():
                         retrieval_question = translated_text
                 except SunbirdError:
                     app.logger.exception("Sunbird translation failed for inbound question (explicit lang)")
-            elif explicit_language in SUPPORTED_LLM_TRANSLATION_LANGS or explicit_language:
+            elif explicit_language:
                 source_language = explicit_language
                 from rag.generator import llm_translate
-
                 translated_text = llm_translate(original_question, "English")
                 if translated_text:
                     retrieval_question = translated_text
         elif not explicit_language or explicit_language == "auto":
-            # Auto-detect language.
+            # Auto-detect language
             try:
                 detected = sunbird.detect_language(original_question)
                 if detected and detected != "eng":
@@ -387,8 +386,7 @@ def api_ask():
                         if translated_source != detected:
                             app.logger.info(
                                 "Sunbird detected unsupported source '%s'; remapped to '%s'",
-                                detected,
-                                translated_source,
+                                detected, translated_source,
                             )
                         translated = sunbird.translate(original_question, translated_source, "eng")
                         translated_text = (translated.get("text") or "").strip()
@@ -397,7 +395,6 @@ def api_ask():
                             source_language = translated_source
                     else:
                         from rag.generator import llm_translate
-
                         translated_text = llm_translate(original_question, "English")
                         if translated_text:
                             retrieval_question = translated_text
@@ -406,6 +403,7 @@ def api_ask():
                 app.logger.exception("Sunbird language detection/translation failed for inbound question")
 
     translated_inbound = retrieval_question.strip().lower() != original_question.strip().lower()
+
     answer = build_answer(retrieval_question)
 
     final_answer = answer
@@ -422,31 +420,14 @@ def api_ask():
                     source_language,
                 )
                 from rag.generator import llm_translate
-
-                lang_map = {
-                    "swa": "Swahili",
-                    "lug": "Luganda",
-                    "ach": "Acholi",
-                    "teo": "Ateso",
-                    "lgg": "Lugbara",
-                    "nyn": "Runyankole",
-                }
+                lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole"}
                 target = lang_map.get(source_language, source_language)
                 translated_text = llm_translate(answer, target)
                 if translated_text:
                     final_answer = translated_text
         else:
             from rag.generator import llm_translate
-
-            lang_map = {
-                "swa": "Swahili",
-                "lug": "Luganda",
-                "ach": "Acholi",
-                "teo": "Ateso",
-                "lgg": "Lugbara",
-                "nyn": "Runyankole",
-                "keo": "Kakwa",
-            }
+            lang_map = {"swa": "Swahili", "lug": "Luganda", "ach": "Acholi", "teo": "Ateso", "lgg": "Lugbara", "nyn": "Runyankole", "keo": "Kakwa"}
             target = lang_map.get(source_language, source_language)
             translated_text = llm_translate(answer, target)
             if translated_text:
@@ -455,9 +436,8 @@ def api_ask():
     translated_outbound = final_answer != answer
     fallback_used = is_fallback_response(answer)
 
-    saved_chat_id = None
     try:
-        saved_chat_id = save_chat(current_user.id, original_question, final_answer)
+        save_chat(current_user.id, original_question, final_answer)
     except Exception:
         app.logger.exception("Failed to persist chat history")
 
@@ -475,12 +455,13 @@ def api_ask():
             fallback_used=fallback_used,
             latency_ms=latency_ms,
             error_type="generation_fallback" if fallback_used else "",
-            legacy_chat_id=saved_chat_id,
         )
     except Exception:
         app.logger.exception("Failed to persist web interaction analytics")
 
     return jsonify({"answer": final_answer, "language": source_language})
+
+
 @app.route("/api/campus-info")
 def campus_info():
     """Return events and clubs data for the web slider / WhatsApp."""
@@ -610,7 +591,6 @@ def meta_whatsapp_webhook_verify():
 
 @app.route("/webhooks/meta/whatsapp", methods=["POST"])
 def meta_whatsapp_webhook_receive():
-    # Backward-compatibility optional token check if defined.
     expected_token = os.getenv("META_WHATSAPP_WEBHOOK_TOKEN", "").strip()
     if expected_token:
         provided = request.headers.get("X-Webhook-Token", "").strip()
@@ -663,7 +643,6 @@ def meta_whatsapp_webhook_receive():
         except Exception:
             app.logger.exception("Failed to generate WhatsApp answer")
             from rag.fallback import build_fallback_response
-
             answer = build_fallback_response(question)
             answer_generation_failed = True
 
@@ -697,6 +676,7 @@ def meta_whatsapp_webhook_receive():
             )
         except Exception:
             app.logger.exception("Failed to persist WhatsApp interaction analytics")
+
         processed.append(
             {
                 "id": message_id,
