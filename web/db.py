@@ -670,7 +670,7 @@ def _dashboard_pg(days, top_n):
             # total users = everyone who has ever used the chatbot (registered + WhatsApp + any channel)
             cur.execute(
                 """SELECT COUNT(*) AS cnt FROM (
-                       SELECT user_id::text AS uid FROM users
+                       SELECT id::text AS uid FROM users
                        UNION
                        SELECT user_ref AS uid FROM interaction_events
                        WHERE TRIM(COALESCE(user_ref,'')) != ''
@@ -855,7 +855,7 @@ def _dashboard_sqlite(days, top_n):
 
     total_users = conn.execute(
         """SELECT COUNT(*) FROM (
-               SELECT CAST(user_id AS TEXT) AS uid FROM users
+               SELECT CAST(id AS TEXT) AS uid FROM users
                UNION
                SELECT user_ref AS uid FROM interaction_events
                WHERE TRIM(COALESCE(user_ref,'')) != ''
