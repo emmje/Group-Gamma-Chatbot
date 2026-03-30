@@ -7,8 +7,7 @@ psycopg[binary]
 pypdf
 pytesseract
 pdf2image
-chromadb
 qdrant-client
-sentence-transformers
+fastembed
 supabase
 requests
