@@ -332,6 +332,33 @@ canvas { width: 100% !important; }
 .dash-table tr:last-child td { border-bottom: none; }
 .dash-table tr:hover td { background: #FAFAFA; }
 
+/* ── Incident accordion ────────────────────────────────── */
+.incident-accordion { display: flex; flex-direction: column; gap: 6px; }
+.incident-date-group {}
+.incident-date-toggle {
+    width: 100%; text-align: left; cursor: pointer;
+    background: var(--purple-light); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    font-weight: 600; font-size: 13px; color: var(--purple-dark);
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background .15s;
+}
+.incident-date-toggle:hover { background: #EDE9FE; }
+.incident-date-toggle .arrow { transition: transform .2s; font-size: 11px; }
+.incident-date-toggle.open .arrow { transform: rotate(90deg); }
+.incident-date-body {
+    display: none; padding: 6px 0 2px;
+}
+.incident-date-body.open { display: block; }
+.incident-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 14px; margin: 4px 0; font-size: 12px;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: center;
+}
+.incident-card .inc-time { font-family: 'SF Mono', monospace; font-size: 11px; color: #666; white-space: nowrap; }
+.incident-card .inc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.incident-card .inc-latency { font-family: 'SF Mono', monospace; font-size: 11px; color: #888; white-space: nowrap; }
+
 /* ── Heatmap ───────────────────────────────────────────── */
 .heatmap-wrap {
     overflow-x: auto;
@@ -606,25 +633,11 @@ canvas { width: 100% !important; }
         <!-- Section: Operational Log -->
         <div class="section-label">&#9654; Operational Incident Log</div>
 
-        <!-- Recent incidents table -->
+        <!-- Recent incidents – collapsible by date -->
         <section class="panel span-12">
             <h3>Recent Operational Incidents</h3>
-            <p class="panel-subtitle">Failed or degraded responses in the last 30 days — for debugging and reliability review</p>
-            <div class="table-wrap">
-                <table class="dash-table">
-                    <thead>
-                        <tr>
-                            <th>Timestamp</th>
-                            <th>Channel</th>
-                            <th>Error Type</th>
-                            <th>Language</th>
-                            <th>Question Snapshot</th>
-                            <th>Latency</th>
-                        </tr>
-                    </thead>
-                    <tbody id="incidentTableBody"></tbody>
-                </table>
-            </div>
+            <p class="panel-subtitle">Failed or degraded responses in the last 30 days — grouped by date</p>
+            <div id="incidentAccordion" class="incident-accordion"></div>
         </section>
 
     </div><!-- /.analytics-grid -->
@@ -1015,27 +1028,46 @@ function renderCompactBars(containerId, items, labelKey, countKey, labelFn) {
     }).join('');
 }
 
-/* ── Incidents table ── */
+/* ── Incidents accordion ── */
 function renderIncidents(m) {
-    const tbody = document.getElementById('incidentTableBody');
-    if (!tbody) return;
+    const wrap = document.getElementById('incidentAccordion');
+    if (!wrap) return;
     const incidents = m.recent_incidents || [];
     if (!incidents.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="padding:14px 10px;">No incidents detected in the last 30 days.</td></tr>';
+        wrap.innerHTML = '<p class="empty-state" style="padding:14px 10px;">No incidents detected in the last 30 days.</p>';
         return;
     }
-    tbody.innerHTML = incidents.map(item => {
-        const q = String(item.question||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const latency = Number(item.latency_ms||0).toFixed(0);
-        const chanClass = (item.channel||'').includes('whatsapp') ? 'badge-orange' : 'badge-purple';
-        return `<tr>
-            <td class="mono" style="white-space:nowrap;font-size:11px;">${item.created_at||'-'}</td>
-            <td><span class="badge ${chanClass}">${item.channel||'-'}</span></td>
-            <td><span class="badge badge-red">${item.error_type||'unknown'}</span></td>
-            <td>${fmtLang(item.source_language||'')}</td>
-            <td title="${q}" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q||'-'}</td>
-            <td class="mono">${latency} ms</td>
-        </tr>`;
+    // Group by date
+    const groups = {};
+    incidents.forEach(item => {
+        const dateStr = (item.created_at||'').split('T')[0] || (item.created_at||'').split(' ')[0] || 'Unknown';
+        if (!groups[dateStr]) groups[dateStr] = [];
+        groups[dateStr].push(item);
+    });
+    const sortedDates = Object.keys(groups).sort().reverse();
+    wrap.innerHTML = sortedDates.map(date => {
+        const items = groups[date];
+        const rows = items.map(item => {
+            const timeStr = ((item.created_at||'').split('T')[1] || (item.created_at||'').split(' ')[1] || '').replace(/\+.*/, '').slice(0,8);
+            const chanClass = (item.channel||'').includes('whatsapp') ? 'badge-orange' : 'badge-purple';
+            const latency = Number(item.latency_ms||0).toFixed(0);
+            return `<div class="incident-card">
+                <span class="inc-time">${timeStr||'-'}</span>
+                <span class="inc-meta">
+                    <span class="badge ${chanClass}">${item.channel||'-'}</span>
+                    <span class="badge badge-red">${item.error_type||'unknown'}</span>
+                    <span>${fmtLang(item.source_language||'')}</span>
+                </span>
+                <span class="inc-latency">${latency} ms</span>
+            </div>`;
+        }).join('');
+        return `<div class="incident-date-group">
+            <button class="incident-date-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+                <span>${date} &nbsp;&middot;&nbsp; ${items.length} incident${items.length>1?'s':''}</span>
+                <span class="arrow">&#9654;</span>
+            </button>
+            <div class="incident-date-body">${rows}</div>
+        </div>`;
     }).join('');
 }
 
