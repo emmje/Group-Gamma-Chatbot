@@ -766,7 +766,7 @@ def dashboard():
         flash("Access denied.", "error")
         return redirect(url_for("chat"))
 
-    metrics = get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8)
+    metrics = get_dashboard_metrics_snapshot(days=30, top_n=15)
     return render_template("dashboard.html", metrics=metrics)
 
 
@@ -777,7 +777,7 @@ def dashboard_metrics():
         return jsonify({"error": "Access denied."}), 403
 
     try:
-        metrics = get_dashboard_metrics_snapshot(days=14, hours=24, top_n=8)
+        metrics = get_dashboard_metrics_snapshot(days=30, top_n=15)
         return jsonify(metrics)
     except Exception:
         app.logger.exception("Failed to load dashboard metrics")
