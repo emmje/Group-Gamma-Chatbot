@@ -33,7 +33,7 @@ def _build_groq_client() -> Groq:
 
 # ── Vision model name ────────────────────────────────────────────────────────
 
-VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "llama-3.2-11b-vision-preview")
+VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
 
 
 # ── System prompts for different scenarios ───────────────────────────────────
