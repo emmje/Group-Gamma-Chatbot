@@ -495,7 +495,7 @@
             </div>
             <!-- Image preview strip -->
             <div id="imagePreview" class="image-preview" style="display:none;">
-                <img id="imagePreviewImg" src="" alt="Preview">
+                <img id="previewImg" src="" alt="Preview">
                 <button id="imageRemoveBtn" type="button" title="Remove image" onclick="removeImage()">✕</button>
             </div>
             <div class="chat-input-wrap">
@@ -587,6 +587,48 @@ questionInput.addEventListener('keydown', function(e) {
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
+let recordingStream = null;
+
+// Convert any audio blob to 16-bit PCM WAV using the Web Audio API.
+// Sunbird STT works reliably with WAV; browser-native WebM/Opus may not.
+async function convertBlobToWav(blob) {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const arrayBuf = await blob.arrayBuffer();
+    const decoded = await audioCtx.decodeAudioData(arrayBuf);
+
+    // Down-mix to mono
+    const mono = decoded.getChannelData(0);
+    const sampleRate = decoded.sampleRate;
+
+    // Encode as 16-bit PCM WAV
+    const numSamples = mono.length;
+    const buffer = new ArrayBuffer(44 + numSamples * 2);
+    const view = new DataView(buffer);
+
+    function writeStr(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    }
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + numSamples * 2, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);           // PCM
+    view.setUint16(22, 1, true);           // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);           // block align
+    view.setUint16(34, 16, true);          // bits per sample
+    writeStr(36, 'data');
+    view.setUint32(40, numSamples * 2, true);
+
+    for (let i = 0; i < numSamples; i++) {
+        let s = Math.max(-1, Math.min(1, mono[i]));
+        view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+    audioCtx.close();
+    return new Blob([buffer], { type: 'audio/wav' });
+}
 
 micBtn.addEventListener('click', async function() {
     if (isRecording) {
@@ -599,7 +641,7 @@ micBtn.addEventListener('click', async function() {
 
     // Start recording
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         // Try to use webm/opus (good quality, widely supported), fall back to whatever is available
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
             ? 'audio/webm;codecs=opus'
@@ -608,8 +650,8 @@ micBtn.addEventListener('click', async function() {
                 : '';
 
         mediaRecorder = mimeType
-            ? new MediaRecorder(stream, { mimeType })
-            : new MediaRecorder(stream);
+            ? new MediaRecorder(recordingStream, { mimeType })
+            : new MediaRecorder(recordingStream);
 
         audioChunks = [];
 
@@ -623,33 +665,28 @@ micBtn.addEventListener('click', async function() {
             recordingIndicator.classList.remove('active');
 
             // Stop all tracks to release the microphone
-            stream.getTracks().forEach(t => t.stop());
+            recordingStream.getTracks().forEach(t => t.stop());
 
             if (audioChunks.length === 0) return;
-
-            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
-
-            // Determine file extension from mime type
-            let ext = 'webm';
-            const mime = mediaRecorder.mimeType || '';
-            if (mime.includes('ogg')) ext = 'ogg';
-            else if (mime.includes('mp4') || mime.includes('m4a')) ext = 'm4a';
-            else if (mime.includes('wav')) ext = 'wav';
 
             // Send to Sunbird STT
             micBtn.disabled = true;
             questionInput.placeholder = 'Transcribing audio…';
 
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.' + ext);
-
-            // Pass the selected language if not auto
-            const lang = languageSelect.value;
-            if (lang && lang !== 'auto') {
-                formData.append('language', lang);
-            }
-
             try {
+                // Convert to WAV for reliable Sunbird STT processing
+                const rawBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                const wavBlob = await convertBlobToWav(rawBlob);
+
+                const formData = new FormData();
+                formData.append('audio', wavBlob, 'recording.wav');
+
+                // Pass the selected language if not auto
+                const lang = languageSelect.value;
+                if (lang && lang !== 'auto') {
+                    formData.append('language', lang);
+                }
+
                 const resp = await fetch('/api/sunbird/stt', {
                     method: 'POST',
                     body: formData
