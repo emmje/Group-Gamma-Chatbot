@@ -28,11 +28,13 @@
 
         .navbar {
             background: var(--card);
-            border-bottom: 1px solid var(--border);
             padding: 14px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            position: relative;
+            z-index: 10;
         }
         .navbar-brand {
             font-size: 20px;
@@ -76,6 +78,27 @@
             border: 1px solid #FECACA;
         }
 
+        .legal-footer {
+            border-top: 1px solid var(--border);
+            margin: 24px 0 0;
+            padding: 16px 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .ai-disclaimer {
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
         {% block extra_style %}{% endblock %}
     </style>
 </head>
@@ -103,6 +126,12 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+    <footer class="legal-footer">
+        <span class="ai-disclaimer">Gamma can make mistakes. Double-check important information.</span>
+        <a href="{{ url_for('terms_of_service') }}">Terms of Service</a>
+        <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+        <a href="{{ url_for('data_deletion') }}">Data Deletion Request</a>
+    </footer>
     {% block scripts %}{% endblock %}
 </body>
 </html>

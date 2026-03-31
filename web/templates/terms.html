@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - Gamma Chatbot{% endblock %}
+
+{% block extra_style %}
+.content-wrap {
+    max-width: 860px;
+    margin: 28px auto;
+    padding: 0 20px;
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    line-height: 1.6;
+}
+h1 { margin-bottom: 12px; }
+h2 { margin-top: 18px; margin-bottom: 8px; font-size: 18px; }
+p, li { color: var(--text); font-size: 14px; }
+ul { padding-left: 18px; }
+.meta { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
+{% endblock %}
+
+{% block content %}
+<div class="content-wrap">
+    <div class="card">
+        <h1>Terms of Service</h1>
+        <p class="meta">Last updated: 2026-03-16</p>
+
+        <p>
+            These Terms govern your use of Gamma Chatbot services provided through web and WhatsApp channels.
+            By using this service, you agree to these Terms.
+        </p>
+
+        <h2>1. Service Scope</h2>
+        <p>
+            Gamma Chatbot provides informational responses related to university content. Responses may be
+            incomplete or outdated and should not replace official institutional communication.
+        </p>
+
+        <h2>2. Acceptable Use</h2>
+        <ul>
+            <li>Use the service lawfully and respectfully.</li>
+            <li>Do not attempt to abuse, disrupt, or reverse engineer the service.</li>
+            <li>Do not submit unlawful, harmful, or infringing content.</li>
+        </ul>
+
+        <h2>3. No Warranty</h2>
+        <p>
+            The service is provided "as is" without warranties of any kind. We do not guarantee uninterrupted
+            availability or complete accuracy of responses.
+        </p>
+
+        <h2>4. Limitation of Liability</h2>
+        <p>
+            To the extent permitted by law, Gamma Chatbot operators are not liable for indirect or consequential
+            damages resulting from use of the service.
+        </p>
+
+        <h2>5. Privacy and Data</h2>
+        <p>
+            Our handling of personal data is described in the <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>.
+            Data deletion requests are handled through the
+            <a href="{{ url_for('data_deletion') }}">Data Deletion Request page</a>.
+        </p>
+
+        <h2>6. Changes to Terms</h2>
+        <p>
+            We may update these Terms periodically. Continued use after updates means you accept the revised Terms.
+        </p>
+
+        {% if base_url %}
+        <h2>Public Legal URL</h2>
+        <p>This Terms page is publicly available at: <a href="{{ base_url }}{{ url_for('terms_of_service') }}">{{ base_url }}{{ url_for('terms_of_service') }}</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

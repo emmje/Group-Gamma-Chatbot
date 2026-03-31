@@ -10,19 +10,20 @@
 .sidebar {
     width: 280px;
     background: var(--card);
-    border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.04);
+    z-index: 2;
 }
 .sidebar-header {
-    padding: 18px 20px 12px;
+    padding: 18px 20px 14px;
     font-weight: 700;
     font-size: 14px;
     color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    background: linear-gradient(to bottom, var(--card), #F9FAFB);
 }
 .sidebar-list {
     flex: 1;
@@ -41,14 +42,14 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.4;
 }
 .sidebar-item .stime {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
+    display: none;
 }
 .sidebar-empty {
     padding: 24px 16px;
@@ -65,11 +66,51 @@
 }
 .chat-header {
     padding: 16px 28px;
-    border-bottom: 1px solid var(--border);
     background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    z-index: 1;
+    position: relative;
 }
-.chat-header h2 { font-size: 18px; font-weight: 600; }
-.chat-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.chat-header-left h2 { font-size: 18px; font-weight: 600; }
+.chat-header-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Language selector ── */
+.lang-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.lang-selector label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.lang-selector select {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+.lang-selector select:focus { border-color: var(--orange); }
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -77,6 +118,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    background: var(--bg);
 }
 .msg {
     max-width: 75%;
@@ -85,6 +127,7 @@
     font-size: 14px;
     line-height: 1.5;
     word-wrap: break-word;
+    position: relative;
 }
 .msg-user {
     align-self: flex-end;
@@ -107,11 +150,56 @@
     font-size: 14px;
     color: var(--text-muted);
 }
+
+/* ── TTS button on bot messages ── */
+.msg-bot-wrap {
+    align-self: flex-start;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.msg-bot-wrap .msg-bot {
+    max-width: 100%;
+    align-self: stretch;
+}
+.msg-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px;
+}
+.tts-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.tts-btn:hover {
+    background: var(--orange-light);
+    color: var(--orange);
+}
+.tts-btn.playing {
+    background: var(--orange-light);
+    color: var(--orange);
+}
+.tts-btn svg { width: 14px; height: 14px; }
+.tts-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ── Input bar ── */
 .chat-input-bar {
     padding: 16px 28px;
-    border-top: 1px solid var(--border);
     background: var(--card);
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 1;
 }
 .chat-input-wrap {
     display: flex;
@@ -139,9 +227,223 @@
 }
 .chat-input-wrap button:hover { background: var(--orange-dark); }
 .chat-input-wrap button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.chat-input-wrap .mic-btn {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.chat-input-wrap .mic-btn svg { width: 18px; height: 18px; }
+.chat-input-wrap .mic-btn:hover { background: var(--orange-light); color: var(--orange); }
+.chat-input-wrap .mic-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.chat-input-wrap .mic-btn.recording {
+    background: #FEE2E2;
+    color: #B91C1C;
+    border-color: #FCA5A5;
+    animation: pulse-recording 1.2s ease-in-out infinite;
+}
+@keyframes pulse-recording {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0); }
+}
+
+/* ── Recording status indicator ── */
+.recording-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #B91C1C;
+    margin-bottom: 8px;
+}
+.recording-indicator.active { display: inline-flex; }
+.recording-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #B91C1C;
+    animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ── Audio player (for TTS) ── */
+.tts-audio-player {
+    margin-top: 4px;
+}
+.tts-audio-player audio {
+    height: 32px;
+    border-radius: 8px;
+}
+
+/* ── Image preview ── */
+.image-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    background: var(--orange-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.image-preview img {
+    max-height: 60px;
+    max-width: 100px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+.image-preview button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.image-preview button:hover {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* ── Image in chat message ── */
+.msg-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    object-fit: cover;
+}
+
+/* ── Building image gallery ── */
+.building-gallery {
+    margin-top: 10px;
+}
+.building-group-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    margin: 8px 0 4px;
+}
+.building-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.building-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 140px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.building-card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.building-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+.building-caption {
+    padding: 4px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--purple);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Lightbox overlay ── */
+.lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+}
+.lightbox-overlay.active { display: flex; }
+.lightbox-overlay img {
+    max-width: 90vw;
+    max-height: 80vh;
+    border-radius: 10px;
+    object-fit: contain;
+}
+.lightbox-caption {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+.lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    color: #fff;
+    font-size: 32px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    line-height: 1;
+}
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 40px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lightbox-nav.prev { left: 16px; }
+.lightbox-nav.next { right: 16px; }
 {% endblock %}
 
 {% block content %}
+<!-- Lightbox overlay for building images -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-nav prev" onclick="lightboxNav(-1, event)">&#8249;</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+    <button class="lightbox-nav next" onclick="lightboxNav(1, event)">&#8250;</button>
+</div>
+
 <div class="chat-layout">
     <!-- Sidebar: chat history -->
     <div class="sidebar">
@@ -149,9 +451,8 @@
         <div class="sidebar-list" id="sidebarList">
             {% if history %}
                 {% for item in history %}
-                <div class="sidebar-item" onclick="showHistoryItem('{{ item.question|e }}', '{{ item.answer|e }}')">
-                    <div class="sq">{{ item.question }}</div>
-                    <div class="stime">{{ item.created_at }}</div>
+                <div class="sidebar-item" onclick="showHistoryItem(this)" data-question="{{ item.question|e }}" data-answer="{{ item.answer|e }}">
+                    <div class="sq">{{ item.question[:60] }}</div>
                 </div>
                 {% endfor %}
             {% else %}
@@ -163,15 +464,58 @@
     <!-- Chat area -->
     <div class="chat-main">
         <div class="chat-header">
-            <h2>Gamma Chatbot</h2>
-            <p>Ask questions about Uganda Christian University</p>
+            <div class="chat-header-left">
+                <h2>Gamma Chatbot</h2>
+                <p>Ask questions about Uganda Christian University</p>
+            </div>
+            <div class="lang-selector" id="langSelector">
+                <label for="languageSelect">🌐 Language</label>
+                <select id="languageSelect">
+                    <option value="auto">Auto-detect</option>
+                    <option value="eng">English</option>
+                    <option value="lug">Luganda</option>
+                    <option value="ach">Acholi</option>
+                    <option value="teo">Ateso</option>
+                    <option value="lgg">Lugbara</option>
+                    <option value="nyn">Runyankole</option>
+                    <option value="swa">Swahili</option>
+                </select>
+            </div>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div class="msg msg-bot">Hello! I can answer questions about UCU using official university documents. What would you like to know?</div>
+            <div class="msg-bot-wrap">
+                <div class="msg msg-bot">Hello! I can answer questions about UCU using official university documents. What would you like to know?</div>
+            </div>
         </div>
         <div class="chat-input-bar">
+            <div class="ai-disclaimer" style="margin-bottom: 6px; border-top: none; padding: 4px 0; background: transparent;">Gamma can make mistakes. Double-check important information.</div>
+            <div id="recordingIndicator" class="recording-indicator">
+                <span class="recording-dot"></span>
+                <span>Recording… click mic again to stop</span>
+            </div>
+            <!-- Image preview strip -->
+            <div id="imagePreview" class="image-preview" style="display:none;">
+                <img id="previewImg" src="" alt="Preview">
+                <button id="imageRemoveBtn" type="button" title="Remove image" onclick="removeImage()">✕</button>
+            </div>
             <div class="chat-input-wrap">
                 <input type="text" id="questionInput" placeholder="Type your question..." autocomplete="off">
+                <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+                <button id="imageBtn" class="mic-btn" type="button" title="Upload an image" aria-label="Upload image" onclick="document.getElementById('imageInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <button id="micBtn" class="mic-btn" type="button" title="Hold to record voice (Sunbird STT)" aria-label="Use microphone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
                 <button id="sendBtn" onclick="sendMessage()">Send</button>
             </div>
         </div>
@@ -184,11 +528,201 @@
 const chatMessages = document.getElementById('chatMessages');
 const questionInput = document.getElementById('questionInput');
 const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const imageBtn = document.getElementById('imageBtn');
+const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewImg = document.getElementById('previewImg');
 const sidebarList = document.getElementById('sidebarList');
+const languageSelect = document.getElementById('languageSelect');
+const recordingIndicator = document.getElementById('recordingIndicator');
+
+let sunbirdConfigured = false;
+let currentAudio = null;
+let selectedImageFile = null;
+
+// ── Image upload handling ──
+imageBtn.addEventListener('click', () => imageInput.click());
+
+imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) {
+        addBotMessage('Please select a JPEG, PNG, WebP, or GIF image.');
+        this.value = '';
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        addBotMessage('Image must be under 10 MB.');
+        this.value = '';
+        return;
+    }
+    selectedImageFile = file;
+    previewImg.src = URL.createObjectURL(file);
+    imagePreview.style.display = 'inline-flex';
+});
+
+function removeImage() {
+    selectedImageFile = null;
+    imageInput.value = '';
+    imagePreview.style.display = 'none';
+    previewImg.src = '';
+}
+
+// ── Check Sunbird status on load ──
+fetch('/api/sunbird/status')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+        if (data && data.configured) {
+            sunbirdConfigured = true;
+        }
+    })
+    .catch(() => {});
 
 questionInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
 });
+
+// ── Microphone: Sunbird STT via MediaRecorder ──
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let recordingStream = null;
+
+// Convert any audio blob to 16-bit PCM WAV using the Web Audio API.
+// Sunbird STT works reliably with WAV; browser-native WebM/Opus may not.
+async function convertBlobToWav(blob) {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const arrayBuf = await blob.arrayBuffer();
+    const decoded = await audioCtx.decodeAudioData(arrayBuf);
+
+    // Down-mix to mono
+    const mono = decoded.getChannelData(0);
+    const sampleRate = decoded.sampleRate;
+
+    // Encode as 16-bit PCM WAV
+    const numSamples = mono.length;
+    const buffer = new ArrayBuffer(44 + numSamples * 2);
+    const view = new DataView(buffer);
+
+    function writeStr(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    }
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + numSamples * 2, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);           // PCM
+    view.setUint16(22, 1, true);           // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);           // block align
+    view.setUint16(34, 16, true);          // bits per sample
+    writeStr(36, 'data');
+    view.setUint32(40, numSamples * 2, true);
+
+    for (let i = 0; i < numSamples; i++) {
+        let s = Math.max(-1, Math.min(1, mono[i]));
+        view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+    audioCtx.close();
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
+micBtn.addEventListener('click', async function() {
+    if (isRecording) {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+        return;
+    }
+
+    // Start recording
+    try {
+        recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Try to use webm/opus (good quality, widely supported), fall back to whatever is available
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+            ? 'audio/webm;codecs=opus'
+            : MediaRecorder.isTypeSupported('audio/webm')
+                ? 'audio/webm'
+                : '';
+
+        mediaRecorder = mimeType
+            ? new MediaRecorder(recordingStream, { mimeType })
+            : new MediaRecorder(recordingStream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function(e) {
+            if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async function() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            recordingIndicator.classList.remove('active');
+
+            // Stop all tracks to release the microphone
+            recordingStream.getTracks().forEach(t => t.stop());
+
+            if (audioChunks.length === 0) return;
+
+            // Send to Sunbird STT
+            micBtn.disabled = true;
+            questionInput.placeholder = 'Transcribing audio…';
+
+            try {
+                // Convert to WAV for reliable Sunbird STT processing
+                const rawBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                const wavBlob = await convertBlobToWav(rawBlob);
+
+                const formData = new FormData();
+                formData.append('audio', wavBlob, 'recording.wav');
+
+                // Pass the selected language if not auto
+                const lang = languageSelect.value;
+                if (lang && lang !== 'auto') {
+                    formData.append('language', lang);
+                }
+
+                const resp = await fetch('/api/sunbird/stt', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await resp.json();
+                if (resp.ok && result.text) {
+                    questionInput.value = result.text;
+                    questionInput.placeholder = 'Type your question...';
+                    // Auto-select detected language so the reply comes back in the same language
+                    if (result.language && result.language !== 'eng') {
+                        const langOpt = languageSelect.querySelector('option[value="' + result.language + '"]');
+                        if (langOpt) {
+                            languageSelect.value = result.language;
+                        }
+                    }
+                } else {
+                    questionInput.placeholder = 'Type your question...';
+                    addBotMessage('Could not transcribe audio: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                questionInput.placeholder = 'Type your question...';
+                addBotMessage('Speech-to-text failed. Please type your question instead.');
+            }
+            micBtn.disabled = false;
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        micBtn.classList.add('recording');
+        recordingIndicator.classList.add('active');
+    } catch (err) {
+        addBotMessage('Microphone access denied or not available. Please allow microphone access and try again.');
+    }
+});
+
+// ── Message helpers ──
 
 function addMessage(text, cls) {
     const div = document.createElement('div');
@@ -199,50 +733,292 @@ function addMessage(text, cls) {
     return div;
 }
 
+function addBotMessage(text, images) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg-bot-wrap';
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'msg msg-bot';
+    msgDiv.textContent = text;
+    wrap.appendChild(msgDiv);
+
+    // Render building images if provided (multi-image format)
+    if (images && images.length > 0) {
+        const gallery = document.createElement('div');
+        gallery.className = 'building-gallery';
+        images.forEach(building => {
+            const urls = building.images || [building.image_url];
+            const label = document.createElement('div');
+            label.className = 'building-group-label';
+            label.textContent = building.name;
+            gallery.appendChild(label);
+
+            const row = document.createElement('div');
+            row.className = 'building-thumbs';
+            urls.forEach((url, i) => {
+                const card = document.createElement('div');
+                card.className = 'building-card';
+                card.onclick = () => openLightbox(urls, i, building.name);
+                const photo = document.createElement('img');
+                photo.src = url;
+                photo.alt = building.name;
+                photo.loading = 'lazy';
+                card.appendChild(photo);
+                row.appendChild(card);
+            });
+            gallery.appendChild(row);
+        });
+        wrap.appendChild(gallery);
+    }
+
+    // Add TTS button
+    if (sunbirdConfigured) {
+        const actions = document.createElement('div');
+        actions.className = 'msg-actions';
+
+        const ttsBtn = document.createElement('button');
+        ttsBtn.className = 'tts-btn';
+        ttsBtn.title = 'Listen (Text-to-Speech)';
+        ttsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span>Listen</span>';
+        ttsBtn.onclick = function() { playTTS(text, ttsBtn, wrap); };
+        actions.appendChild(ttsBtn);
+
+        wrap.appendChild(actions);
+    }
+
+    chatMessages.appendChild(wrap);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return wrap;
+}
+
+// ── Lightbox for building images ──
+let lbImages = [];
+let lbIndex = 0;
+
+function openLightbox(urls, index, caption) {
+    lbImages = urls;
+    lbIndex = index;
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = urls[index];
+    document.getElementById('lightboxCaption').textContent = caption + (urls.length > 1 ? ` (${index + 1}/${urls.length})` : '');
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+    if (e && e.target !== e.currentTarget && !e.target.classList.contains('lightbox-close')) return;
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function lightboxNav(dir, e) {
+    if (e) e.stopPropagation();
+    lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+    document.getElementById('lightboxImg').src = lbImages[lbIndex];
+    const cap = document.getElementById('lightboxCaption');
+    const base = cap.textContent.replace(/\s*\(\d+\/\d+\)$/, '');
+    cap.textContent = base + (lbImages.length > 1 ? ` (${lbIndex + 1}/${lbImages.length})` : '');
+}
+
+document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxNav(-1);
+    if (e.key === 'ArrowRight') lightboxNav(1);
+});
+
+// ── TTS playback ──
+
+async function playTTS(text, btn, container) {
+    // If currently playing, stop it
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+        document.querySelectorAll('.tts-btn.playing').forEach(b => b.classList.remove('playing'));
+        return;
+    }
+
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Loading…';
+
+    try {
+        const resp = await fetch('/api/sunbird/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+        const result = await resp.json();
+
+        if (resp.ok && result.audio_url) {
+            // Remove any existing audio player in this message
+            const existingPlayer = container.querySelector('.tts-audio-player');
+            if (existingPlayer) existingPlayer.remove();
+
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'tts-audio-player';
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = result.audio_url;
+            playerDiv.appendChild(audio);
+            container.appendChild(playerDiv);
+
+            currentAudio = audio;
+            btn.classList.add('playing');
+            btn.querySelector('span').textContent = 'Playing…';
+
+            audio.play().catch(() => {});
+
+            audio.onended = function() {
+                btn.classList.remove('playing');
+                btn.querySelector('span').textContent = 'Listen';
+                currentAudio = null;
+            };
+            audio.onpause = function() {
+                if (audio.ended) return;
+                btn.classList.remove('playing');
+                btn.querySelector('span').textContent = 'Listen';
+            };
+            audio.onplay = function() {
+                btn.classList.add('playing');
+                btn.querySelector('span').textContent = 'Playing…';
+            };
+        } else {
+            btn.querySelector('span').textContent = 'Failed';
+            setTimeout(() => { btn.querySelector('span').textContent = 'Listen'; }, 2000);
+        }
+    } catch (err) {
+        btn.querySelector('span').textContent = 'Failed';
+        setTimeout(() => { btn.querySelector('span').textContent = 'Listen'; }, 2000);
+    }
+    btn.disabled = false;
+}
+
+// ── Send message ──
+
 function sendMessage() {
     const q = questionInput.value.trim();
-    if (!q) return;
+    if (!q && !selectedImageFile) return;
     questionInput.value = '';
-    addMessage(q, 'msg-user');
+
+    const hasImage = !!selectedImageFile;
+    const imageFile = selectedImageFile;
+
+    // Show user message (with image thumbnail if attached)
+    if (hasImage) {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'msg msg-user';
+        const img = document.createElement('img');
+        img.className = 'msg-image';
+        img.src = URL.createObjectURL(imageFile);
+        userDiv.appendChild(img);
+        if (q) {
+            const txt = document.createElement('div');
+            txt.textContent = q;
+            userDiv.appendChild(txt);
+        }
+        chatMessages.appendChild(userDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        removeImage();
+    } else {
+        addMessage(q, 'msg msg-user');
+    }
 
     sendBtn.disabled = true;
     const typing = document.createElement('div');
     typing.className = 'msg-typing';
-    typing.textContent = 'Thinking...';
+    typing.textContent = hasImage ? 'Analysing image…' : 'Thinking...';
     chatMessages.appendChild(typing);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    fetch('/api/ask', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({question: q})
+    const lang = languageSelect.value;
+
+    let fetchPromise;
+
+    if (hasImage) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        formData.append('question', q || 'What is in this image?');
+        if (lang && lang !== 'auto') formData.append('language', lang);
+        fetchPromise = fetch('/api/ask-image', { method: 'POST', body: formData });
+    } else {
+        const payload = { question: q };
+        if (lang && lang !== 'auto') payload.language = lang;
+        fetchPromise = fetch('/api/ask', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+    }
+
+    fetchPromise
+    .then(async (r) => {
+        let data = {};
+        try {
+            data = await r.json();
+        } catch (e) {
+            data = {};
+        }
+        if (!r.ok) {
+            throw new Error(data.error || 'Something went wrong. Please try again.');
+        }
+        return data;
     })
-    .then(r => r.json())
-    .then(data => {
+    .then((data) => {
         chatMessages.removeChild(typing);
-        addMessage(data.answer || data.error, 'msg-bot');
+        addBotMessage(data.answer || 'No response returned.', data.images);
         sendBtn.disabled = false;
-        addToSidebar(q);
+        addToSidebar(q || 'Image question', data.answer || '');
     })
     .catch(err => {
         chatMessages.removeChild(typing);
-        addMessage('Something went wrong. Please try again.', 'msg-bot');
+        addBotMessage(err.message || 'Something went wrong. Please try again.');
         sendBtn.disabled = false;
     });
 }
 
-function addToSidebar(question) {
+function summarizeTitle(text) {
+    if (!text) return 'New chat';
+    // Remove image prefix markers
+    let t = text.replace(/^\[Image\]\s*/i, '').trim();
+    // Capitalise first letter, truncate to ~50 chars at word boundary
+    t = t.charAt(0).toUpperCase() + t.slice(1);
+    if (t.length > 50) t = t.slice(0, 50).replace(/\s+\S*$/, '') + '...';
+    return t || 'New chat';
+}
+
+function addToSidebar(question, answer) {
     const empty = sidebarList.querySelector('.sidebar-empty');
     if (empty) empty.remove();
     const div = document.createElement('div');
     div.className = 'sidebar-item';
-    div.innerHTML = '<div class="sq">' + question + '</div><div class="stime">Just now</div>';
+    div.setAttribute('data-question', question);
+    div.setAttribute('data-answer', answer || '');
+    div.onclick = function() { showHistoryItem(this); };
+    div.innerHTML = '<div class="sq">' + summarizeTitle(question) + '</div>';
     sidebarList.prepend(div);
 }
 
-function showHistoryItem(question, answer) {
-    addMessage(question, 'msg-user');
-    addMessage(answer, 'msg-bot');
+function showHistoryItem(el) {
+    const question = el.getAttribute('data-question');
+    const answer = el.getAttribute('data-answer');
+    // Clear chat area
+    chatMessages.innerHTML = '';
+    addMessage(question, 'msg msg-user');
+    // Re-derive building images from stored answer
+    fetch('/api/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ question: question, history_only: true })
+    })
+    .then(r => r.json())
+    .then(data => {
+        addBotMessage(answer, data.images);
+    })
+    .catch(() => {
+        addBotMessage(answer);
+    });
 }
 </script>
 {% endblock %}

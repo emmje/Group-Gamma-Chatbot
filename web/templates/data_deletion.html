@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Data Deletion Request - Gamma Chatbot{% endblock %}
+
+{% block extra_style %}
+.content-wrap {
+    max-width: 860px;
+    margin: 28px auto;
+    padding: 0 20px;
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+h1 { margin-bottom: 12px; }
+p, label { font-size: 14px; color: var(--text); }
+.meta { color: var(--text-muted); font-size: 13px; margin-bottom: 12px; }
+.form-grid { display: grid; gap: 12px; margin-top: 14px; }
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+}
+textarea.input { min-height: 110px; resize: vertical; }
+.help { color: var(--text-muted); font-size: 13px; margin-top: 10px; }
+{% endblock %}
+
+{% block content %}
+<div class="content-wrap">
+    <div class="card">
+        <h1>User Data Deletion Request</h1>
+        <p class="meta">Use this page to request deletion of your data from Gamma Chatbot systems.</p>
+
+        <p>
+            Provide enough details for us to identify your records. We will process valid requests and contact you
+            using the email you provide.
+        </p>
+
+        <form method="post" class="form-grid">
+            <div>
+                <label for="full_name">Full Name *</label>
+                <input id="full_name" name="full_name" class="input" required>
+            </div>
+            <div>
+                <label for="contact_email">Email Address *</label>
+                <input id="contact_email" name="contact_email" type="email" class="input" required>
+            </div>
+            <div>
+                <label for="whatsapp_number">WhatsApp Number (including country code)</label>
+                <input id="whatsapp_number" name="whatsapp_number" class="input" placeholder="e.g. 2567XXXXXXXX">
+            </div>
+            <div>
+                <label for="details">Additional Details</label>
+                <textarea id="details" name="details" class="input" placeholder="Optional information to help locate your data"></textarea>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Submit Deletion Request</button>
+            </div>
+        </form>
+
+        <p class="help">
+            If this form is unavailable, send your deletion request through your support channel and include your
+            WhatsApp number and contact email.
+        </p>
+
+        {% if base_url %}
+        <p class="help">Public deletion URL: <a href="{{ base_url }}{{ url_for('data_deletion') }}">{{ base_url }}{{ url_for('data_deletion') }}</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

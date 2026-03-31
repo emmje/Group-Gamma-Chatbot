@@ -4,8 +4,10 @@ __pycache__/
 .DS_Store
 
 # Vector database
-data/chroma/
 .env
 .env.*
 data/gamma.db
 data/gamma.db-*
+data/users_backup.json
+data/users_backup.json.tmp
+web/static/images/buildings/my_buildings*

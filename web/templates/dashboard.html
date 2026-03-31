@@ -1,158 +1,1109 @@
 {% extends "base.html" %}
-{% block title %}Dashboard – Gamma Chatbot{% endblock %}
+{% block title %}Analytics Dashboard – Gamma Chatbot{% endblock %}
 
 {% block extra_style %}
-.dash-wrap { padding: 28px 32px; max-width: 1200px; }
-.dash-wrap h2 { font-size: 22px; margin-bottom: 24px; }
+:root {
+    --purple: #7C3AED;
+    --purple-dark: #5B21B6;
+    --purple-mid: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --orange: #E87A2D;
+    --orange-dark: #C96A20;
+    --orange-light: #FFF3EB;
+}
 
-/* Stat cards */
-.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat-card {
+.dashboard-shell {
+    padding: 24px 32px 48px;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+/* ── Top bar ───────────────────────────────────────────── */
+.dashboard-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.dashboard-title h2 {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 5px;
+    color: #7C3AED;
+}
+
+.dashboard-title p {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--purple-light);
+    background: var(--card);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--purple);
+    white-space: nowrap;
+}
+
+.live-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--purple);
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+    animation: pulse-live 1.8s infinite;
+}
+
+.live-pill.degraded .dot { background: #EF4444; box-shadow: none; animation: none; }
+.live-pill.degraded { color: #EF4444; border-color: #FEE2E2; }
+
+@keyframes pulse-live {
+    0%   { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.4); }
+    70%  { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);   }
+    100% { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0);    }
+}
+
+/* ── KPI grid ──────────────────────────────────────────── */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.kpi-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px 24px;
+    border-radius: 14px;
+    padding: 18px 16px 14px;
+    border-top: 3px solid;
+    transition: box-shadow 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
 }
-.stat-card .label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.stat-card .value { font-size: 32px; font-weight: 700; margin-top: 4px; color: var(--orange); }
 
-/* Sections */
-.dash-section {
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+    background: currentColor;
+}
+
+.kpi-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+.kpi-card:nth-child(1)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(2)  { border-top-color: #E87A2D; }
+.kpi-card:nth-child(3)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(4)  { border-top-color: #E87A2D; }
+.kpi-card:nth-child(5)  { border-top-color: #8B5CF6; }
+.kpi-card:nth-child(6)  { border-top-color: #EF4444; }
+.kpi-card:nth-child(7)  { border-top-color: #7C3AED; }
+.kpi-card:nth-child(8)  { border-top-color: #E87A2D; }
+
+.kpi-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.kpi-value {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.kpi-card:nth-child(1) .kpi-value { color: #7C3AED; }
+.kpi-card:nth-child(2) .kpi-value { color: #E87A2D; }
+.kpi-card:nth-child(3) .kpi-value { color: #6D28D9; }
+.kpi-card:nth-child(4) .kpi-value { color: #C96A20; }
+.kpi-card:nth-child(5) .kpi-value { color: #8B5CF6; }
+.kpi-card:nth-child(6) .kpi-value { color: #DC2626; }
+.kpi-card:nth-child(7) .kpi-value { color: #7C3AED; }
+.kpi-card:nth-child(8) .kpi-value { color: #E87A2D; }
+
+.kpi-sub {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+.kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+/* ── Analytics grid ────────────────────────────────────── */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.panel {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px;
+    transition: box-shadow 0.2s;
 }
-.dash-section h3 { font-size: 16px; margin-bottom: 16px; }
 
-/* Table */
-.dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.panel:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.06); }
+
+.panel h3 {
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel h3 .ph-icon {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.ph-purple { background: var(--purple-light); color: var(--purple); }
+.ph-orange { background: var(--orange-light); color: var(--orange); }
+.ph-green  { background: var(--purple-light); color: var(--purple); }
+.ph-red    { background: #FEE2E2; color: #DC2626; }
+.ph-blue   { background: var(--orange-light); color: var(--orange); }
+
+.panel-subtitle {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.span-3  { grid-column: span 3;  }
+.span-4  { grid-column: span 4;  }
+.span-5  { grid-column: span 5;  }
+.span-6  { grid-column: span 6;  }
+.span-7  { grid-column: span 7;  }
+.span-8  { grid-column: span 8;  }
+.span-12 { grid-column: span 12; }
+
+canvas { width: 100% !important; }
+.chart-h-260 { height: 260px !important; }
+.chart-h-220 { height: 220px !important; }
+.chart-h-180 { height: 180px !important; }
+.chart-h-320 { height: 320px !important; }
+
+/* ── Progress bars ─────────────────────────────────────── */
+.quality-row { margin-bottom: 12px; }
+.quality-row:last-child { margin-bottom: 0; }
+
+.quality-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: var(--text-muted);
+}
+
+.progress-track {
+    width: 100%; height: 10px;
+    border-radius: 999px;
+    background: #F3F4F6;
+    overflow: hidden;
+}
+
+.progress-fill { height: 100%; border-radius: 999px; }
+.success-fill  { background: #7C3AED; }
+.fallback-fill { background: #E87A2D; }
+.error-fill    { background: #EF4444; }
+.transl-fill   { background: #E87A2D; }
+
+/* ── Compact bars / lists ──────────────────────────────── */
+.compact-list { display: flex; flex-direction: column; gap: 9px; }
+
+.compact-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px;
+    align-items: center;
+}
+
+.compact-item .label {
+    font-size: 12.5px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.compact-item .count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bar-mini {
+    grid-column: span 2;
+    height: 5px;
+    border-radius: 999px;
+    background: #F3F4F6;
+    overflow: hidden;
+}
+
+.bar-mini > span {
+    display: block; height: 100%;
+    background: #7C3AED;
+    border-radius: 999px;
+}
+
+/* ── Badge chips ───────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-orange { background: var(--orange-light); color: var(--orange); }
+.badge-green  { background: var(--purple-light); color: var(--purple); }
+.badge-red    { background: #FEE2E2; color: #DC2626; }
+
+/* ── Stat rows  ────────────────────────────────────────── */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-row .stat-label { color: var(--text-muted); }
+.stat-row .stat-value { font-weight: 700; color: var(--text); }
+
+/* ── Table ─────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+
+.dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
 .dash-table th {
     text-align: left;
-    padding: 10px 12px;
-    border-bottom: 2px solid var(--border);
-    color: var(--text-muted);
-    font-weight: 600;
+    padding: 9px 10px;
+    border-bottom: 2px solid var(--purple);
+    color: var(--purple-dark);
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 11px;
     letter-spacing: 0.4px;
+    background: var(--purple-light);
+    font-size: 11px;
 }
+
 .dash-table td {
-    padding: 10px 12px;
+    padding: 9px 10px;
     border-bottom: 1px solid var(--border);
     vertical-align: top;
 }
+
 .dash-table tr:last-child td { border-bottom: none; }
-.truncate { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-table tr:hover td { background: #FAFAFA; }
 
-/* FAQ bar */
-.faq-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
+/* ── Incident accordion ────────────────────────────────── */
+.incident-accordion { display: flex; flex-direction: column; gap: 6px; }
+.incident-date-group {}
+.incident-date-toggle {
+    width: 100%; text-align: left; cursor: pointer;
+    background: var(--purple-light); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    font-weight: 600; font-size: 13px; color: var(--purple-dark);
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background .15s;
 }
-.faq-bar {
-    height: 24px;
-    background: var(--orange);
+.incident-date-toggle:hover { background: #EDE9FE; }
+.incident-date-toggle .arrow { transition: transform .2s; font-size: 11px; }
+.incident-date-toggle.open .arrow { transform: rotate(90deg); }
+.incident-date-body {
+    display: none; padding: 6px 0 2px;
+}
+.incident-date-body.open { display: block; }
+.incident-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 14px; margin: 4px 0; font-size: 12px;
+    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; align-items: start;
+}
+.incident-card .inc-time { font-family: 'SF Mono', monospace; font-size: 11px; color: #666; white-space: nowrap; padding-top: 2px; }
+.incident-card .inc-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.incident-card .inc-question { font-size: 12px; color: #444; margin-top: 3px; line-height: 1.35; word-break: break-word; grid-column: 2 / -1; }
+.incident-card .inc-latency { font-family: 'SF Mono', monospace; font-size: 11px; color: #888; white-space: nowrap; padding-top: 2px; }
+
+/* ── Heatmap ───────────────────────────────────────────── */
+.heatmap-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.heatmap-table {
+    border-collapse: separate;
+    border-spacing: 3px;
+    font-size: 10px;
+    min-width: 580px;
+}
+
+.heatmap-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 2px 4px;
+    text-align: center;
+}
+
+.heatmap-table td.hm-cell {
+    width: 28px; height: 22px;
     border-radius: 4px;
-    min-width: 8px;
-    transition: width 0.3s;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: default;
+    transition: transform 0.1s;
 }
-.faq-q { font-size: 13px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.faq-count { font-size: 12px; color: var(--text-muted); font-weight: 600; min-width: 24px; text-align: right; }
 
-/* Daily chart */
-.day-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
-.day-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.day-bar { width: 100%; background: var(--orange); border-radius: 4px 4px 0 0; min-height: 4px; }
-.day-label { font-size: 10px; color: var(--text-muted); }
-.day-count { font-size: 10px; font-weight: 600; }
+.heatmap-table td.hm-cell:hover { transform: scale(1.15); }
+
+.hm-day-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-right: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── Mono ──────────────────────────────────────────────── */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; }
+
+.empty-state { font-size: 13px; color: var(--text-muted); padding: 12px 0; }
+
+/* ── Section divider label ──────────────────────────────── */
+.section-label {
+    grid-column: span 12;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--purple);
+    padding: 4px 0 2px;
+    border-bottom: 2px solid var(--purple-light);
+    margin-bottom: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .span-3,.span-4,.span-5,.span-6,.span-7,.span-8 { grid-column: span 12; }
+}
+
+@media (max-width: 640px) {
+    .dashboard-shell { padding: 14px 12px 32px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .dashboard-title h2 { font-size: 20px; }
+}
 {% endblock %}
 
 {% block content %}
-<div class="dash-wrap">
-    <h2>Admin Dashboard</h2>
+<div class="dashboard-shell">
 
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="label">Total Users</div>
-            <div class="value">{{ stats.total_users }}</div>
+    <!-- Top bar -->
+    <div class="dashboard-topbar">
+        <div class="dashboard-title">
+            <h2>Gamma Chatbot Analytics</h2>
+            <p>Real-time cross-channel intelligence dashboard &mdash; 30-day operational window</p>
         </div>
-        <div class="stat-card">
-            <div class="label">Total Conversations</div>
-            <div class="value">{{ stats.total_chats }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Avg Answer Length</div>
-            <div class="value">{{ stats.avg_answer_len|int }} <span style="font-size:14px;color:var(--text-muted)">chars</span></div>
+        <div class="live-pill" id="livePill">
+            <span class="dot"></span>
+            <span id="liveStatusText">Live &bull; refreshes every 8s</span>
         </div>
     </div>
 
-    <!-- Daily usage chart -->
-    <div class="dash-section">
-        <h3>Daily Usage (Last 14 Days)</h3>
-        {% if stats.daily %}
-        <div class="day-chart">
-            {% set max_count = stats.daily|map(attribute='count')|max %}
-            {% for d in stats.daily %}
-            <div class="day-bar-wrap">
-                <div class="day-count">{{ d.count }}</div>
-                <div class="day-bar" style="height: {{ (d.count / max_count * 100)|int }}%"></div>
-                <div class="day-label">{{ d.day[5:] }}</div>
+    <!-- KPI row -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Users</div>
+            <div class="kpi-value" id="kpiTotalUsers">0</div>
+            <div class="kpi-sub">Everyone who has ever used the chatbot</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Interactions</div>
+            <div class="kpi-value" id="kpiTotalInteractions">0</div>
+            <div class="kpi-sub">All channels, all time</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Registered Users</div>
+            <div class="kpi-value" id="kpiActiveUsers">0</div>
+            <div class="kpi-sub">Users with accounts in the system</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Interactions (30d)</div>
+            <div class="kpi-value" id="kpiInteractions30d">0</div>
+            <div class="kpi-sub">Conversations in last 30 days</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Success Rate (30d)</div>
+            <div class="kpi-value" id="kpiSuccessRate">0%</div>
+            <div class="kpi-sub">RAG retrievals delivered successfully</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Fallback Rate (30d)</div>
+            <div class="kpi-value" id="kpiFallbackRate">0%</div>
+            <div class="kpi-sub">Low-confidence / fallback responses</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Median Latency (30d)</div>
+            <div class="kpi-value" id="kpiMedianLatency">0 ms</div>
+            <div class="kpi-sub">p50 end-to-end answer latency</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">P95 Latency (30d)</div>
+            <div class="kpi-value" id="kpiP95Latency">0 ms</div>
+            <div class="kpi-sub">Tail latency, worst-case UX signal</div>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+
+        <!-- Section: Volume & Growth -->
+        <div class="section-label">&#9654; Volume &amp; Growth</div>
+
+        <!-- Daily interaction volume (30d) -->
+        <section class="panel span-8">
+            <h3>Daily Interaction Volume</h3>
+            <p class="panel-subtitle">Last 30 days &mdash; trend across all channels</p>
+            <canvas id="dailyVolumeChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Cumulative growth -->
+        <section class="panel span-4">
+            <h3>Cumulative Growth</h3>
+            <p class="panel-subtitle">Running total of all interactions</p>
+            <canvas id="cumulativeChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Section: Response Quality -->
+        <div class="section-label">&#9654; Response Quality &amp; System Health</div>
+
+        <!-- Response quality over time (stacked bar chart) -->
+        <section class="panel span-8">
+            <h3>Response Quality Over Time</h3>
+            <p class="panel-subtitle">Daily breakdown: successful RAG answers vs fallbacks vs errors, key signal for system trust</p>
+            <canvas id="qualityTrendChart" class="chart-h-260"></canvas>
+        </section>
+
+        <!-- Quality signals summary -->
+        <section class="panel span-4">
+            <h3>Quality Signals</h3>
+            <p class="panel-subtitle">30-day averages</p>
+            <div class="quality-row">
+                <div class="quality-label"><span>Success Rate</span><strong id="qualitySuccessLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill success-fill" id="qualitySuccessBar" style="width:0%"></div></div>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No data yet.</p>
-        {% endif %}
-    </div>
-
-    <!-- Frequently Asked Questions -->
-    <div class="dash-section">
-        <h3>Frequently Asked Questions</h3>
-        {% if stats.faq %}
-            {% set max_faq = stats.faq[0].count if stats.faq else 1 %}
-            {% for item in stats.faq %}
-            <div class="faq-item">
-                <div class="faq-bar" style="width: {{ (item.count / max_faq * 200)|int }}px"></div>
-                <div class="faq-q">{{ item.question }}</div>
-                <div class="faq-count">{{ item.count }}x</div>
+            <div class="quality-row">
+                <div class="quality-label"><span>Fallback Rate</span><strong id="qualityFallbackLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill fallback-fill" id="qualityFallbackBar" style="width:0%"></div></div>
             </div>
-            {% endfor %}
-        {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No questions asked yet.</p>
-        {% endif %}
-    </div>
+            <div class="quality-row">
+                <div class="quality-label"><span>Error Rate</span><strong id="qualityErrorLabel">0%</strong></div>
+                <div class="progress-track"><div class="progress-fill error-fill" id="qualityErrorBar" style="width:0%"></div></div>
+            </div>
+            <div class="quality-row" style="margin-top:16px;">
+                <div class="stat-row">
+                    <span class="stat-label">Avg Answer Length</span>
+                    <span class="stat-value" id="qualityAnswerLen">0 chars</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Multilingual Queries</span>
+                    <span class="stat-value" id="qualityMultilingual">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Last refreshed</span>
+                    <span class="stat-value mono" id="lastUpdatedTs" style="font-size:11px;">-</span>
+                </div>
+            </div>
+        </section>
 
-    <!-- Recent conversations -->
-    <div class="dash-section">
-        <h3>Recent Conversations</h3>
-        {% if stats.recent %}
-        <table class="dash-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Question</th>
-                    <th>Answer</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in stats.recent %}
-                <tr>
-                    <td>{{ item.username }}</td>
-                    <td class="truncate">{{ item.question }}</td>
-                    <td class="truncate">{{ item.answer }}</td>
-                    <td style="white-space:nowrap;">{{ item.created_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p style="color:var(--text-muted);font-size:13px;">No conversations yet.</p>
-        {% endif %}
-    </div>
-</div>
+        <!-- Section: Usage Patterns -->
+        <div class="section-label">&#9654; Usage Patterns &amp; Behaviour</div>
+
+        <!-- Peak-hour heatmap -->
+        <section class="panel span-7">
+            <h3>Peak Usage Heatmap</h3>
+            <p class="panel-subtitle">Hour-of-day × day-of-week over last 30 days &mdash; identify when users engage most to optimise infrastructure and staffing</p>
+            <div class="heatmap-wrap">
+                <div id="heatmapContainer"></div>
+            </div>
+        </section>
+
+        <!-- Channel breakdown (donut) -->
+        <section class="panel span-5">
+            <h3>Channel Distribution</h3>
+            <p class="panel-subtitle">Web vs WhatsApp: shows which deployment surface drives engagement</p>
+            <canvas id="channelChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Section: Multilingual Intelligence -->
+        <div class="section-label">&#9654; Multilingual Intelligence</div>
+
+        <!-- Language distribution bar chart -->
+        <section class="panel span-6">
+            <h3>Language Distribution</h3>
+            <p class="panel-subtitle">Query language breakdown: validates multilingual NLP coverage; 7 languages supported</p>
+            <canvas id="languageChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Translation analytics -->
+        <section class="panel span-6">
+            <h3>Translation Analytics</h3>
+            <p class="panel-subtitle">Inbound and outbound translation rates per language: assesses Sunbird AI + LLM fallback coverage</p>
+            <canvas id="translationChart" class="chart-h-220"></canvas>
+        </section>
+
+        <!-- Section: Content Intelligence -->
+        <div class="section-label">&#9654; Content Intelligence</div>
+
+        <!-- Top recurring questions -->
+        <section class="panel span-6">
+            <h3>Top Recurring Questions</h3>
+            <p class="panel-subtitle">Asked 2 or more times in last 30 days: reveals knowledge gaps and FAQ candidates for content improvement</p>
+            <div id="topQuestionsList" class="compact-list"></div>
+        </section>
+
+        <!-- Error breakdown -->
+        <section class="panel span-3">
+            <h3>Error Breakdown</h3>
+            <p class="panel-subtitle">Failure modes by type</p>
+            <div id="errorList" class="compact-list"></div>
+        </section>
+
+        <!-- System summary stats -->
+        <section class="panel span-3">
+            <h3>System Summary</h3>
+            <p class="panel-subtitle">All-time aggregate</p>
+            <div class="stat-row">
+                <span class="stat-label">Total questions answered</span>
+                <span class="stat-value" id="summTotalInteractions">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Languages detected</span>
+                <span class="stat-value" id="summLanguages">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Translations performed</span>
+                <span class="stat-value" id="summTranslations">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Channels active</span>
+                <span class="stat-value" id="summChannels">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Throughput (15min)</span>
+                <span class="stat-value" id="summThroughput">0/min</span>
+            </div>
+        </section>
+
+        <!-- Section: Operational Log -->
+        <div class="section-label">&#9654; Operational Incident Log</div>
+
+        <!-- Recent incidents – collapsible by date -->
+        <section class="panel span-12">
+            <h3>Recent Operational Incidents</h3>
+            <p class="panel-subtitle">Failed or degraded responses in the last 30 days, grouped by date</p>
+            <div id="incidentAccordion" class="incident-accordion"></div>
+        </section>
+
+    </div><!-- /.analytics-grid -->
+</div><!-- /.dashboard-shell -->
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const INITIAL_METRICS = {{ metrics|tojson }};
+
+// Chart instances
+const _charts = {};
+
+const PURPLE        = '#7C3AED';
+const PURPLE_MID    = '#8B5CF6';
+const PURPLE_LIGHT  = 'rgba(124,58,237,0.15)';
+const ORANGE        = '#E87A2D';
+const ORANGE_MID    = '#F59E0B';
+const ORANGE_LIGHT  = 'rgba(232,122,45,0.15)';
+const GREEN         = '#8B5CF6';
+const RED           = '#EF4444';
+const BLUE          = '#3B82F6';
+
+const LANG_NAMES = {
+    eng:'English', lug:'Luganda', ach:'Acholi', teo:'Ateso',
+    lgg:'Lugbara', nyn:'Runyankole', swa:'Swahili'
+};
+
+function fmt(v)    { return Number(v||0).toLocaleString(); }
+function fmtPct(v) { return `${Number(v||0).toFixed(1)}%`; }
+function fmtMs(v)  { return `${Number(v||0).toFixed(0)} ms`; }
+function fmtLang(code) { return LANG_NAMES[code] || code || 'Unknown'; }
+
+function setLiveStatus(ok) {
+    const pill = document.getElementById('livePill');
+    const txt  = document.getElementById('liveStatusText');
+    pill.classList.toggle('degraded', !ok);
+    txt.textContent = ok ? 'Live \u2022 refreshes every 8s' : 'Feed degraded \u2014 retrying\u2026';
+}
+
+/* ── Build / update a chart, destroying old instance if data keys change ── */
+function upsertChart(id, config) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return null;
+    if (_charts[id]) {
+        try {
+            _charts[id].data    = config.data;
+            _charts[id].options = config.options;
+            _charts[id].update('active');
+            return _charts[id];
+        } catch(e) {
+            _charts[id].destroy();
+        }
+    }
+    _charts[id] = new Chart(canvas, config);
+    return _charts[id];
+}
+
+/* ── Default scale options ── */
+function yScale(opts={}) {
+    return Object.assign({ beginAtZero:true, ticks:{ precision:0, color:'#9CA3AF', font:{size:11} }, grid:{ color:'rgba(0,0,0,0.04)' } }, opts);
+}
+function xScale(opts={}) {
+    return Object.assign({ grid:{ display:false }, ticks:{ color:'#9CA3AF', font:{size:11} } }, opts);
+}
+
+/* ── KPIs ── */
+function updateKpis(m) {
+    const k = (m && m.kpis) || {};
+    document.getElementById('kpiTotalUsers').textContent          = fmt(k.total_users);
+    document.getElementById('kpiTotalInteractions').textContent   = fmt(k.total_interactions);
+    document.getElementById('kpiActiveUsers').textContent         = fmt(k.registered_users);
+    document.getElementById('kpiInteractions30d').textContent     = fmt(k.interactions_30d);
+    document.getElementById('kpiSuccessRate').textContent         = fmtPct(k.success_rate_30d);
+    document.getElementById('kpiFallbackRate').textContent        = fmtPct(k.fallback_rate_30d);
+    document.getElementById('kpiMedianLatency').textContent       = fmtMs(k.median_latency_ms_30d);
+    document.getElementById('kpiP95Latency').textContent          = fmtMs(k.p95_latency_ms_30d);
+
+    // Quality panel
+    const sr = Math.min(100, Number(k.success_rate_30d||0));
+    const fr = Math.min(100, Number(k.fallback_rate_30d||0));
+    const er = Math.min(100, Number(k.error_rate_30d||0));
+    document.getElementById('qualitySuccessLabel').textContent    = fmtPct(k.success_rate_30d);
+    document.getElementById('qualityFallbackLabel').textContent   = fmtPct(k.fallback_rate_30d);
+    document.getElementById('qualityErrorLabel').textContent      = fmtPct(k.error_rate_30d);
+    document.getElementById('qualitySuccessBar').style.width      = `${sr}%`;
+    document.getElementById('qualityFallbackBar').style.width     = `${fr}%`;
+    document.getElementById('qualityErrorBar').style.width        = `${er}%`;
+    document.getElementById('qualityAnswerLen').textContent       = `${Number(k.avg_answer_len_30d||0).toFixed(0)} chars`;
+    document.getElementById('qualityMultilingual').textContent    = fmt(k.multilingual_queries_30d);
+
+    const ts = m && m.generated_at ? m.generated_at : new Date().toISOString();
+    document.getElementById('lastUpdatedTs').textContent          = ts.replace('T',' ').replace('Z',' UTC');
+
+    // System summary
+    document.getElementById('summTotalInteractions').textContent  = fmt(k.total_interactions);
+    document.getElementById('summLanguages').textContent          = fmt(k.distinct_languages);
+    document.getElementById('summTranslations').textContent       = fmt(k.total_translations);
+    document.getElementById('summChannels').textContent           = fmt(k.distinct_channels);
+    document.getElementById('summThroughput').textContent         = `${Number(k.events_per_min_15m||0).toFixed(2)}/min`;
+}
+
+/* ── Daily volume line chart (30d) ── */
+function chartDailyVolume(m) {
+    const daily = m.daily_volume || [];
+    upsertChart('dailyVolumeChart', {
+        type: 'line',
+        data: {
+            labels: daily.map(x => (x.day||'').slice(5)),
+            datasets: [{
+                label: 'Interactions',
+                data: daily.map(x => Number(x.count||0)),
+                borderColor: PURPLE,
+                backgroundColor: 'transparent',
+                fill: false, tension: 0.3,
+                pointRadius: 4, pointHoverRadius: 7,
+                pointBackgroundColor: PURPLE,
+                borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false },
+                tooltip:{ callbacks:{ label: ctx => ` ${ctx.parsed.y} interactions` } } },
+            scales:{ y: yScale(), x: xScale() },
+        },
+    });
+}
+
+/* ── Cumulative growth ── */
+function chartCumulative(m) {
+    const daily = m.daily_volume || [];
+    let running = 0;
+    const cumData = daily.map(x => { running += Number(x.count||0); return running; });
+    const baseTotal = Number(((m.kpis||{}).total_interactions||0)) - (cumData[cumData.length-1]||0);
+    const absData = cumData.map(v => v + Math.max(0, baseTotal));
+
+    upsertChart('cumulativeChart', {
+        type: 'line',
+        data: {
+            labels: daily.map(x => (x.day||'').slice(5)),
+            datasets: [{
+                label: 'Cumulative interactions',
+                data: absData,
+                borderColor: ORANGE,
+                backgroundColor: 'transparent',
+                fill: false, tension: 0.2,
+                pointRadius: 2, borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{ y: yScale(), x: xScale({ ticks:{ maxTicksLimit:6 } }) },
+        },
+    });
+}
+
+/* ── Response Quality Over Time (stacked bar) ── */
+function chartQualityTrend(m) {
+    const qt = m.quality_trend || [];
+    upsertChart('qualityTrendChart', {
+        type: 'bar',
+        data: {
+            labels: qt.map(x => (x.day||'').slice(5)),
+            datasets: [
+                {
+                    label: 'Successful',
+                    data: qt.map(x => Number(x.success_count||0)),
+                    backgroundColor: PURPLE,
+                    borderRadius: 4,
+                    stack: 'q',
+                },
+                {
+                    label: 'Fallback',
+                    data: qt.map(x => Number(x.fallback_count||0)),
+                    backgroundColor: ORANGE,
+                    borderRadius: 4,
+                    stack: 'q',
+                },
+                {
+                    label: 'Error',
+                    data: qt.map(x => Number(x.error_count||0)),
+                    backgroundColor: RED,
+                    borderRadius: 4,
+                    stack: 'q',
+                },
+            ],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:8, font:{size:11} } },
+                tooltip:{
+                    callbacks:{
+                        footer: items => {
+                            const total = items.reduce((s,i) => s + i.parsed.y, 0);
+                            return `Total: ${total}`;
+                        }
+                    }
+                }
+            },
+            scales:{
+                y: yScale({ stacked:true }),
+                x: xScale({ stacked:true }),
+            },
+        },
+    });
+}
+
+/* ── Channel distribution donut ── */
+function chartChannel(m) {
+    const ch = m.channels || [];
+    upsertChart('channelChart', {
+        type: 'doughnut',
+        data: {
+            labels: ch.map(x => (x.channel||'unknown').replace(/_/g,' ').replace(/\b\w/g, l=>l.toUpperCase())),
+            datasets: [{
+                data: ch.map(x => Number(x.count||0)),
+                backgroundColor: [PURPLE, ORANGE, PURPLE_MID, ORANGE_MID, '#C084FC'],
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:9, font:{size:11} } },
+                tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${fmt(ctx.parsed)} queries` } },
+            },
+            cutout: '62%',
+        },
+    });
+}
+
+/* ── Language distribution horizontal bar chart ── */
+function chartLanguage(m) {
+    const langs = m.languages || [];
+    const labels = langs.map(x => fmtLang(x.language));
+    const data   = langs.map(x => Number(x.count||0));
+    upsertChart('languageChart', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Queries',
+                data,
+                backgroundColor: [PURPLE, ORANGE, PURPLE_MID, ORANGE_MID, '#C084FC', '#F97316', '#A855F7'],
+                borderRadius: 6,
+                borderSkipped: false,
+            }],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ display:false } },
+            scales:{
+                x: xScale({ grid:{ display:true, color:'rgba(0,0,0,0.04)' }, beginAtZero:true }),
+                y: { grid:{ display:false }, ticks:{ color:'#374151', font:{size:12,weight:'600'} } },
+            },
+        },
+    });
+}
+
+/* ── Translation analytics grouped bar ── */
+function chartTranslation(m) {
+    const tl = m.translation_stats || [];
+    const labels   = tl.map(x => fmtLang(x.language));
+    const inbound  = tl.map(x => Number(x.inbound||0));
+    const outbound = tl.map(x => Number(x.outbound||0));
+    upsertChart('translationChart', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label:'Inbound (→ English)', data:inbound,  backgroundColor:PURPLE, borderRadius:4 },
+                { label:'Outbound (→ lang)',   data:outbound, backgroundColor:ORANGE, borderRadius:4 },
+            ],
+        },
+        options: {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:8, font:{size:11} } } },
+            scales:{
+                y: yScale(),
+                x: xScale(),
+            },
+        },
+    });
+}
+
+/* ── Heatmap: hour-of-day × day-of-week ── */
+function renderHeatmap(m) {
+    const container = document.getElementById('heatmapContainer');
+    if (!container) return;
+    const cells = m.heatmap || [];
+
+    const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const HOURS = Array.from({length:24}, (_,i) => i);
+
+    // Build lookup  day:hour → count
+    const lookup = {};
+    let maxVal = 1;
+    for (const c of cells) {
+        const key = `${c.dow}:${c.hour}`;
+        lookup[key] = Number(c.count||0);
+        if (lookup[key] > maxVal) maxVal = lookup[key];
+    }
+
+    function heatColor(v) {
+        if (!v) return '#F3F4F6';
+        const t = v / maxVal;
+        if (t < 0.2) return `rgba(124,58,237,${0.1 + t * 1.5})`;
+        if (t < 0.6) return `rgba(124,58,237,${0.3 + t * 0.8})`;
+        return `rgba(124,58,237,${0.55 + t * 0.45})`;
+    }
+
+    function textColor(v) {
+        const t = v / maxVal;
+        return t > 0.45 ? '#fff' : '#6B7280';
+    }
+
+    let html = '<table class="heatmap-table"><thead><tr><th></th>';
+    for (const h of HOURS) {
+        html += `<th>${h.toString().padStart(2,'0')}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+
+    for (let d = 0; d < 7; d++) {
+        html += `<tr><td class="hm-day-label">${DAYS[d]}</td>`;
+        for (const h of HOURS) {
+            const v = lookup[`${d}:${h}`] || 0;
+            const bg = heatColor(v);
+            const fg = textColor(v);
+            const title = `${DAYS[d]} ${h.toString().padStart(2,'0')}:00: ${v} interactions`;
+            html += `<td class="hm-cell" style="background:${bg};color:${fg}" title="${title}">${v||''}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+/* ── Top recurring questions (count ≥ 2) ── */
+function renderTopQuestions(m) {
+    const container = document.getElementById('topQuestionsList');
+    if (!container) return;
+    const items = (m.top_questions || []).filter(x => Number(x.count||0) >= 2);
+    if (!items.length) {
+        container.innerHTML = '<div class="empty-state">No question asked twice yet &mdash; check back after more interactions.</div>';
+        return;
+    }
+    const max = Math.max(...items.map(x => Number(x.count||0)), 1);
+    container.innerHTML = items.map(item => {
+        const label = String(item.question||'(unknown)');
+        const count = Number(item.count||0);
+        const w = Math.max(4, Math.round((count/max)*100));
+        const escaped = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `<div class="compact-item">
+            <div class="label" title="${escaped}">${escaped}</div>
+            <div class="count"><span class="badge badge-purple">${count}×</span></div>
+            <div class="bar-mini"><span style="width:${w}%"></span></div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Compact list (errors / languages text list) ── */
+function renderCompactBars(containerId, items, labelKey, countKey, labelFn) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (!items || !items.length) {
+        container.innerHTML = '<div class="empty-state">No data yet.</div>';
+        return;
+    }
+    const max = Math.max(...items.map(x => Number(x[countKey]||0)), 1);
+    container.innerHTML = items.map(item => {
+        const rawLabel = String(item[labelKey]||'(unknown)');
+        const label = labelFn ? labelFn(rawLabel) : rawLabel;
+        const count = Number(item[countKey]||0);
+        const w = Math.max(3, Math.round((count/max)*100));
+        const escaped = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `<div class="compact-item">
+            <div class="label" title="${escaped}">${escaped}</div>
+            <div class="count">${count}</div>
+            <div class="bar-mini"><span style="width:${w}%"></span></div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Incidents accordion ── */
+function renderIncidents(m) {
+    const wrap = document.getElementById('incidentAccordion');
+    if (!wrap) return;
+    const incidents = m.recent_incidents || [];
+    if (!incidents.length) {
+        wrap.innerHTML = '<p class="empty-state" style="padding:14px 10px;">No incidents detected in the last 30 days.</p>';
+        return;
+    }
+    // Group by date
+    const groups = {};
+    incidents.forEach(item => {
+        const raw = item.created_at || '';
+        const dateStr = (raw.includes('T') ? raw.split('T')[0] : raw.split(' ')[0]) || 'Unknown';
+        if (!groups[dateStr]) groups[dateStr] = [];
+        groups[dateStr].push(item);
+    });
+    const sortedDates = Object.keys(groups).sort().reverse();
+    wrap.innerHTML = sortedDates.map(date => {
+        const items = groups[date];
+        const rows = items.map(item => {
+            const timeStr = ((item.created_at||'').split('T')[1] || (item.created_at||'').split(' ')[1] || '').replace(/\+.*/, '').slice(0,8);
+            const chanClass = (item.channel||'').includes('whatsapp') ? 'badge-orange' : 'badge-purple';
+            const latency = Number(item.latency_ms||0).toFixed(0);
+            const question = (item.question||'').slice(0, 100) || '-';
+            return `<div class="incident-card">
+                <span class="inc-time">${timeStr||'-'}</span>
+                <span class="inc-meta">
+                    <span class="badge ${chanClass}">${item.channel||'-'}</span>
+                    <span class="badge badge-red">${item.error_type||'unknown'}</span>
+                    <span>${fmtLang(item.source_language||'')}</span>
+                </span>
+                <span class="inc-latency">${latency} ms</span>
+                <span class="inc-question">${question}</span>
+            </div>`;
+        }).join('');
+        return `<div class="incident-date-group">
+            <button class="incident-date-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+                <span>${date} &nbsp;&middot;&nbsp; ${items.length} incident${items.length>1?'s':''}</span>
+                <span class="arrow">&#9654;</span>
+            </button>
+            <div class="incident-date-body">${rows}</div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Master render ── */
+function renderDashboard(m) {
+    updateKpis(m);
+    chartDailyVolume(m);
+    chartCumulative(m);
+    chartQualityTrend(m);
+    chartChannel(m);
+    chartLanguage(m);
+    chartTranslation(m);
+    renderHeatmap(m);
+    renderTopQuestions(m);
+    renderCompactBars('errorList', m.error_breakdown||[], 'error_type', 'count');
+    renderIncidents(m);
+}
+
+/* ── Live polling ── */
+async function fetchLiveMetrics() {
+    try {
+        const r = await fetch('/api/dashboard/metrics', { cache:'no-store', headers:{ Accept:'application/json' } });
+        if (!r.ok) throw new Error('bad response');
+        renderDashboard(await r.json());
+        setLiveStatus(true);
+    } catch(e) {
+        setLiveStatus(false);
+        console.error('Dashboard poll error:', e);
+    }
+}
+
+renderDashboard(INITIAL_METRICS || {});
+setInterval(fetchLiveMetrics, 8000);
+</script>
 {% endblock %}

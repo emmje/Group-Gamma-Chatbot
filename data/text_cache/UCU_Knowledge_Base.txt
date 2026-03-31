@@ -1,0 +1,3466 @@
+Document Title: UCU Knowledge Base
+UGANDA  CHRISTIAN  UNIVERSITY 
+A  Centre  of  Excellence  in  the  Heart  of  Africa 
+ 
+COMPREHENSIVE  KNOWLEDGE  BASE 
+For  AI-Powered  Student  Virtual  Assistant  (Chatbot) 
+  Version  1.0  |  March  2025 Research  compiled  from  UCU  official  sources,  NCHE,  Wikipedia,  news  media,  student  forums     Intended  Use:  RAG/Embeddings  pipeline  for  UCU  Chatbot  System  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  1:  GENERAL  INFORMATION  ABOUT  UCU  
+ 
+1.1  Overview  
+Uganda  Christian  University  (UCU)  is  a  private,  chartered,  Christian  university  administered  by  the  Church  of  
+Uganda
+ 
+(Anglican).
+ 
+It
+ 
+is
+ 
+one
+ 
+of
+ 
+Uganda's
+ 
+leading
+ 
+teaching
+ 
+and
+ 
+research
+ 
+universities
+ 
+and
+ 
+was
+ 
+the
+ 
+first
+ 
+private
+ 
+university
+ 
+in
+ 
+Uganda
+ 
+to
+ 
+receive
+ 
+a
+ 
+government
+ 
+charter.
+ 
+1.2  Key  Facts  at  a  Glance  
+Founded  1997  (as  UCU);  predecessor  Bishop  Tucker  Theological  College,  1913  
+Location  (Main  Campus)  Mukono  Hill,  Bishop  Tucker  Road,  P.O.  Box  4,  Mukono,  Uganda  
+Distance  from  Kampala  ~25  km  east,  on  the  Kampala–Jinja  Highway  (approx.  1–1.5  hrs  drive)  
+Ownership  Church  of  Uganda  (Anglican  Communion)  
+Accreditation  National  Council  for  Higher  Education  (NCHE),  Uganda;  Government  Charter  granted  2004  
+Chancellor  Most  Rev.  Dr.  Stephen  Samuel  Kaziimba  Mugalu  (Archbishop  of  Uganda,  since  March  2020)  
+Vice  Chancellor  Assoc.  Prof.  Aaron  Mushengyezi  (3rd  VC;  holds  PhD  from  University  of  Connecticut)  
+Campuses  6  locations  across  Uganda  (Mukono,  Kampala,  Mbale,  Arua,  Kabale,  Kagando)  
+Enrolment  Approx.  15,000  students  (Mukono  main  campus);  total  across  all  campuses  ~7,000–15,000+  
+Programs  70+  diploma,  bachelor's,  master's,  and  PhD  programmes  
+Intakes  per  Year  Three:  Easter  (January),  Trinity  (May),  Advent  (September)  
+Medium  of  Instruction  English  
+Phone  +256  312  350  800  
+Email  info@ucu.ac.ug  
+Website  www.ucu.ac.ug  
+Application  Portal  https://application.ucu.ac.ug  
+eLearning  https://elearning.ucu.ac.ug  
+Student  System  (Alpha)  https://alpha.ucu.ac.ug  
+1.3  History  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+UCU  traces  its  roots  to  Bishop  Tucker  Theological  College  (BTTC),  established  in  1913  and  named  after  
+pioneer
+ 
+missionary
+ 
+bishop
+ 
+Alfred
+ 
+Robert
+ 
+Tucker.
+ 
+Local
+ 
+Chief
+ 
+Hamu
+ 
+Mukasa
+ 
+granted
+ 
+land
+ 
+in
+ 
+Mukono
+ 
+for
+ 
+the
+ 
+college.
+ 
+For
+ 
+84
+ 
+years
+ 
+(1913–1997),
+ 
+BTTC
+ 
+trained
+ 
+clergy
+ 
+and
+ 
+educators
+ 
+for
+ 
+Church
+ 
+and
+ 
+State.
+ 
+The
+ 
+Church
+ 
+Mission
+ 
+Society
+ 
+partnered
+ 
+with
+ 
+Ugandan
+ 
+leaders
+ 
+to
+ 
+sustain
+ 
+the
+ 
+college.
+ By  the  late  1990s,  the  Church  of  Uganda  sought  broader  societal  impact  through  a  full  university  —  
+educating
+ 
+professionals
+ 
+beyond
+ 
+clergy.
+ 
+In
+ 
+1997,
+ 
+Uganda
+ 
+Christian
+ 
+University
+ 
+was
+ 
+officially
+ 
+established,
+ 
+replacing
+ 
+BTTC.
+ In  2004,  UCU  became  the  FIRST  private  university  in  Uganda  to  be  awarded  a  government  charter  —  the  
+highest
+ 
+form
+ 
+of
+ 
+national
+ 
+accreditation.
+ 
+In
+ 
+the
+ 
+same
+ 
+year,
+ 
+the
+ 
+Technology
+ 
+Park
+ 
+was
+ 
+established,
+ 
+broadband
+ 
+internet
+ 
+was
+ 
+installed,
+ 
+and
+ 
+the
+ 
+Bachelor
+ 
+of
+ 
+Science
+ 
+in
+ 
+Information
+ 
+Technology
+ 
+was
+ 
+introduced.
+ UCU  became  the  first  African  university  to  affiliate  with  the  US  Council  for  Christian  Colleges  and  Universities  
+(CCCU).
+ 
+The
+ 
+Uganda
+ 
+Studies
+ 
+Programme
+ 
+(USP
+ 
+Study
+ 
+Abroad)
+ 
+was
+ 
+launched,
+ 
+attracting
+ 
+international
+ 
+students,
+ 
+especially
+ 
+from
+ 
+North
+ 
+America.
+ UCU  celebrated  100  years  of  Bishop  Tucker  Theological  College  with  a  nationwide  Martyrs  Day  service.  The  
+School
+ 
+of
+ 
+Medicine
+ 
+and
+ 
+School
+ 
+of
+ 
+Dentistry
+ 
+were
+ 
+subsequently
+ 
+established,
+ 
+expanding
+ 
+UCU's
+ 
+health
+ 
+sciences
+ 
+offerings.
+ 
+In
+ 
+2014,
+ 
+UCU
+ 
+launched
+ 
+its
+ 
+eLearning
+ 
+(ODeL)
+ 
+platform.
+ 
+Online
+ 
+learning
+ 
+was
+ 
+approved
+ 
+by
+ 
+NCHE.
+ 
+The
+ 
+Alpha
+ 
+digital
+ 
+management
+ 
+system
+ 
+was
+ 
+developed,
+ 
+enabling
+ 
+virtual
+ 
+guild
+ 
+elections
+ 
+and
+ 
+online
+ 
+pre-entry
+ 
+exams.
+ 
+As
+ 
+of
+ 
+2024,
+ 
+UCU
+ 
+was
+ 
+recognised
+ 
+as
+ 
+'Top
+ 
+Eduroam
+ 
+User
+ 
+2024'
+ 
+and
+ 
+UCU
+ 
+sports
+ 
+teams
+ 
+won
+ 
+silver
+ 
+at
+ 
+the
+ 
+13th
+ 
+East
+ 
+Africa
+ 
+University
+ 
+Games.
+ 
+1.4  Vision,  Mission,  Motto,  and  Values  •  Vision:  A  Centre  of  Excellence  in  the  Heart  of  Africa  •  Mission:  To  Equip  students  for  productive,  holistic  lives  of  Christian  faith  and  service  •  Motto:  Alpha  and  Omega  —  God  the  Beginning  and  the  End  •  Theme:  A  Complete  Education  for  A  Complete  Person  (integrating  physical,  social,  emotional,  and  
+spiritual
+ 
+growth
+ 
+with
+ 
+academic
+ 
+learning)
+ Core  Values  (Instruments  of  Identity):  •  Rule  of  Faith  —  Christian  doctrinal  foundations  •  Rule  of  Life  —  Moral  conduct  and  ethical  standards  •  Rule  of  Spirituality  —  Active  engagement  with  the  Christian  faith  •  Integrity,  Discipline,  and  Professionalism  —  the  hallmarks  of  UCU  graduates  
+1.5  Governance  Structure  
+Chancellor:  Most  Rev.  Dr.  Stephen  Kaziimba  Mugalu  (Archbishop  of  Uganda)  —  ceremonial  head  Vice  Chancellor:  Assoc.  Prof.  Aaron  Mushengyezi  —  Chief  executive  and  academic  head  University  Council:  Governing  board;  chaired  by  Rt.  Rev.  Prof.  Alfred  Olwa  University  Senate:  Principal  deliberative  and  academic  body,  chaired  by  the  Vice  Chancellor;  responsible  for  
+academic
+ 
+quality
+ Deputy  Vice  Chancellor  (Academic  Affairs):  Oversees  academic  programmes  and  standards  Deputy  Vice  Chancellor  (Finance  &  Administration):  Manages  financial  and  administrative  operations  Dean  of  Students  Affairs  (DOSA):  First  administrative  contact  for  students;  oversees  student  welfare  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Guild  Government:  Student  self-governance  body;  Guild  President  leads  student  representation  on  
+University
+ 
+Council
+ 
+and
+ 
+committees
+ 
+1.6  International  Partnerships  &  Affiliations  •  US  Council  for  Christian  Colleges  and  Universities  (CCCU)  —  first  African  university  affiliate  •  Uganda  Studies  Programme  (USP)  —  Study  abroad  programme  drawing  students  from  North  
+American
+ 
+universities
+ •  Church  Mission  Society  (CMS)  •  Anglican  Communion  churches  (global)  •  Duke  University  (USA)  •  Stellenbosch  University  (South  Africa)  •  Waseda  University  (Japan)  •  International  Association  of  Universities  (IAU)  —  IAU  accredited  •  Top  Eduroam  network  participant  (2024  award)  
+1.7  Reputation  &  Rankings  •  First  private  university  in  Uganda  to  receive  a  government  charter  (2004)  •  Voted  most  beautiful  Christian  university  in  Africa  and  50th  in  the  world  
+(christianuniversitiesonline.org)
+ •  Recognised  by  NCHE  Uganda  as  a  leading  institution  in  online/distance  learning  (ODeL)  •  Strong  employer  preference:  UCU  graduates  are  known  for  discipline,  integrity,  and  professionalism  •  UCU  sports  teams  consistently  achieve  top  results  nationally  and  regionally  •  School  of  Law  students  won  Unwanted  Witness  Privacy  Moot  Competition,  Nairobi,  Kenya  (2024)  NOTE:  UCU  does  not  appear  in  global  QS  or  Times  Higher  Education  rankings  as  of  this  research,  but  is  widely  
+recognized
+ 
+as
+ 
+a
+ 
+top-tier
+ 
+private
+ 
+university
+ 
+within
+ 
+Uganda
+ 
+and
+ 
+East
+ 
+Africa.  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  2:  CAMPUSES  &  LOCATIONS  
+ 
+2.1  Mukono  Main  Campus  (Flagship)  
+Location:  Mukono  Hill,  Bishop  Tucker  Road,  Mukono  Town  —  ~25  km  from  Kampala  on  the  Kampala–Jinja  
+Highway.
+ 
+GPS:
+ 
+0°21'27.0"N,
+ 
+32°44'29.0"E
+ The  main  campus  is  UCU's  largest  and  most  comprehensive  site.  It  hosts  central  administration,  most  
+faculties
+ 
+and
+ 
+schools,
+ 
+the
+ 
+main
+ 
+library
+ 
+(Hamu
+ 
+Mukasa
+ 
+Library),
+ 
+medical
+ 
+clinic,
+ 
+sports
+ 
+complex,
+ 
+halls
+ 
+of
+ 
+residence,
+ 
+Technology
+ 
+Park,
+ 
+and
+ 
+the
+ 
+Chapel.
+ Key  facilities:  •  Hamu  Mukasa  Library:  seats  1,200  people,  holds  250,000+  volumes,  200  computers  •  Bishop  Tucker  Library  (archival/secondary  library)  •  Technology  Park  (ICT  infrastructure,  computer  labs)  •  Stephen  and  Peggy  Noll  Lecture  Block  •  All  Nations  House  and  Christ  Church  House  (residential/event  spaces)  •  Sports  complex:  football  pitches,  basketball  courts,  volleyball  courts,  gym,  tennis  courts,  athletics  
+track
+ •  Chapel  (Christ  Church  on  campus)  •  UCU  Medical  Clinic  (on-campus  health  services)  •  Halls  of  Residence  (male  and  female,  various  standards  —  see  Section  7)  •  Dining  Hall  (cafeteria):  nutritious,  well-balanced  meals;  popular  among  students  •  Wi-Fi  throughout  campus;  all  halls  of  residence  have  internet  hotspots  •  DStv  in  all  halls  of  residence  common  rooms  •  Bookstore  and  banking  services  on  campus  Transport:  Taxis  and  minibuses  run  frequently  between  Kampala  (Old  Park)  and  Mukono.  Campus  is  
+accessible
+ 
+from
+ 
+both
+ 
+Kampala
+ 
+and
+ 
+Jinja.
+ 
+2.2  Kampala  Campus  
+Location:  Mengo  neighbourhood,  Musajja  Alumbwa  Road,  Kampala.  Permanent  campus  construction  began  
+2019.
+ Focus:  Urban  learning  hub  for  working  professionals  and  students  seeking  flexible  schedules.  Popular  programmes:  Law,  Business,  IT,  and  Management.  •  Branch  library  at  Kampala  Campus  (Mengo)  •  Hostel  accommodation  available  (rates  slightly  higher  than  Mukono  —  see  Section  7)  
+2.3  Mbale  Campus  (Mbale  University  College)  
+Location:  Mbale  City,  Eastern  Uganda  Serves  students  in  eastern  Uganda.  Programmes  offered:  Education,  Business,  Theology,  and  Social  Sciences  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+2.4  Arua  Campus  
+Location:  Arua  Town,  Northern  Uganda  Focus:  Enhancing  education  accessibility  in  Northern  Uganda.  Programmes  offered:  Business,  Development  Studies,  and  Education  —  tailored  to  professional  demands  in  
+the
+ 
+region.
+ 
+2.5  Bishop  Barham  University  College  (Kabale)  
+Location:  Kabale  City,  South-Western  Uganda  (~420  km  from  Kampala)  Status:  Regional  constituent  college  of  UCU;  approx.  1,500  students.  Specialisations:  Theology,  Business,  Social  Sciences,  and  Education  Strong  Christian  learning  environment.  
+2.6  UCU  Kagando  University  College  (UCU  KUC)  
+Location:  Kagando,  Kasese  District,  Western  Uganda  Affiliated  constituent  college.  
+2.7  Campus  Comparison  Guide  
+Factor Mukono Kampala Mbale/Arua Kabale  (BBUC) 
+Programme  variety  Most  (all  schools)  Medium  (Law,  Business,  IT)  
+Limited  Theology-heavy  
+Hostel  availability  Yes  (3  tiers)  Yes  (slightly  pricier)  Limited  Yes  
+Library  Excellent  (250k  vols)  
+Branch  library  Branch  library  Branch  library  
+Sports  facilities  Full  complex  Limited  Basic  Basic  
+Wi-Fi  Full  campus  Available  Available  Available  
+Distance  from  Kampala  25  km  (~1  hr)  In  city  250+  km  420  km  
+Best  for  Full  university  life  Working  professionals  
+Regional  students  Theology/region  
+ 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  3:  ACADEMIC  STRUCTURE  
+ 
+3.1  Schools  and  Faculties  
+UCU  has  8  schools  and  3  faculties:  •  School  of  Law  •  School  of  Business  •  School  of  Education  •  School  of  Medicine  •  School  of  Dentistry  •  School  of  Social  Sciences  •  School  of  Journalism,  Media  &  Communication  •  Bishop  Tucker  School  of  Divinity  and  Theology  (BTSDT)  •  Faculty  of  Engineering,  Design  &  Technology  (EDT)  •  Faculty  of  Agricultural  Sciences  (FAS)  •  Faculty  of  Public  Health,  Nursing  &  Midwifery  (PHNM)  
+3.2  Undergraduate  Programmes  
+School  of  Law  •  Bachelor  of  Laws  (LLB)  —  4  years  •  Diploma  in  Law  —  2  years  
+School  of  Business  •  Bachelor  of  Business  Administration  (BBA)  —  3  years  •  Bachelor  of  Procurement  and  Logistics  Management  —  3  years  •  Bachelor  of  Human  Resource  Management  —  3  years  •  BSc.  Accounting  and  Finance  —  3  years  •  BSc.  Economics  and  Statistics  —  3  years  •  Bachelor  of  Tourism  and  Hospitality  Management  —  3  years  •  Diploma  in  Business  Administration  —  2  years  
+Faculty  of  Engineering,  Design  &  Technology  •  BSc.  Computer  Science  —  3  years  •  BSc.  Information  Technology  —  3  years  •  BSc.  Data  Science  and  Analytics  —  3  years  •  Bachelor  of  Electronics  and  Communication  Science  —  3  years  •  BSc.  Civil  and  Environmental  Engineering  —  4  years  •  Bachelor  of  Visual  Art  and  Design  —  3  years  •  Bachelor  of  Art  in  Graphic  Design  and  Animation  —  3  years  •  Diploma  in  Information  Technology  —  2  years  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Diploma  in  Visual  Art  and  Design  —  2  years  
+School  of  Medicine  •  Bachelor  of  Medicine  and  Bachelor  of  Surgery  (MBChB)  —  5  years  
+School  of  Dentistry  •  Bachelor  of  Dental  Surgery  (BDS)  —  5  years  
+School  of  Education  •  Bachelor  of  Science  in  Education  (BSc.  Ed.)  —  3  years  •  Bachelor  of  Arts  in  Education  (BA  Ed.)  —  3  years  •  Higher  Education  Certificate  —  Arts  (1  year)  •  Higher  Education  Certificate  —  Sciences  (1  year)  •  Higher  Education  Certificate  —  Blended  (1  year)  •  Bachelor  of  Education  (Recess/Upgrading)  —  2  years  
+Faculty  of  Public  Health,  Nursing  &  Midwifery  •  Bachelor  of  Nursing  Science  —  4  years  (A-level  entry)  or  3  years  (Diploma  entry)  •  Bachelor  of  Public  Health  —  3  years  
+School  of  Social  Sciences  •  Bachelor  of  Social  Work  and  Social  Administration  —  3  years  •  Bachelor  of  Public  Administration  and  Management  —  3  years  •  Bachelor  of  Governance  and  International  Relations  —  3  years  •  Bachelor  of  Human  Rights,  Peace  and  Humanitarian  Interventions  —  3  years  •  Diploma  in  Social  Work  and  Social  Administration  —  2  years  
+School  of  Journalism,  Media  &  Communication  •  Bachelor  of  Arts  in  Journalism  and  Communication  —  3  years  
+Faculty  of  Agricultural  Sciences  •  BSc.  Agricultural  Science  and  Entrepreneurship  —  4  years  •  BSc.  Human  Nutrition  and  Clinical  Dietetics  —  4  years  •  BSc.  Food  Science  and  Technology  —  4  years  
+Bishop  Tucker  School  of  Divinity  and  Theology  •  Bachelor  of  Divinity  —  3  years  
+3.3  Postgraduate  Programmes  (Masters  &  PhD)  
+Masters  programmes  (2  years  unless  stated):  •  MBA  (Master  of  Business  Administration)  •  Master  of  Human  Resource  Management  •  Master  of  Laws  —  International  Business  Law,  Energy  Law,  Oil  &  Gas  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Master  of  Education  (Admin  &  Mgt,  Curriculum  Studies,  Library  &  Info  Science,  Edu  Psychology,  
+Higher
+ 
+Education,
+ 
+Literature)
+ •  Master  of  Public  Health  |  Master  of  Nursing  Science  |  Master  of  Public  Health  Leadership  •  MSc.  Computer  Science  |  Master  of  Information  Technology  |  MSc.  Data  Science  &  Analytics  •  MSc.  Environmental  Science  &  Management  |  MSc.  Water  and  Sanitation  •  Master  of  Social  Work  |  Master  of  Counselling  Psychology  •  Master  of  Governance  and  International  Relations  |  Master  of  Public  Administration  and  
+Management
+ •  Master  of  Research  and  Public  Policy  |  Master  of  Development  Monitoring  and  Evaluation  •  MA  African  Studies  |  MA  Organizational  Leadership  and  Management  •  MSc.  Procurement  and  Supply  Chain  Management  •  MSc.  Agriculture  (Rural  Dev't,  Crop  Science,  Soil  Science)  |  MSc.  Agricultural  Economics  |  MSc.  
+Agribusiness
+ 
+|
+ 
+MSc.
+ 
+Human
+ 
+Nutrition
+ •  MA  Journalism  and  Strategic  Communication  |  MA  Strategic  Communication  •  MA  Theology  |  Master  of  Theological  Studies  |  Master  of  Divinity  (3  years)  |  Master  of  Divinity  in  
+Christian
+ 
+Ministries
+ PhD  programmes  (3  years):  •  PhD  in  Theology  |  PhD  in  Literature  |  PhD  in  Education  |  PhD  in  Journalism,  Media  and  
+Communication
+ •  PhD  in  Business  Administration  |  PhD  in  Development  Studies  •  PhD  in  Agricultural  Systems  and  Value  Chain  Management  Postgraduate  Diplomas  (1  year  each):  •  PGD  Education  |  PGD  Higher  Education  |  PGD  Internationalisation  of  Education  •  PGD  Public  Administration  |  PGD  Development  Monitoring  and  Evaluation  •  PGD  Human  Resource  Management  |  PGD  Sustainable  Business  and  Renewable  Energy  •  PGD  Water  and  Sanitation  
+3.4  Academic  Calendar  
+UCU  operates  on  a  trimester  (three-semester)  system:  
+Semester Period Notes 
+Semester  1  (Easter)  January  –  April  Largest  intake;  most  programmes  available  
+Semester  2  (Trinity)  May  –  August  Mid-year  intake;  some  programmes  only  
+Semester  3  (Advent)  September  –  December  Second  major  intake;  all  major  programmes  
+Each  semester  lasts  approximately  12–14  weeks.  UCU  holds  7  graduation  ceremonies  annually  across  its  
+campuses
+ 
+and
+ 
+constituent
+ 
+colleges.
+ 
+Transcripts
+ 
+are
+ 
+issued
+ 
+on
+ 
+graduation
+ 
+day
+ 
+to
+ 
+facilitate
+ 
+rapid
+ 
+employment.
+  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  4:  DEEP  PROGRAMME  INSIGHTS  
+ 
+4.1  Bachelor  of  Science  in  Information  Technology  (BSc.  IT)  
+Duration:  3  years  |  School:  Faculty  of  Engineering,  Design  &  Technology  Tuition:  UGX  2,225,000/year  (nationals)  |  UGX  3,337,500/year  (non-nationals)  Core  competency  areas:  •  Programming  (Python,  Java,  C++)  •  Database  Management  Systems  •  Networks  and  Communications  •  Systems  Analysis  and  Design  •  Software  Engineering  •  Web  Technologies  and  Development  •  Cybersecurity  and  Ethical  Hacking  •  IT  Project  Management  •  Mobile  Application  Development  •  Data  Structures  and  Algorithms  Career  paths:  Software  Developer,  Systems  Analyst,  Network  Engineer,  IT  Project  Manager,  Cybersecurity  
+Analyst,
+ 
+Database
+ 
+Administrator,
+ 
+Web
+ 
+Developer,
+ 
+IT
+ 
+Consultant
+ Industrial  training  requirement:  Yes  —  a  semester  of  industrial  attachment/internship  is  required,  typically  in  
+Year
+ 
+3.
+ 
+4.2  BSc.  Computer  Science  
+Duration:  3  years  |  School:  Faculty  of  Engineering,  Design  &  Technology  Tuition:  UGX  2,225,000/year  (nationals)  More  theoretical  than  IT;  focuses  on  algorithms,  mathematical  foundations,  artificial  intelligence,  and  
+systems
+ 
+design.
+ •  Theory  of  Computation  and  Algorithm  Design  •  Artificial  Intelligence  and  Machine  Learning  •  Operating  Systems  and  Computer  Architecture  •  Compiler  Design  •  Parallel  and  Distributed  Computing  •  Research  Methods  in  Computing  Career  paths:  Research  Scientist,  AI/ML  Engineer,  Software  Architect,  University  Lecturer,  Backend  Developer,  
+Data
+ 
+Scientist
+ 
+4.3  BSc.  Data  Science  and  Analytics  
+Duration:  3  years  |  School:  Faculty  of  Engineering,  Design  &  Technology  Tuition:  UGX  2,225,000/year  (nationals)  Focus:  Turning  data  into  actionable  insight  using  statistical,  mathematical,  and  computational  methods.  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Statistical  Analysis  and  Probability  •  Data  Mining  and  Warehousing  •  Machine  Learning  •  Big  Data  Technologies  •  Data  Visualisation  •  Business  Intelligence  Career  paths:  Data  Analyst,  Business  Intelligence  Analyst,  Data  Scientist,  Statistician,  Data  Engineer  
+4.4  Bachelor  of  Laws  (LLB)  
+Duration:  4  years  |  School:  School  of  Law  Tuition:  UGX  2,225,000/year  (nationals)  Note:  Requires  a  pre-entry  exam;  application  fee  is  UGX  150,000.  LLB  students  must  wear  formal  black  suits  every  Monday  and  Thursday  (School  of  Law  dress  code  directive,  
+2025).
+ Core  subjects:  •  Constitutional  Law  and  Administrative  Law  •  Criminal  Law  and  Procedure  •  Law  of  Contract  and  Torts  •  Company  Law  and  Commercial  Law  •  Land  Law  and  Conveyancing  •  Family  Law  •  Evidence  and  Civil  Procedure  •  International  Law  and  Human  Rights  •  Legal  Research  and  Writing  Career  paths:  Advocate/Barrister,  State  Attorney,  Magistrate/Judge,  Corporate  Counsel,  Legal  Aid  Officer,  
+Human
+ 
+Rights
+ 
+Officer,
+ 
+International
+ 
+Law
+ 
+Practitioner
+ UCU  Law  students  have  excelled  in  national  and  international  moot  competitions  (e.g.,  Unwanted  Witness  
+Privacy
+ 
+Moot,
+ 
+Nairobi,
+ 
+2024).
+ 
+4.5  Bachelor  of  Business  Administration  (BBA)  
+Duration:  3  years  |  School:  School  of  Business  Tuition:  UGX  1,618,000/year  (nationals)  Core  modules:  •  Principles  of  Management  •  Business  Finance  and  Accounting  •  Marketing  Management  •  Entrepreneurship  and  Innovation  •  Business  Ethics  and  Corporate  Governance  •  Operations  Management  •  Organisational  Behaviour  •  Business  Communication  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Strategic  Management  Career  paths:  Business  Manager,  Marketing  Officer,  Entrepreneur,  NGO  Programme  Officer,  Bank  Officer,  
+Sales
+ 
+Manager,
+ 
+Administrative
+ 
+Officer
+ 
+4.6  Bachelor  of  Medicine  and  Surgery  (MBChB)  
+Duration:  5  years  |  School:  School  of  Medicine  Tuition:  UGX  5,000,000/year  (nationals)  |  UGX  7,500,000/year  (non-nationals)  Note:  Pre-entry  exam  required;  application  fee  UGX  150,000.  Most  competitive  and  expensive  programme  at  
+UCU.
+ Programme  covers:  Basic  Sciences  (Year  1–2),  Clinical  Medicine  (Year  3–5),  Hospital  rotations  Recess  term  fees  apply  (UGX  550,000  per  recess):  for  MBChB  and  BDS  students.  Career  paths:  Medical  Officer,  Specialist  (after  further  training),  Research  Scientist,  Public  Health  Officer  
+4.7  Bachelor  of  Arts  in  Journalism  and  Communication  
+Duration:  3  years  |  School:  School  of  Journalism,  Media  &  Communication  Tuition:  UGX  2,104,000/year  (nationals)  Core  areas:  Print  Journalism,  Broadcast  Journalism,  Online/Digital  Media,  Strategic  Communication,  Public  
+Relations,
+ 
+Media
+ 
+Law
+ 
+and
+ 
+Ethics,
+ 
+Photojournalism,
+ 
+Media
+ 
+Management
+ Career  paths:  Journalist/Reporter,  TV/Radio  Presenter,  Public  Relations  Officer,  Communication  Specialist,  
+Media
+ 
+Manager,
+ 
+Content
+ 
+Creator,
+ 
+NGO
+ 
+Communications
+ 
+Officer
+ 
+4.8  Bachelor  of  Divinity  
+Duration:  3  years  |  School:  Bishop  Tucker  School  of  Divinity  and  Theology  Tuition:  UGX  1,618,000/year  (nationals)  Focus:  Theology,  Biblical  Studies,  Church  History,  Pastoral  Ministry,  Preaching,  Christian  Ethics  Career  paths:  Pastor/Priest,  Church  Planter,  Chaplain,  Theological  Educator,  Missionary  
+4.9  BSc.  Civil  and  Environmental  Engineering  
+Duration:  4  years  |  Faculty:  Engineering,  Design  &  Technology  Tuition:  UGX  2,225,000/year  (nationals)  Focus:  Structural  engineering,  water  and  sanitation  infrastructure,  roads  and  bridges,  environmental  impact  
+assessment
+ Career  paths:  Civil  Engineer,  Environmental  Consultant,  Project  Engineer,  Urban  Planner  
+4.10  Bachelor  of  Nursing  Science  
+Duration:  4  years  (A-level  entry)  or  3  years  (Diploma  entry)  |  Faculty:  Public  Health,  Nursing  &  Midwifery  Tuition:  UGX  2,104,000/year  (nationals)  Career  paths:  Registered  Nurse,  Community  Health  Nurse,  Midwife,  Hospital  Administrator   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  5:  ADMISSIONS  
+ 
+5.1  Entry  Requirements  —  Undergraduate  
+For  Ugandan  Applicants:  Direct  Entry  (School  Leavers):  •  Uganda  Certificate  of  Education  (UCE)  —  minimum  5  passes  •  Uganda  Advanced  Certificate  of  Education  (UACE)  —  minimum  2  principal  passes  in  relevant  subjects  Alternative  Entry:  •  A  Higher  Education  Certificate  (HEC)  in  a  relevant  field  •  A  Diploma  in  a  relevant  discipline  from  a  recognised  institution  of  Higher  Learning  •  A  pass  in  the  Mature  Age  Entrance  Examination  (for  mature  applicants  who  do  not  have  A-level  
+qualifications)
+ 
+For  Kenyan  Applicants:  •  KCSE  holders:  minimum  grade  C+  and  above  •  KACE/'GCE/A-levels':  at  least  2  principal  passes  or  equivalent  •  Diploma  in  a  relevant  discipline  from  a  recognised  institution  
+For  Tanzanian  Applicants:  •  TCE  &  TACE  Certificate  with  at  least  2  principal  passes,  OR  •  Diploma  from  a  recognised  institution  of  Higher  Learning  
+For  International  Applicants  (other  countries):  •  Qualifications  recognised  for  University  entry  in  the  applicant's  home  country  •  Non-English  transcripts  must  be  officially  translated  and  certified  •  Application  fee:  USD  50  
+Special  Notes  on  Competitive  Programmes:  •  Bachelor  of  Laws  (LLB):  Pre-entry  exam  required  •  Bachelor  of  Medicine  and  Surgery  (MBChB):  Pre-entry  exam  required  •  Bachelor  of  Dental  Surgery  (BDS):  Pre-entry  exam  required  •  Master  of  Business  Administration  (MBA):  Pre-entry  exam  required  •  Application  fee  for  pre-entry  exam  programmes:  UGX  150,000  
+5.2  Postgraduate  Entry  Requirements  •  A  good  first  degree  from  a  recognised  institution  of  higher  learning,  relevant  to  the  course  applied  
+for
+ •  Applicants  with  a  Third  Class  degree  may  be  considered  for  some  programmes  depending  on  work  
+experience
+ 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  International  qualifications  recognised  for  postgraduate  study  in  the  applicant's  home  country  are  
+accepted
+ 
+5.3  Application  Process  —  Step  by  Step  1.  Visit  the  online  application  portal:  https://application.ucu.ac.ug  2.  Create  an  account  using  a  valid  email  address  3.  Fill  in  personal  and  academic  details  4.  Upload  required  academic  documents  5.  Affirm  and  subscribe  to  UCU's  Christian  Philosophy  (mandatory  checkbox)  6.  Select  payment  method:  MTN  Mobile  Money  (*165*4*3*2*1#),  Airtel  Money  (*185*6*2*1#),  
+VISA/MasterCard,
+ 
+or
+ 
+bank
+ 
+deposit
+ 7.  Pay  the  non-refundable  application  fee  (UGX  100,000  standard;  UGX  150,000  for  pre-entry  exam  
+programmes)
+ 8.  Submit  your  application  —  a  student  number  (EMPLID)  is  sent  to  your  email  9.  Check  admission  results  on  the  dates  specified  on  the  portal  or  at  the  Admissions  Office  10.  If  admitted:  pick  up  admission  letter  from  the  Admissions  Office  or  request  via  email  
+(admissions@ucu.ac.ug)
+ 11.  Confirm  your  acceptance  by  paying  a  non-refundable  tuition  fee  deposit  NOTE:  Applications  can  also  be  submitted  in  hard  copy:  purchase  a  form  from  any  UCU  campus  for  UGX  50,000  or  USD  
+25
+ 
+(Stanbic
+ 
+Bank
+ 
+branches),
+ 
+complete
+ 
+and
+ 
+return
+ 
+to
+ 
+the
+ 
+Admissions
+ 
+Office
+ 
+with
+ 
+all
+ 
+required
+ 
+documents. 
+5.4  Required  Documents  •  Certified  academic  transcripts  and  certificates  (O-level  and  A-level,  or  Diploma)  •  National  ID  or  passport  (for  international  students)  •  Passport-size  photographs  •  Application  fee  payment  receipt  •  Two  referees/recommendation  letters  (for  postgraduate)  •  First  degree  transcripts  (for  postgraduate)  •  Certified  translations  of  non-English  documents  
+5.5  Intake  Deadlines  
+UCU  does  not  publish  fixed  universal  deadlines  —  these  vary  by  programme  and  intake.  Applicants  should:  •  Check  the  UCU  website  (ucu.ac.ug/admission-announcements/)  for  current  deadlines  •  Contact  the  Admissions  Office:  admissions@ucu.ac.ug  |  +256  312  350  880/835  |  Mobile:  +256  794  
+770
+ 
+826
+ There  are  three  intakes  per  year:  January  (Easter),  May  (Trinity),  and  September  (Advent).  
+5.6  Admissions  Contact  
+Admissions  Office,  Uganda  Christian  University  P.O.  Box  4,  Mukono,  Uganda  Phone:  +256  312  350  880/835  |  Mobile:  +256  794  770  826  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Email:  admissions@ucu.ac.ug  (Undergraduate)  |  graduateadmissions@ucu.ac.ug  (Postgraduate)   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  6:  FEES  &  FINANCIAL  INFORMATION  
+ NOTE:  All  fees  below  are  in  Ugandan  Shillings  (UGX)  per  year  of  study.  Verify  current  figures  at  
+https://ucu.ac.ug/Downloads/ucu-fees-structure.pdf
+ 
+or
+ 
+contact
+ 
+the
+ 
+Finance
+ 
+Office. 
+6.1  Undergraduate  Tuition  Fees  
+Faculty  of  Engineering,  Design  &  Technology  
+Programme Years Tuition/Yr  (UGX) 
+BSc.  Computer  Science 3  yrs 2,225,000 
+BSc.  Information  Technology 3  yrs 2,225,000 
+BSc.  Data  Science  and  Analytics 3  yrs 2,225,000 
+Bachelor  of  Electronics  &  Communication  Science 3  yrs 2,225,000 
+Bachelor  of  Visual  Art  and  Design 3  yrs 1,741,000 
+Bachelor  of  Art  in  Graphic  Design  and  Animation 3  yrs 2,225,000 
+BSc.  Civil  and  Environmental  Engineering 4  yrs 2,225,000 
+Diploma  in  Information  Technology 2  yrs 500,000 
+Diploma  in  Visual  Art  and  Design 2  yrs 500,000 
+ School  of  Law  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Laws  (LLB) 4  yrs 2,225,000 
+Diploma  in  Law 2  yrs 500,000 
+ School  of  Medicine  &  Dentistry  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Medicine  &  Bachelor  of  Surgery  (MBChB) 5  yrs 5,000,000 
+Bachelor  of  Dental  Surgery  (BDS) 5  yrs 5,000,000 
+ School  of  Business  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Business  Administration  (BBA) 3  yrs 1,618,000 
+Bachelor  of  Procurement  and  Logistics  Management 3  yrs 1,618,000 
+Bachelor  of  Human  Resource  Management 3  yrs 1,618,000 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Programme Years Tuition/Yr  (UGX) 
+BSc.  Accounting  and  Finance 3  yrs 1,618,000 
+BSc.  Economics  and  Statistics 3  yrs 1,618,000 
+Bachelor  of  Tourism  and  Hospitality  Management 3  yrs 1,618,000 
+Diploma  in  Business  Administration 2  yrs 500,000 
+ School  of  Education  
+Programme Years Tuition/Yr  (UGX) 
+BSc.  Education  /  BA  Education 3  yrs 1,618,000 
+Bachelor  of  Education  —  Recess  (Upgrading) 2  yrs 800,000 
+Higher  Education  Certificate  (Arts) 1  yr 850,000 
+Higher  Education  Certificate  (Sciences) 1  yr 1,070,000 
+ School  of  Social  Sciences  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Social  Work  and  Social  Administration 3  yrs 1,618,000 
+Bachelor  of  Public  Administration  and  Management 3  yrs 1,618,000 
+Bachelor  of  Governance  and  International  Relations 3  yrs 1,618,000 
+Bachelor  of  Human  Rights,  Peace  &  Humanitarian  Interventions 3  yrs 1,618,000 
+Diploma  in  Social  Work  and  Social  Administration 2  yrs 500,000 
+ Faculty  of  Public  Health,  Nursing  &  Midwifery  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Public  Health 3  yrs 2,104,000 
+Bachelor  of  Nursing  Science  (A-level  entry) 4  yrs 2,104,000 
+Bachelor  of  Nursing  Science  (Diploma  entry) 3  yrs 2,104,000 
+ Faculty  of  Agricultural  Sciences  
+Programme Years Tuition/Yr  (UGX) 
+BSc.  Agricultural  Science  and  Entrepreneurship 4  yrs 2,225,000 
+BSc.  Human  Nutrition  and  Clinical  Dietetics 4  yrs 2,225,000 
+BSc.  Food  Science  and  Technology 4  yrs 2,225,000 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Bishop  Tucker  School  of  Divinity  &  Theology  
+Programme Years Tuition/Yr  (UGX) 
+Bachelor  of  Divinity 3  yrs 1,618,000 
+ School  of  Journalism,  Media  &  Communication  
+Programme Years Tuition/Yr  (UGX) 
+BA  Journalism  and  Communication 3  yrs 2,104,000 
+6.2  Postgraduate  Tuition  Fees  
+Programme Years Tuition/Yr  (UGX) 
+Master  of  Laws  (International  Business  Law) 2  yrs 4,523,000 
+Master  of  Laws  (International  Energy  /  Oil  &  Gas) 2  yrs 5,000,000 
+Master  of  Business  Administration  (MBA) 2  yrs 2,384,000 
+Master  of  Human  Resource  Management 2  yrs 2,384,000 
+MSc.  Procurement  and  Supply  Chain  Management 2  yrs 2,384,000 
+MSc.  Computer  Science 2  yrs 2,345,000 
+Master  of  Information  Technology 2  yrs 2,345,000 
+MSc.  Data  Science  and  Analytics 2  yrs 2,345,000 
+MSc.  Water  and  Sanitation 2  yrs 2,345,000 
+Master  of  Public  Health 2  yrs 2,386,500 
+Master  of  Nursing  Science 2  yrs 2,386,500 
+Master  of  Counselling  Psychology 2  yrs 2,009,000 
+Master  of  Education  (all  specialisations) 2  yrs 2,346,500 
+MA  Journalism  and  Strategic  Communication 2  yrs 2,345,000 
+MA  Theology  /  Master  of  Theological  Studies 2  yrs 2,345,000 
+MA  Organizational  Leadership  and  Management 3  yrs 1,564,000 
+PhD  (all  disciplines) 3  yrs 5,496,000 
+All  Postgraduate  Diplomas 1  yr ~2,345,000  –  2,386,500 
+6.3  Other  /  Functional  Fees  (Per  Semester)  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Fee  Description Undergraduate  (UGX) Postgraduate  (UGX) 
+Registration  Fee  53,000  35,000  
+Development  Fee  500,000  333,000  
+Medical  Fee  70,000  70,000  
+Student  Activity  Fee  90,000  66,000  
+Computer  Fee  100,000  67,000  
+Examination  Fee  80,000  53,000  
+Book  Fee  /  IMAT  90,000  64,000  
+TOTAL  Functional  Fees  983,000  618,000  
+NCHE  Fee  (per  year)  20,000  20,000  
+Church  Fee  (per  year)  5,000  5,000  
+Application  Fees:  UGX  100,000  (standard)  |  UGX  150,000  (programmes  with  pre-entry  exams:  LLB,  MBChB,  
+BDS,
+ 
+MBA)
+ Recess  Term  Fees  (MBChB  &  BDS  only):  Development  Fee  210,000  +  Medical  Fee  70,000  +  IMAT  Fee  100,000  
++
+ 
+Computer
+ 
+Fee
+ 
+90,000
+ 
++
+ 
+Exam
+ 
+Fee
+ 
+80,000
+ 
+=
+ 
+UGX
+ 
+550,000
+ NOTE:  Full  prompt  payment  of  fees  exempts  the  student  from  paying  the  Registration  Fee  (UGX  53,000/semester). 
+6.4  Halls  of  Residence  Fees  (Per  Semester)  
+Room  Type Mukono  (UGX) Kampala  (UGX) 
+Executive  (Single,  self-contained)  1,200,000  1,500,000  
+Double  (Shared  room)  650,000  750,000  
+Ordinary  (Shared,  not  self-contained)  550,000  650,000  
+6.5  Payment  Methods  &  Bank  Details  MTN  Mobile  Money:  Dial  *165*4*3*2*1#  →  Enter  Access  Number  as  Student  Code  →  Enter  amount  →  
+Enter
+ 
+PIN
+ Airtel  Money:  Dial  *185*6*2*1#  →  Enter  Access  Number  as  Student  Code  →  Enter  amount  →  Enter  PIN  Bank:  Stanbic  Bank  Uganda  (A/C:  9030005917610  UGX  |  9030008067111  USD),  Centenary  Bank  
+(4210600136),
+ 
+KCB
+ 
+Uganda
+ 
+(2201256357)
+ SWIFT  (International):  SBICUGKX  (Stanbic),  CERBUGKA  (Centenary),  CITIUGKA  (Citibank)  IMPORTANT:  Always  include  your  Access  Number  on  all  payment  slips.  Application  forms  use  APP000  as  the  
+Access
+ 
+Number.
+ 
+6.6  Fee  Payment  Structure  •  Option  1  —  Full  Prompt  Payment:  Pay  full  tuition  +  functional  fees  at  the  start  of  the  semester.  
+BENEFIT:
+ 
+Exemption
+ 
+from
+ 
+registration
+ 
+fee
+ 
+(UGX
+ 
+53,000).
+ 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Option  2  —  Installments:  Pay  in  two  equal  installments.  The  first  installment  is  due  at  the  start  of  the  
+semester;
+ 
+second
+ 
+installment
+ 
+by
+ 
+a
+ 
+date
+ 
+set
+ 
+by
+ 
+Finance
+ 
+Office.
+ NOTE:  Failure  to  pay  fees  by  the  stipulated  deadlines  may  result  in  deregistration  or  inability  to  sit  examinations. 
+6.7  Scholarships  and  Financial  Aid  •  UCU  Scholarship  Fund:  Provides  tuition  fee  waivers  for  deserving  and  financially  needy  students  •  Sports  Scholarships:  For  talented  athletes  in  programmes  like  football,  netball,  rugby  •  Theology  Scholarships:  For  theology  scholars  and  ordinands  •  Bright  Minds  Scholarship:  For  exceptionally  high-achieving  students  •  Church-based  Scholarships:  Some  dioceses  offer  scholarship  support  to  students  studying  at  UCU  •  International  Partnerships:  Exchange  programme  funding  may  be  available  through  partner  
+universities
+ For  scholarship  enquiries:  Contact  the  Scholarships  Office  or  visit  https://ucu.ac.ug/financial-aid/  NOTE:  The  Uganda  Government  does  not  sponsor  UCU  as  it  is  a  private  university.  Students  should  plan  to  self-fund  or  
+seek
+ 
+scholarships.
+ 
+UCU
+ 
+offers
+ 
+installment
+ 
+payment
+ 
+to
+ 
+ease
+ 
+the
+ 
+financial
+ 
+burden. 
+6.8  Estimated  Total  Cost  Per  Year  (Nationals)  
+Below  is  a  cost  estimate  for  a  Ugandan  national  student  at  Mukono  Main  Campus  (Ordinary  room):  
+Cost  Item Estimated  Amount  (UGX/yr) 
+Tuition  (BBA  example)  1,618,000  
+Functional  Fees  (2  semesters)  1,966,000  
+Hostel  (Ordinary  room,  2  semesters)  1,100,000  
+Meals  (dining  hall  estimate)  800,000  –  1,200,000  
+Transport  (within  Mukono/to  Kampala)  200,000  –  400,000  
+Books  /  Stationery  200,000  –  400,000  
+Personal  expenses  300,000  –  600,000  
+TOTAL  ESTIMATE  (BBA)  ~6,200,000  –  7,700,000  
+NOTE:  Off-campus  housing  in  Mukono  town  typically  costs  UGX  200,000–600,000/month  depending  on  quality.  Some  
+students
+ 
+prefer
+ 
+off-campus
+ 
+for
+ 
+lower
+ 
+costs
+ 
+and
+ 
+more
+ 
+independence.  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  7:  ACCOMMODATION  &  LIVING  
+ 
+7.1  On-Campus  Halls  of  Residence  
+UCU  provides  on-campus  accommodation  for  both  male  and  female  students.  Rooms  are  allocated  on  a  
+first-come,
+ 
+first-served
+ 
+basis
+ 
+during
+ 
+registration.
+ Room  types  and  features:  •  Executive  (Single,  self-contained):  Private  bathroom,  ideal  for  postgraduate  or  privacy-seeking  
+students.
+ 
+UGX
+ 
+1,200,000/semester
+ 
+(Mukono)
+ •  Double  (Shared,  2  students  per  room):  Shared  bathroom  facilities.  UGX  650,000/semester  (Mukono)  •  Ordinary  (Shared,  not  self-contained):  Shared  bathroom,  communal  facilities.  UGX  550,000/semester  
+(Mukono)
+ All  halls  of  residence  include:  •  Computer  laboratory  with  internet  hotspots  (high-speed  Wi-Fi)  •  Common  room  with  DStv  (satellite  TV)  •  Resident  Assistants  (student  leaders)  supervised  by  DOSA  office  Residential  rules  include:  No  alcohol,  no  smoking,  modest  dress,  quiet  hours,  visitor  sign-in  policies.  
+7.2  Off-Campus  Housing  
+Many  students  (especially  those  who  cannot  secure  on-campus  housing)  live  in  Mukono  town  near  the  
+university.
+ 
+Options
+ 
+include:
+ •  Private  student  hostels:  UGX  400,000  –  1,200,000  per  semester;  some  offer  shuttle  services,  DStv,  
+free
+ 
+internet,
+ 
+and
+ 
+meals
+ •  Shared  apartments:  Groups  of  2–4  students  share  a  house  for  lower  individual  cost  •  Single  rooms:  Available  in  Mukono  at  approx.  UGX  150,000  –  350,000/month  NOTE:  Off-campus  options  are  OPINION-based  and  vary  by  operator.  Students  should  inspect  any  accommodation  
+before
+ 
+paying.
+ 
+The
+ 
+university
+ 
+does
+ 
+not
+ 
+officially
+ 
+endorse
+ 
+off-campus
+ 
+hostels. 
+7.3  Dining  &  Food  
+UCU  Dining  Hall  (Main  Campus,  Mukono):  •  Provides  nutritious,  well-balanced  meals;  popular  among  students  •  Common  menu  includes:  rice,  posho  (sticky  cornmeal),  beans,  peas,  greens,  G-nut  (peanut)  sauce,  
+and
+ 
+various
+ 
+Ugandan
+ 
+dishes
+ •  Affordable  pricing;  meals  can  be  purchased  per  item  or  as  sets  Off-campus  food  options:  •  Numerous  small  restaurants,  food  stalls,  and  market  vendors  around  Mukono  town  •  'Rolex'  (chapati  +  egg  roll)  —  popular  cheap  street  food  •  Fast  food  and  supermarkets  accessible  in  Kampala  (~1  hour  away)  
+7.4  Cost  of  Living  Estimates  (Monthly)  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+For  a  Ugandan  national  student  on-campus  at  Mukono:  •  Accommodation  (on-campus):  UGX  275,000  –  600,000/month  (depending  on  room  type)  •  Meals:  UGX  80,000  –  150,000/month  (dining  hall  /  off-campus  mix)  •  Personal  expenses:  UGX  50,000  –  100,000/month  •  Transport  (within  Mukono):  UGX  20,000  –  60,000/month  •  Airtime/data:  UGX  15,000  –  50,000/month  •  Total  estimate:  UGX  440,000  –  960,000/month   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  8:  STUDENT  LIFE  AT  UCU  
+ 
+8.1  Campus  Culture  &  Environment  
+UCU  has  a  distinctly  Christian,  disciplined  campus  culture.  The  environment  is  safe,  green  (voted  most  
+beautiful
+ 
+Christian
+ 
+campus
+ 
+in
+ 
+Africa),
+ 
+and
+ 
+spiritually
+ 
+active.
+ 
+The
+ 
+campus
+ 
+is
+ 
+less
+ 
+hectic
+ 
+than
+ 
+Kampala,
+ 
+giving
+ 
+students
+ 
+a
+ 
+focused
+ 
+academic
+ 
+setting
+ 
+with
+ 
+easy
+ 
+access
+ 
+to
+ 
+the
+ 
+city.
+ All  students  sign  a  statement  agreeing  to  UCU's  Instruments  of  Identity  (Rule  of  Faith,  Life,  and  Spirituality)  at  
+admission.
+ 
+The
+ 
+campus
+ 
+upholds
+ 
+Christian
+ 
+morals
+ 
+and
+ 
+values.
+ 
+8.2  Religious  Life  •  The  official  form  of  worship  at  UCU  is  that  of  the  Anglican  Church  (Church  of  Uganda)  •  Students  of  other  denominations  may  worship  at  their  respective  off-campus  churches  •  All  students  are  expected  to  acknowledge  and  respect  Anglican  religious  activities  •  Community  worship:  Monday  and  Thursday;  Sunday  Chapel  services  •  Theology/Divinity  students  must  attend  regular  worship  sessions  •  Fellowships:  Student  Christian  Fellowship  (SCF),  prayer  groups,  choirs  •  UCU  Chaplaincy:  Provides  spiritual  guidance,  counselling,  and  pastoral  care  for  all  students  •  Choirs:  Chapel  Choir,  Mustard  Seed  Choir  (and  others);  widely  popular  and  active  •  UCU  Mission  Week:  Annual  campus-wide  evangelical  programme  •  Students  report  significant  spiritual  growth  through  cross-cultural  encounters  and  community  
+engagement
+ 
+8.3  Clubs,  Societies  &  Organisations  •  Student  Christian  Fellowship  (SCF)  —  largest  and  most  active  spiritual  group  •  Rotaract  Club  —  community  service,  leadership,  professional  development  •  Toastmasters  Club  —  public  speaking  and  communication  skills  •  School  of  Law  Society  —  moot  debates,  legal  clinics,  mock  trials  •  Drama  and  Theatre  Club  •  Debate  Society  •  Environmental  Club  •  Student  guild  government  —  elected  student  representation  body  •  Various  faculty/school-based  academic  clubs  Students  can  join  clubs  during  orientation  or  through  the  Student  Affairs  Office.  
+8.4  Sports  &  Recreation  
+UCU  has  a  strong  sports  culture  and  modern  facilities:  •  Football  (Soccer):  UCU  teams  have  won  national  university  football  leagues  •  Netball:  Peace  Proscovia  (UCU  alumna)  was  captain  of  Uganda  National  Netball  Team  •  Basketball,  Volleyball,  Rugby,  Tennis,  Athletics,  Woodball  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Fully  equipped  modern  gymnasium  •  UCU  teams  placed  2nd  at  13th  East  Africa  University  Games  (2024):  15  gold,  10  silver,  7  bronze  
+medals
+ •  UCU  campus  is  a  preferred  venue  for  local  and  international  sports  tournaments  Sports  scholarships  are  available  for  talented  athletes.  
+8.5  Key  Annual  Events  •  Freshers'  Week  /  Orientation:  Welcoming  events  for  new  students  at  each  intake  •  UCU  Mission  Week:  Spiritual  awareness  and  evangelism  programme  •  Inter-Faculty/School  Games:  Competitive  sporting  events  between  schools  •  Cultural  Night:  Showcasing  Uganda's  and  East  Africa's  cultural  diversity  •  Graduation  Ceremonies:  7  annually  across  campuses  —  transcripts  issued  same  day  •  Uganda  Martyrs'  Day  (June  3):  UCU  actively  participates  in  national  Martyrs'  Day  observances  •  Inter-University  Games  (national)  
+8.6  Student  Governance  
+Guild  Government  is  the  official  student  body.  It  is  led  by  the  Guild  President  and  Guild  Cabinet  (ministers).  
+Guild
+ 
+elections
+ 
+are
+ 
+held
+ 
+annually
+ 
+and
+ 
+since
+ 
+2020
+ 
+have
+ 
+been
+ 
+conducted
+ 
+virtually
+ 
+through
+ 
+the
+ 
+Alpha
+ 
+system.
+ The  Guild  Government  advocates  for  students,  manages  student  welfare,  and  has  direct  access  to  the  Dean  
+of
+ 
+Students
+ 
+Affairs
+ 
+(DOSA)
+ 
+and
+ 
+other
+ 
+university
+ 
+authorities.
+ 
+Two
+ 
+student
+ 
+representatives
+ 
+sit
+ 
+on
+ 
+the
+ 
+University
+ 
+Council
+ 
+and
+ 
+Faculty
+ 
+Committees.
+ 
+8.7  Health  &  Wellness  •  On-campus  medical  clinic:  Fully  staffed,  capable  of  treating  common  illnesses  •  International  hospital  in  Kampala  (approx.  1  hour)  accessible  for  emergency  or  specialist  care  •  Counselling  and  Guidance  Office:  Professional  counselling  for  academic,  personal,  and  mental  health  
+needs
+ •  Physical  health:  Sports  complex,  gym,  and  recreation  facilities  •  Spiritual  wellbeing:  Chaplaincy  services,  prayer  groups,  fellowships  •  Emergency  Contact  numbers  published  on  UCU  website  (ucu.ac.ug/emergency-numbers/)   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  9:  FACILITIES  &  RESOURCES  
+ 
+9.1  Libraries  •  Hamu  Mukasa  Library  (Main  Library,  Mukono):  Capacity  1,200  seats;  250,000  volumes;  200  
+computers
+ 
+in
+ 
+open
+ 
+terrace;
+ 
+archival
+ 
+section
+ •  Bishop  Tucker  Library:  Secondary  library  at  main  campus  •  Branch  Libraries:  Kampala  (Mengo),  Mbale,  Kabale,  Arua  campuses  •  UCU  Digital  Repository:  https://ucudir.ucu.ac.ug  —  online  research  materials  •  UCU  Scholar:  https://scholar.ucu.ac.ug  —  academic  publications  •  Library  access  is  available  online  (off-campus)  through  library.ucu.ac.ug  •  Students  have  access  to  physical  and  digital  journals,  e-books,  and  databases  
+9.2  ICT  Infrastructure  •  Technology  Park:  Dedicated  ICT  complex  at  Mukono  main  campus  •  Computer  labs:  In  Technology  Park,  library,  halls  of  residence,  and  faculty  buildings  •  Campus-wide  Wi-Fi:  All  academic  and  residential  buildings  •  eLearning  platform  (Moodle-based):  https://elearning.ucu.ac.ug  —  established  2014  •  Alpha  (Management  Information  System):  https://alpha.ucu.ac.ug  —  admissions,  registration,  
+results,
+ 
+career
+ 
+services
+ •  UCU  Webmail:  https://mailx.ucu.ac.ug  —  official  student  and  staff  email  •  UCU  has  been  recognised  as  'Top  Eduroam  User  2024'  —  meaning  fast,  secure,  globally  federated  
+Wi-Fi
+ 
+access
+ •  UIS  (University  ICT  Services):  https://uis.ucu.ac.ug  —  helpdesk  and  IT  support  
+9.3  Research  Centres  •  Directorate  of  Research,  Partnerships  and  Innovation  (DRPI):  Main  research  body  •  Africa  Policy  Centre  (APC):  https://apc.ucu.ac.ug  •  Sustainable  Development  Centre  •  UCU  Writing  Centre  •  Centre  for  Research  in  Governance,  Development  and  Peace  Studies  •  Centre  for  Research  in  HIV/AIDS  •  Centre  for  Research  in  Gender  Studies  •  Centre  for  Research  in  Disaster  Management  •  Centre  for  Research  in  Economic  Development  •  Centre  for  Research  in  Sustainable  Agriculture  •  Grants  Management  System:  https://grants.ucu.ac.ug  
+9.4  Other  Facilities  •  UCU  Chapel  (Christ  Church):  Central  place  of  worship  on  main  campus  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Bookstore:  On-campus  bookstore  for  textbooks  and  stationery  •  Banking:  ATM  and  banking  services  available  on  campus  •  Post  Office:  P.O.  Box  4,  Mukono  —  official  correspondence  address  •  UCU  Standard  Newspaper:  Student  and  university  news  publication  —  standard.ucu.ac.ug  •  UCU  Radio/Media:  Cloud-based  media  services  •  Hospitality  Services:  Accommodation  and  conference  facilities  for  visitors  •  Kids  Care  Services:  For  students  with  young  children  •  Campus  Security:  24-hour  security;  security  staff  from  contracted  firms  (e.g.,  Saracen  Uganda  
+Limited)
+  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  10:  DIGITAL  SYSTEMS  &  STUDENT  TOOLS  
+ 
+10.1  Alpha  —  UCU  Management  Information  System  
+Alpha  (https://alpha.ucu.ac.ug)  is  UCU's  central  digital  platform.  It  handles:  •  Online  admission  applications  •  Course  registration  (semester  by  semester)  •  Viewing  and  downloading  results  •  Student  profile  management  •  Guild  elections  (virtual)  •  Pre-entry  exam  registrations  (Law,  Medicine,  Dentistry,  MBA)  •  Career  services  and  job  listings  •  Financial  account  and  fee  payment  tracking  How  to  register  for  a  semester  on  Alpha:  Log  in  →  Academic  tab  →  Register  for  semester  →  Select  courses  
+→
+ 
+Confirm
+ 
+→
+ 
+Pay
+ 
+fees
+ 
+through
+ 
+Alpha
+ 
+or
+ 
+designated
+ 
+payment
+ 
+channels
+ To  reset  Alpha  password:  Visit  UCU  Helpdesk  (helpme.ucu.ac.ug)  →  Follow  'Alpha  General  Guides'  →  Submit  
+your
+ 
+email
+ 
+for
+ 
+reset
+ 
+link
+ 
+10.2  UCU  eLearning  Platform  
+URL:  https://elearning.ucu.ac.ug  |  Email:  elearning@ucu.ac.ug  |  Phone:  +256  312  350  896/826  The  Moodle-based  Learning  Management  System  established  in  2014  allows:  •  Students:  Attend  classes  online  (real-time),  access  recorded  lectures,  download  course  materials  
+(PDFs,
+ 
+videos,
+ 
+audio),
+ 
+submit
+ 
+assignments,
+ 
+attempt
+ 
+online
+ 
+exams
+ •  Lecturers:  Teach  in  real-time,  pre-record  lectures,  upload  resources,  administer  assessments  The  platform  was  formally  approved  by  NCHE.  UCU  is  a  leading  ODeL  (Online  Distance  Learning)  institution  in  
+Uganda.
+ 
+10.3  UCU  Webmail  
+URL:  https://mailx.ucu.ac.ug  All  students  and  staff  receive  an  official  UCU  email  address  upon  enrolment.  Used  for  official  communication  
+with
+ 
+lecturers,
+ 
+administration,
+ 
+and
+ 
+the
+ 
+university.
+ 
+10.4  Student  Registration  Process  (Step  by  Step)  12.  Pay  fees  (tuition  +  functional  fees)  via  MTN  Mobile  Money,  Airtel,  or  bank  13.  Log  into  Alpha  (alpha.ucu.ac.ug)  using  your  student  credentials  14.  Navigate  to  the  current  semester's  registration  page  15.  Select  your  courses  for  the  semester  16.  Confirm  registration  —  print  or  save  your  registration  slip  17.  Report  to  relevant  offices  for  any  physical  verification  required  18.  Begin  attending  classes  as  per  the  timetable  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+10.5  Accessing  Results  
+Results  are  accessed  through  the  Alpha  system  after  each  semester's  examinations.  •  Log  in  to  Alpha  →  Results/Transcript  section  •  Results  are  released  on  dates  announced  by  the  Academic  Registrar  •  Transcripts  are  issued  officially  on  graduation  day  •  Supplementary/retake  results  are  also  viewable  on  Alpha  
+10.6  UCU  Helpdesk  
+URL:  https://helpme.ucu.ac.ug  The  UCU  Helpdesk  provides  step-by-step  guides  for  students  on:  •  Course  registration  using  Alpha  •  Password  resets  •  eLearning  platform  navigation  •  Finance  and  fees  queries   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  11:  CAREER  &  OPPORTUNITIES  
+ 
+11.1  Career  Services  
+UCU  provides  career  development  services  accessible  through  the  Alpha  system  and  the  Student  Affairs  /  
+Alumni
+ 
+offices:
+ •  Job  listings  on  Alpha  (alpha.ucu.ac.ug/careers)  •  Career  guidance  and  counselling  through  DOSA's  office  •  CV  writing  workshops,  interview  preparation  •  Industry  networking  events  and  career  fairs  •  Internship  placement  coordination  
+11.2  Internship  /  Industrial  Training  Requirements  
+Most  undergraduate  programmes  at  UCU  require  an  industrial  attachment  (internship)  component,  typically:  •  Duration:  8–12  weeks  (one  semester  or  recess  period)  •  Timing:  Usually  Year  3  (final  year)  or  Year  4  for  4-year  programmes  •  Students  source  their  own  placements  with  university  guidance  •  Assessed  by  a  supervisor  and  university  lecturer  UCU  graduates  are  highly  sought  after  by  employers  because  of  the  university's  strong  reputation  for  
+discipline,
+ 
+integrity,
+ 
+and
+ 
+professionalism.
+ 
+11.3  Industry  Partnerships  •  Mengo  Hospital  (School  of  Medicine  partnership)  •  Various  NGOs,  government  ministries,  media  houses,  law  firms,  banks,  and  tech  companies  in  
+Uganda
+ •  Global  partners:  Duke  University,  Stellenbosch  University,  Waseda  University,  CCCU  network  
+universities
+ •  UCU  Signs  Strategic  Partnership  with  Insurance  Training  College  (2025)  
+11.4  Alumni  Success  •  Peace  Proscovia:  Professional  netball  player,  former  captain  of  Uganda  National  Netball  Team  •  John  Senyonyi:  2nd  Vice  Chancellor  of  UCU;  evangelist  and  mathematician  •  UCU  graduates  are  employed  across  Uganda  in  law,  medicine,  business,  education,  NGOs,  
+government,
+ 
+and
+ 
+technology
+ NOTE:  Alumni  success  stories  are  available  on  the  UCU  website  and  the  UCU  Standard  newspaper  (standard.ucu.ac.ug).  
+This
+ 
+section
+ 
+should
+ 
+be
+ 
+expanded
+ 
+with
+ 
+verified
+ 
+stories
+ 
+from
+ 
+UCU
+ 
+communications. 
+11.5  Graduate  Employment  Outcomes  
+(OPINION/OBSERVATION  —  based  on  public  perception  and  student  testimonials)  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  UCU's  reputation  for  producing  disciplined  and  ethical  graduates  makes  them  preferred  by  
+employers
+ •  Law  graduates  often  proceed  to  Law  Development  Centre  (LDC)  for  bar  admission  •  IT/Computer  Science  graduates  find  roles  in  Uganda's  growing  tech  sector,  banking,  telecom  •  Education  graduates  are  absorbed  into  the  teaching  profession  at  all  levels  •  Medicine  and  Dentistry  graduates  join  the  public  and  private  health  sector  •  Business  graduates  find  roles  in  banking,  NGOs,  government  agencies,  and  entrepreneurship   
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  12:  POLICIES  &  REGULATIONS  
+ 
+12.1  Grading  System  
+UCU  uses  a  percentage-based  grading  system  aligned  with  Uganda's  national  standards:  
+Grade Percentage  Range Classification 
+A  /  First  Class  80%  and  above  First  Class  Honours  /  Distinction  
+B  /  Upper  Second  70%  –  79%  Upper  Second  Class  Honours  (2:1)  
+C  /  Lower  Second  60%  –  69%  Lower  Second  Class  Honours  (2:2)  
+D  /  Pass  50%  –  59%  Pass  /  Third  Class  
+E  /  Fail  Below  50%  Fail  —  retake  required  
+NOTE:  Exact  grading  boundaries  may  vary  by  school/programme.  Confirm  with  your  school's  Academic  Handbook. 
+12.2  Attendance  Policy  •  Students  must  attend  a  minimum  of  75%  of  lectures  per  course  to  be  eligible  to  sit  examinations  •  Roll  calls  are  conducted  during  lectures  for  attendance  verification  •  Missing  more  than  25%  of  lectures  without  valid  excuse  disqualifies  a  student  from  examinations  for  
+that
+ 
+course
+ •  This  policy  is  strictly  enforced  —  lecturers  may  have  attendance  verification  officers  
+12.3  Examination  Policies  •  Examinations  are  scheduled  at  the  end  of  each  semester  •  Students  must  be  registered  (fees  paid  and  courses  selected)  to  sit  exams  •  Missing  an  exam  without  prior  notification:  student  receives  a  zero  (fail)  for  that  paper  •  Special  Examinations:  Granted  for  legitimate  absence  (serious  illness,  bereavement,  etc.)  —  apply  
+through
+ 
+the
+ 
+Dean/Academic
+ 
+Registrar
+ 
+with
+ 
+supporting
+ 
+documents
+ •  Retakes/Supplementary  Exams:  Students  who  fail  a  course  may  retake;  maximum  marks  on  retake  
+capped
+ 
+at
+ 
+50%
+ 
+(Pass)
+ 
+in
+ 
+most
+ 
+schools
+ •  Academic  Integrity:  Plagiarism  and  cheating  are  serious  offences  subject  to  disciplinary  action  up  to  
+expulsion
+ •  Results  are  available  via  the  Alpha  system  after  official  release  dates  
+12.4  Dress  Code  
+UCU  enforces  a  formal  dress  code  consistent  with  its  Christian  values:  General  Campus  Dress  Code:  •  Men:  Collared  shirts,  belted  dress  trousers  (at  least  to  the  ankle),  dress  shoes  or  closed-toed  leather  
+sandals
+ •  Women:  Skirts  or  dresses  reaching  the  knee  or  below;  modest  tops  covering  the  shoulders  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Prohibited  for  ALL  students:  Miniskirts,  short  dresses,  shorts,  sandals  (in  academic  spaces),  ripped  
+jeans,
+ 
+exposed
+ 
+tattoos,
+ 
+revealing
+ 
+clothing,
+ 
+tight-fitting
+ 
+attire
+ •  Caps/hats:  Generally  discouraged  or  prohibited  in  academic  spaces  School  of  Law  Specific  Dress  Code  (from  June  2025  directive):  •  All  LLB  students  must  wear  a  full  black  suit  every  Monday  and  Thursday  •  Required:  Black  suit,  long-sleeved  white  shirt,  black  shoes,  necktie  (male  students)  •  Prohibited:  Sandals,  coloured  shoes,  canvas  shoes,  toe-exposing  footwear,  dyed/tinted  hair  •  Non-compliance  =  denied  access  to  classrooms,  main  library,  and  School  of  Law  offices  Enforcement:  Security  staff  and  designated  officers  check  dress  code  at  gates  and  academic  spaces.  First  
+offence:
+ 
+warning
+ 
+and
+ 
+direction
+ 
+to
+ 
+change.
+ 
+Repeated
+ 
+violations:
+ 
+referred
+ 
+to
+ 
+Disciplinary
+ 
+Committee.
+ 
+12.5  Code  of  Conduct  
+All  students  and  staff  must  sign  the  UCU  Instruments  of  Identity  (Code  of  Conduct):  •  Men  and  women  must  dress  decently  and  treat  each  other  with  decency  and  purity  •  No  alcohol  on  campus;  drunkenness  is  a  punishable  offence  •  No  smoking  on  campus  •  No  pornography,  gambling,  or  substance  abuse  •  Sexual  relations  between  unmarried  students  are  prohibited  (consistent  with  Christian  moral  
+standards)
+ •  No  disrespect  or  disruption  of  Anglican  worship  on  campus  •  All  religious  activities  must  be  pre-approved  by  the  Chaplaincy  •  Theft,  violence,  and  harassment  are  grounds  for  disciplinary  action  •  Students  must  comply  with  residential  rules  in  halls  of  residence  
+12.6  Disciplinary  Procedures  
+Breaches  of  conduct  are  handled  through  a  graduated  authority  structure:  19.  Informal  resolution:  Resident  Assistant  /  Hall  Warden  /  Course  Lecturer  20.  Dean  of  Students  Affairs  (DOSA):  Handles  student  welfare  and  conduct  issues  21.  Faculty/School  Dean:  Academic  misconduct  at  programme  level  22.  University  Disciplinary  Committee:  Serious  offences  (violence,  cheating,  repeated  violations)  23.  Vice  Chancellor  /  Senate:  Major  decisions  including  suspension  or  expulsion  Students  have  the  right  to  be  heard  and  to  appeal  decisions  through  official  channels.  
+12.7  Graduation  Requirements  
+To  graduate  from  UCU:  •  Successfully  complete  all  required  courses  for  the  programme  (minimum  credit  hours)  •  Achieve  at  least  a  Pass  grade  (50%)  in  all  required  papers;  no  outstanding  fails  •  Complete  industrial  attachment  /  internship  (where  required)  •  Settle  all  outstanding  fees  and  obligations  to  the  university  •  Attend  the  graduation  ceremony  (or  apply  for  in-absentia  graduation)  For  detailed  requirements:  https://ucu.ac.ug/graduation-requirements/  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+UCU  holds  7  graduation  ceremonies  annually.  Transcripts  are  issued  on  graduation  day  —  facilitating  
+immediate
+ 
+entry
+ 
+into
+ 
+the
+ 
+job
+ 
+market.
+  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  13:  STUDENT  EXPERIENCE  &  DECISION  SUPPORT  
+ 
+13.1  Pros  of  Studying  at  UCU  
+NOTE:  The  following  are  based  on  publicly  available  student  testimonials,  news  reports,  and  official  UCU  
+communications.
+ 
+Clearly
+ 
+labelled
+ 
+as
+ 
+OPINION/OBSERVATION. •  [OPINION]  Beautiful,  green,  peaceful  campus  —  voted  most  beautiful  Christian  campus  in  Africa  •  [FACT]  First  private  university  in  Uganda  to  be  government-chartered  (high  credibility)  •  [OPINION]  Strong  employer  preference  —  'UCU  brand'  associated  with  discipline  and  
+professionalism
+ •  [FACT]  Three  intakes  per  year  —  more  flexible  entry  opportunities  than  many  universities  •  [FACT]  Transcripts  issued  on  graduation  day  —  faster  entry  into  employment  •  [OPINION]  Vibrant  spiritual  community  —  excellent  for  Christians  seeking  faith-based  education  •  [FACT]  Strong  sports  culture  —  multiple  national  and  regional  achievements  •  [FACT]  ODeL/eLearning  available  —  flexibility  for  distance  and  part-time  learners  •  [OPINION]  Safe  campus  environment  —  strong  security  and  Christian  moral  culture  •  [FACT]  International  exchange  programmes  —  exposure  to  global  academic  networks  •  [OPINION]  Students  from  DRC,  South  Sudan,  and  other  African  countries  appreciate  the  welcoming  
+environment
+ •  [FACT]  Modern  library  (1,200  seats,  250,000  volumes)  and  good  ICT  infrastructure  
+13.2  Common  Challenges  (Cons)  
+NOTE:  These  are  OPINIONS  based  on  student  discussions,  news  reports,  and  forum  observations  —  not  official  UCU  
+positions. •  [OPINION]  Strict  dress  code  can  feel  burdensome  —  especially  financial  cost  of  maintaining  a  formal  
+wardrobe
+ 
+(particularly
+ 
+LLB
+ 
+students)
+ •  [OPINION]  Alcohol  and  social  restrictions  frustrate  some  students  used  to  more  liberal  university  
+environments
+ •  [OPINION]  Distance  from  Kampala  means  limited  access  to  city  amenities  and  entertainment  •  [OPINION]  On-campus  accommodation  demand  exceeds  supply  —  many  students  must  find  
+off-campus
+ 
+housing
+ •  [OPINION]  Private  university  fees  —  no  government  sponsorship  —  can  be  a  barrier  for  financially  
+struggling
+ 
+students
+ •  [OPINION]  Some  students  report  occasional  inconsistency  in  enforcement  of  rules  (dress  code,  
+attendance)
+ •  [OPINION]  Limited  public  transport  at  night  —  students  returning  from  Kampala  after  dark  face  
+challenges
+ 
+13.3  Programme  Recommendations  by  Career  Goal  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Career  Goal Recommended  Programme(s) 
+Software  Developer  /  Tech  BSc.  IT  or  BSc.  Computer  Science  
+Data  /  AI  Career  BSc.  Data  Science  and  Analytics  or  MSc.  Data  Science  
+Lawyer  /  Advocate  Bachelor  of  Laws  (LLB)  
+Doctor  /  Surgeon  Bachelor  of  Medicine  and  Surgery  (MBChB)  
+Nurse  /  Midwife  Bachelor  of  Nursing  Science  
+Dentist  Bachelor  of  Dental  Surgery  (BDS)  
+Accountant  /  Finance  BSc.  Accounting  and  Finance  or  BBA  (with  Finance  major)  
+HR  Professional  Bachelor  of  Human  Resource  Management  
+NGO  /  Development  Work  BA  Social  Sciences,  BSc.  Development  Studies,  Master  of  Dev't  M&E  
+Journalist  /  Media  BA  Journalism  and  Communication  
+Minister  /  Pastor  Bachelor  of  Divinity  or  MA  Theology  
+Engineer  BSc.  Civil  and  Environmental  Engineering  
+Nutritionist  BSc.  Human  Nutrition  and  Clinical  Dietetics  
+Entrepreneur  /  Business  Bachelor  of  Business  Administration  (BBA)  
+Supply  Chain  Bachelor  of  Procurement  and  Logistics  Management  
+Teacher  /  Educator  BA/BSc.  Education  or  MA  in  Education  specialisation  
+13.4  Campus  Recommendations  by  Student  Preference  •  Full  university  experience  (sport,  hostels,  clubs,  chapel,  social):  Mukono  Main  Campus  •  Working  professional  /  evening  classes  /  Kampala-based:  Kampala  Campus  (Mengo)  •  Eastern  Uganda  region  /  close  to  home:  Mbale  Campus  •  Northern  Uganda:  Arua  Campus  •  South-Western  Uganda  /  Theology  focus:  Bishop  Barham  University  College  (Kabale)  •  Western  Uganda  (Kasese  area):  Kagando  University  College  
+13.5  Advice  for  New  Students  •  Apply  early:  UCU  fills  up  fast,  especially  for  competitive  programmes  (Medicine,  Law,  IT)  •  Check  exact  fee  payment  deadlines  on  Alpha  to  avoid  penalty  or  deregistration  •  Apply  for  on-campus  accommodation  as  soon  as  you  are  admitted  —  rooms  go  quickly  •  Bring  a  formal  wardrobe  —  dress  code  is  enforced  and  can  cause  issues  if  ignored  •  Make  use  of  the  eLearning  platform  from  Day  1  —  course  materials  are  usually  uploaded  before  
+physical
+ 
+classes
+ 
+start
+ •  Join  a  fellowship  or  club  in  Week  1  of  orientation  —  this  builds  your  social  network  quickly  •  Get  your  UCU  email  activated  immediately  for  official  communication  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Download  the  Alpha  app  and  set  up  your  account  before  arriving  at  campus  •  Start  networking  with  seniors  in  your  department  —  they  can  guide  you  on  course  selection  and  
+study
+ 
+strategies
+ •  Budget  realistically:  tuition  +  functional  fees  +  accommodation  +  living  =  ~UGX  6–8  million/year  
+minimum
+  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  14:  COMPREHENSIVE  FAQ  DATASET  
+This  section  contains  200+  Q&A  pairs  for  chatbot  training  and  retrieval.  Questions  are  realistic  and  
+conversational.
+  
+14.1  ADMISSIONS  FAQs  
+Q:  How  do  I  apply  to  UCU? A:  Apply  online  at  https://application.ucu.ac.ug.  Create  an  account,  fill  in  your  personal  and  academic  details,  
+upload
+ 
+documents,
+ 
+agree
+ 
+to
+ 
+UCU's
+ 
+Christian
+ 
+philosophy,
+ 
+and
+ 
+pay
+ 
+the
+ 
+application
+ 
+fee
+ 
+via
+ 
+MTN
+ 
+Mobile
+ 
+Money,
+ 
+Airtel,
+ 
+or
+ 
+card. Q:  What  are  the  A-level  requirements  to  join  UCU? A:  You  need  at  least  2  principal  passes  in  relevant  subjects  from  the  Uganda  Advanced  Certificate  of  
+Education
+ 
+(UACE),
+ 
+plus
+ 
+a
+ 
+Uganda
+ 
+Certificate
+ 
+of
+ 
+Education
+ 
+(UCE)
+ 
+with
+ 
+at
+ 
+least
+ 
+5
+ 
+passes. Q:  Can  I  apply  to  UCU  with  a  diploma? A:  Yes.  Holders  of  a  Diploma  from  a  recognised  institution  of  higher  learning  can  apply  for  undergraduate  
+programmes.
+ 
+Your
+ 
+diploma
+ 
+field
+ 
+should
+ 
+ideally
+ 
+be
+ 
+relevant
+ 
+to
+ 
+the
+ 
+programme
+ 
+you
+ 
+are
+ 
+applying
+ 
+for. Q:  Does  UCU  accept  mature  age  students? A:  Yes.  Applicants  who  do  not  have  A-level  qualifications  but  pass  the  Mature  Age  Entrance  Examination  can  
+be
+ 
+admitted
+ 
+to
+ 
+undergraduate
+ 
+programmes. Q:  Can  international  students  apply  to  UCU? A:  Absolutely.  UCU  welcomes  international  students.  You  need  qualifications  recognised  for  university  entry  
+in
+ 
+your
+ 
+home
+ 
+country.
+ 
+Non-English
+ 
+documents
+ 
+must
+ 
+be
+ 
+officially
+ 
+translated
+ 
+and
+ 
+certified.
+ 
+Application
+ 
+fee
+ 
+is
+ 
+USD
+ 
+50. Q:  What  is  the  application  fee  for  UCU? A:  UGX  100,000  for  standard  programmes.  UGX  150,000  for  programmes  with  pre-entry  exams  (LLB,  MBChB,  
+BDS,
+ 
+MBA).
+ 
+International
+ 
+students
+ 
+pay
+ 
+USD
+ 
+50. Q:  Which  UCU  programmes  require  a  pre-entry  exam? A:  Bachelor  of  Laws  (LLB),  Bachelor  of  Medicine  and  Surgery  (MBChB),  Bachelor  of  Dental  Surgery  (BDS),  and  
+Master
+ 
+of
+ 
+Business
+ 
+Administration
+ 
+(MBA)
+ 
+all
+ 
+require
+ 
+a
+ 
+pre-entry
+ 
+exam. Q:  How  many  intakes  does  UCU  have  per  year? A:  Three  intakes:  Easter  (January),  Trinity  (May),  and  Advent  (September). Q:  What  is  the  application  portal  URL? A:  https://application.ucu.ac.ug Q:  How  do  I  get  my  admission  letter? A:  Check  for  results  on  the  dates  specified  at  the  Admissions  Office  or  on  the  UCU  website.  If  admitted,  
+collect
+ 
+your
+ 
+letter
+ 
+from
+ 
+the
+ 
+Admissions
+ 
+Office
+ 
+in
+ 
+Mukono
+ 
+or
+ 
+request
+ 
+it
+ 
+via
+ 
+email
+ 
+at
+ 
+admissions@ucu.ac.ug. Q:  Can  a  Kenyan  student  apply  to  UCU? A:  Yes.  KCSE  holders  need  a  minimum  grade  of  C+  and  above.  KACE/A-level  holders  need  at  least  2  principal  
+passes.
+ 
+Diploma
+ 
+holders
+ 
+from
+ 
+recognised
+ 
+institutions
+ 
+are
+ 
+also
+ 
+eligible. Q:  What  happens  after  I  submit  my  application? 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+A:  Your  application  is  processed  by  the  Admissions  Office  and  reviewed  by  the  Admissions  Committee.  You  
+will
+ 
+receive
+ 
+a
+ 
+decision
+ 
+on
+ 
+the
+ 
+published
+ 
+results
+ 
+date.
+ 
+If
+ 
+admitted,
+ 
+you
+ 
+must
+ 
+confirm
+ 
+by
+ 
+paying
+ 
+a
+ 
+non-refundable
+ 
+tuition
+ 
+deposit. Q:  Is  there  a  closing  date  for  applications? A:  Yes.  Deadlines  vary  per  intake  and  programme.  Check  the  official  UCU  website  
+(ucu.ac.ug/admission-announcements/)
+ 
+or
+ 
+contact
+ 
+admissions@ucu.ac.ug
+ 
+for
+ 
+current
+ 
+deadlines. Q:  Can  I  defer  my  admission  to  UCU? A:  Admitted  students  who  cannot  immediately  enrol  can  notify  the  Admissions  Office  in  writing.  Your  file  
+may
+ 
+be
+ 
+held
+ 
+for
+ 
+up
+ 
+to
+ 
+one
+ 
+year.
+ 
+Contact
+ 
+admissions@ucu.ac.ug. 
+14.2  FEES  FAQs  
+Q:  How  much  is  the  tuition  for  Computer  Science  at  UCU? A:  BSc.  Computer  Science  costs  UGX  2,225,000  per  year  for  Ugandan  nationals  and  UGX  3,338,000  per  year  
+for
+ 
+non-nationals. Q:  How  much  is  tuition  for  Information  Technology? A:  BSc.  Information  Technology  is  UGX  2,225,000/year  for  nationals  and  UGX  3,337,500/year  for  
+non-nationals. Q:  How  much  is  Law  tuition  at  UCU? A:  Bachelor  of  Laws  (LLB)  costs  UGX  2,225,000/year  for  nationals  and  UGX  3,338,000/year  for  non-nationals. Q:  How  much  does  medicine  cost  at  UCU? A:  Bachelor  of  Medicine  and  Bachelor  of  Surgery  (MBChB)  costs  UGX  5,000,000/year  for  nationals  and  UGX  
+7,500,000/year
+ 
+for
+ 
+non-nationals.
+ 
+It
+ 
+is
+ 
+the
+ 
+most
+ 
+expensive
+ 
+programme. Q:  How  much  is  the  BBA  at  UCU? A:  Bachelor  of  Business  Administration  (BBA)  costs  UGX  1,618,000/year  for  nationals. Q:  What  are  the  other  fees  apart  from  tuition? A:  Each  semester,  students  pay:  Registration  Fee  (UGX  53,000),  Development  Fee  (500,000),  Medical  Fee  
+(70,000),
+ 
+Student
+ 
+Activity
+ 
+Fee
+ 
+(90,000),
+ 
+Computer
+ 
+Fee
+ 
+(100,000),
+ 
+Exam
+ 
+Fee
+ 
+(80,000),
+ 
+Book/IMAT
+ 
+Fee
+ 
+(90,000).
+ 
+Total
+ 
+functional
+ 
+fees:
+ 
+~UGX
+ 
+983,000/semester.
+ 
+Annual
+ 
+NCHE
+ 
+fee
+ 
+(20,000)
+ 
+and
+ 
+Church
+ 
+fee
+ 
+(5,000)
+ 
+are
+ 
+also
+ 
+charged. Q:  Can  I  pay  UCU  fees  in  installments? A:  Yes.  Fees  can  be  paid  in  two  equal  installments:  first  installment  at  the  beginning  of  the  semester;  second  
+installment
+ 
+by
+ 
+the
+ 
+Finance
+ 
+Office
+ 
+deadline.
+ 
+Full
+ 
+prompt
+ 
+payment
+ 
+exempts
+ 
+you
+ 
+from
+ 
+the
+ 
+registration
+ 
+fee. Q:  How  do  I  pay  UCU  fees? A:  Via  MTN  Mobile  Money  (dial  *165*4*3*2*1#),  Airtel  Money  (*185*6*2*1#),  bank  deposit  at  Stanbic  Bank  
+/
+ 
+Centenary
+ 
+Bank
+ 
+/
+ 
+KCB
+ 
+Uganda,
+ 
+or
+ 
+VISA/MasterCard.
+ 
+Always
+ 
+use
+ 
+your
+ 
+Access
+ 
+Number. Q:  How  much  is  hostel  accommodation  at  UCU? A:  Mukono:  Ordinary  room  UGX  550,000/semester,  Double  room  UGX  650,000/semester,  Executive  room  
+UGX
+ 
+1,200,000/semester.
+ 
+Kampala
+ 
+Campus
+ 
+rates
+ 
+are
+ 
+slightly
+ 
+higher. Q:  Does  UCU  have  scholarships? A:  Yes.  UCU  offers  scholarships  for  talented  athletes  (sports),  outstanding  theology  students,  academically  
+excellent
+ 
+students,
+ 
+and
+ 
+financially
+ 
+needy
+ 
+students.
+ 
+Contact
+ 
+the
+ 
+Financial
+ 
+Aid
+ 
+Office
+ 
+or
+ 
+visit
+ 
+ucu.ac.ug/financial-aid/. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  Is  UCU  government-sponsored? A:  No.  UCU  is  a  private  university  and  does  not  receive  direct  government  student  sponsorships.  Students  are  
+expected
+ 
+to
+ 
+self-fund
+ 
+or
+ 
+seek
+ 
+scholarships. Q:  How  much  do  I  need  per  year  to  study  BBA  at  UCU? A:  Approximately  UGX  6–8  million  per  year  including  tuition,  functional  fees,  accommodation,  meals,  and  
+personal
+ 
+expenses
+ 
+for
+ 
+a
+ 
+Ugandan
+ 
+national
+ 
+student
+ 
+on-campus
+ 
+at
+ 
+Mukono. Q:  What  bank  should  I  use  to  pay  UCU  fees? A:  You  can  use  Stanbic  Bank  Uganda  (account  number  9030005917610  UGX),  Centenary  Bank  (4210600136),  
+or
+ 
+KCB
+ 
+Uganda
+ 
+(2201256357).
+ 
+You
+ 
+can
+ 
+also
+ 
+pay
+ 
+via
+ 
+mobile
+ 
+money. 
+14.3  ACADEMIC  FAQs  
+Q:  What  programmes  does  UCU  offer? A:  UCU  offers  70+  diploma,  bachelor's,  master's,  and  PhD  programmes  across  11  schools  and  faculties  
+covering
+ 
+Law,
+ 
+Business,
+ 
+IT,
+ 
+Computer
+ 
+Science,
+ 
+Education,
+ 
+Medicine,
+ 
+Dentistry,
+ 
+Nursing,
+ 
+Social
+ 
+Sciences,
+ 
+Journalism,
+ 
+Theology,
+ 
+Agriculture,
+ 
+Engineering,
+ 
+and
+ 
+more. Q:  Does  UCU  offer  online  or  distance  learning? A:  Yes.  UCU  is  a  leading  Online  Distance  Learning  (ODeL)  institution  in  Uganda.  The  eLearning  platform  
+(elearning.ucu.ac.ug)
+ 
+allows
+ 
+students
+ 
+to
+ 
+attend
+ 
+classes
+ 
+online,
+ 
+access
+ 
+materials,
+ 
+submit
+ 
+assignments,
+ 
+and
+ 
+sit
+ 
+exams
+ 
+remotely. Q:  How  long  is  the  Bachelor  of  Laws  (LLB)  at  UCU? A:  4  years. Q:  How  long  is  the  Computer  Science  degree  at  UCU? A:  3  years  (BSc.  Computer  Science  or  BSc.  IT). Q:  How  long  is  the  medicine  degree  at  UCU? A:  5  years  (Bachelor  of  Medicine  and  Bachelor  of  Surgery  —  MBChB). Q:  What  is  the  difference  between  BSc.  IT  and  BSc.  Computer  Science  at  UCU? A:  BSc.  IT  is  more  applied  and  practical,  focusing  on  networks,  web  development,  software,  and  systems  
+support.
+ 
+BSc.
+ 
+Computer
+ 
+Science
+ 
+is
+ 
+more
+ 
+theoretical,
+ 
+covering
+ 
+algorithms,
+ 
+AI,
+ 
+operating
+ 
+systems,
+ 
+and
+ 
+mathematical
+ 
+foundations
+ 
+of
+ 
+computing. Q:  Does  UCU  have  a  Business  degree? A:  Yes.  UCU  offers  Bachelor  of  Business  Administration  (BBA),  BSc.  Accounting  and  Finance,  BSc.  Economics  
+and
+ 
+Statistics,
+ 
+Bachelor
+ 
+of
+ 
+Human
+ 
+Resource
+ 
+Management,
+ 
+Bachelor
+ 
+of
+ 
+Procurement
+ 
+and
+ 
+Logistics
+ 
+Management,
+ 
+and
+ 
+Bachelor
+ 
+of
+ 
+Tourism
+ 
+and
+ 
+Hospitality
+ 
+Management
+ 
+—
+ 
+all
+ 
+through
+ 
+the
+ 
+School
+ 
+of
+ 
+Business. Q:  What  GPA  do  I  need  to  stay  in  the  Honours  College  at  UCU? A:  A  cumulative  GPA  of  4.00  for  the  first  two  semesters  at  UCU.  The  Honours  College  is  for  academically  
+exceptional
+ 
+students. Q:  Does  UCU  have  a  Masters  in  IT? A:  Yes.  UCU  offers  a  Master  of  Information  Technology,  MSc.  Computer  Science,  and  MSc.  Data  Science  and  
+Analytics
+ 
+—
+ 
+all
+ 
+2-year
+ 
+programmes. Q:  Does  UCU  offer  PhD  programmes? A:  Yes.  UCU  offers  PhD  programmes  in  Theology,  Literature,  Education,  Business  Administration,  
+Development
+ 
+Studies,
+ 
+Agricultural
+ 
+Systems,
+ 
+and
+ 
+Journalism/Media/Communication. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  What  is  the  Alpha  system  at  UCU? A:  Alpha  is  UCU's  Management  Information  System  at  https://alpha.ucu.ac.ug.  It  handles  course  registration,  
+results,
+ 
+admissions,
+ 
+guild
+ 
+elections,
+ 
+career
+ 
+services,
+ 
+and
+ 
+student
+ 
+profile
+ 
+management. Q:  How  do  I  register  for  courses  at  UCU? A:  Log  into  Alpha  (alpha.ucu.ac.ug)  →  Navigate  to  the  current  semester's  registration  →  Select  your  courses  
+→
+ 
+Confirm
+ 
+registration
+ 
+→
+ 
+Pay
+ 
+required
+ 
+fees. Q:  How  do  I  access  my  results  at  UCU? A:  Log  into  Alpha  (alpha.ucu.ac.ug)  →  Go  to  the  Results/Transcript  section.  Results  are  published  after  
+official
+ 
+release
+ 
+dates
+ 
+announced
+ 
+by
+ 
+the
+ 
+Academic
+ 
+Registrar. Q:  What  is  the  eLearning  platform  at  UCU? A:  It's  a  Moodle-based  Learning  Management  System  at  elearning.ucu.ac.ug.  Students  can  access  lectures  
+(live
+ 
+and
+ 
+recorded),
+ 
+course
+ 
+materials,
+ 
+submit
+ 
+assignments,
+ 
+and
+ 
+do
+ 
+online
+ 
+exams. Q:  What  are  UCU's  academic  intakes? A:  Easter  (January),  Trinity  (May),  and  Advent  (September).  Each  semester  lasts  approximately  12–14  weeks. Q:  Does  UCU  have  an  Engineering  programme? A:  Yes.  BSc.  Civil  and  Environmental  Engineering  (4  years)  and  Bachelor  of  Electronics  and  Communication  
+Science
+ 
+(3
+ 
+years)
+ 
+are
+ 
+offered
+ 
+under
+ 
+the
+ 
+Faculty
+ 
+of
+ 
+Engineering,
+ 
+Design
+ 
+&
+ 
+Technology. Q:  Does  UCU  offer  Nursing? A:  Yes.  Bachelor  of  Nursing  Science  —  4  years  (A-level  entry)  or  3  years  (Diploma  entry)  —  is  offered  under  
+the
+ 
+Faculty
+ 
+of
+ 
+Public
+ 
+Health,
+ 
+Nursing
+ 
+&
+ 
+Midwifery. Q:  Does  UCU  have  Agriculture  courses? A:  Yes.  BSc.  Agricultural  Science  and  Entrepreneurship,  BSc.  Human  Nutrition  and  Clinical  Dietetics,  and  BSc.  
+Food
+ 
+Science
+ 
+and
+ 
+Technology
+ 
+are
+ 
+offered
+ 
+under
+ 
+the
+ 
+Faculty
+ 
+of
+ 
+Agricultural
+ 
+Sciences
+ 
+(4-year
+ 
+programmes). Q:  What  is  the  minimum  attendance  required  to  sit  exams  at  UCU? A:  75%  lecture  attendance  per  course.  Missing  more  than  25%  of  lectures  (without  valid  excuse)  disqualifies  
+you
+ 
+from
+ 
+sitting
+ 
+the
+ 
+exam. 
+14.4  CAMPUS  LIFE  FAQs  
+Q:  Does  UCU  have  hostels? A:  Yes.  UCU  has  on-campus  halls  of  residence  for  both  male  and  female  students  at  Mukono  main  campus  
+and
+ 
+Kampala
+ 
+Campus.
+ 
+Rooms
+ 
+are
+ 
+allocated
+ 
+first-come,
+ 
+first-served
+ 
+during
+ 
+registration. Q:  Is  UCU  strict? A:  Yes.  UCU  is  known  for  its  disciplined,  Christian-values-based  environment.  There  is  a  strict  dress  code,  no  
+alcohol
+ 
+on
+ 
+campus,
+ 
+no
+ 
+smoking,
+ 
+attendance
+ 
+requirements
+ 
+are
+ 
+enforced,
+ 
+and
+ 
+moral
+ 
+conduct
+ 
+standards
+ 
+apply
+ 
+to
+ 
+all
+ 
+students. Q:  What  is  the  dress  code  at  UCU? A:  Smart,  formal  wear  is  required  on  campus.  Women  must  wear  knee-length  or  longer  skirts/dresses  with  
+covered
+ 
+shoulders.
+ 
+Men
+ 
+must
+ 
+wear
+ 
+collared
+ 
+shirts
+ 
+and
+ 
+formal
+ 
+trousers.
+ 
+Miniskirts,
+ 
+shorts,
+ 
+ripped
+ 
+jeans,
+ 
+and
+ 
+revealing
+ 
+clothing
+ 
+are
+ 
+prohibited.
+ 
+Law
+ 
+students
+ 
+additionally
+ 
+wear
+ 
+black
+ 
+suits
+ 
+on
+ 
+Mondays
+ 
+and
+ 
+Thursdays. Q:  Is  alcohol  allowed  at  UCU? A:  No.  The  use  of  alcohol  is  completely  prohibited  on  campus.  Drunkenness  is  treated  as  a  disciplinary  
+offence. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  What  clubs  can  I  join  at  UCU? A:  Student  Christian  Fellowship  (SCF),  Rotaract  Club,  Toastmasters  Club,  Law  Society,  Drama  Club,  Debate  
+Society,
+ 
+Environmental
+ 
+Club,
+ 
+and
+ 
+various
+ 
+sports
+ 
+clubs.
+ 
+Join
+ 
+during
+ 
+orientation
+ 
+or
+ 
+through
+ 
+the
+ 
+Student
+ 
+Affairs
+ 
+Office. Q:  What  sports  does  UCU  offer? A:  Football,  basketball,  rugby,  volleyball,  netball,  woodball,  tennis,  athletics,  and  more.  UCU  has  a  modern  
+sports
+ 
+complex
+ 
+with
+ 
+a
+ 
+gym,
+ 
+pitches,
+ 
+and
+ 
+courts.
+ 
+UCU
+ 
+teams
+ 
+win
+ 
+consistently
+ 
+at
+ 
+national
+ 
+and
+ 
+regional
+ 
+levels. Q:  What  is  life  like  at  UCU  Mukono? A:  Peaceful,  green  campus  25  km  from  Kampala.  Strong  Christian  community  with  fellowships,  chapel,  and  
+choirs.
+ 
+Active
+ 
+sports
+ 
+and
+ 
+clubs.
+ 
+Disciplined
+ 
+but
+ 
+socially
+ 
+rich
+ 
+environment.
+ 
+Safe,
+ 
+with
+ 
+a
+ 
+small-town
+ 
+feel. Q:  Does  UCU  have  Wi-Fi? A:  Yes.  Campus-wide  Wi-Fi  is  available  throughout  the  Mukono  main  campus  and  in  all  halls  of  residence.  
+UCU
+ 
+was
+ 
+recognised
+ 
+as
+ 
+'Top
+ 
+Eduroam
+ 
+User
+ 
+2024'. Q:  What  food  is  available  at  UCU? A:  The  UCU  Dining  Hall  serves  nutritious,  well-balanced  Ugandan  meals  (rice,  posho,  beans,  peas,  greens,  
+G-nut
+ 
+sauce).
+ 
+Off-campus
+ 
+restaurants
+ 
+and
+ 
+food
+ 
+stalls
+ 
+in
+ 
+Mukono
+ 
+town
+ 
+are
+ 
+also
+ 
+nearby. Q:  Does  UCU  have  a  medical  clinic? A:  Yes.  There  is  a  fully  staffed  on-campus  medical  clinic  at  Mukono  capable  of  treating  common  illnesses.  A  
+well-respected
+ 
+international
+ 
+hospital
+ 
+in
+ 
+Kampala
+ 
+is
+ 
+also
+ 
+accessible
+ 
+for
+ 
+emergencies. Q:  How  far  is  UCU  from  Kampala? A:  Approximately  25  km  east  of  Kampala,  on  the  Kampala–Jinja  Highway.  The  trip  takes  about  1  to  1.5  hours  
+by
+ 
+road
+ 
+(taxi
+ 
+or
+ 
+bus). Q:  Can  I  go  to  Kampala  on  weekends  from  UCU? A:  Yes.  Taxis  and  minibuses  run  frequently  between  Mukono  and  Kampala.  Weekend  travel  is  common  
+among
+ 
+students. Q:  Which  campus  is  the  best  at  UCU? A:  Mukono  Main  Campus  offers  the  most  complete  experience:  most  programmes,  full  facilities,  sports,  
+hostels,
+ 
+chapel,
+ 
+clubs,
+ 
+and
+ 
+research
+ 
+centres.
+ 
+Kampala
+ 
+Campus
+ 
+is
+ 
+best
+ 
+for
+ 
+working
+ 
+professionals
+ 
+wanting
+ 
+flexibility.
+ 
+The
+ 
+best
+ 
+campus
+ 
+depends
+ 
+on
+ 
+your
+ 
+programme
+ 
+and
+ 
+personal
+ 
+needs. Q:  Is  there  a  chapel  at  UCU? A:  Yes.  Christ  Church  on  campus  is  UCU's  main  chapel.  Community  worship  is  held  on  Mondays,  Thursdays,  
+and
+ 
+Sundays.
+ 
+Choirs,
+ 
+prayer
+ 
+groups,
+ 
+and
+ 
+fellowships
+ 
+are
+ 
+very
+ 
+active. Q:  Can  students  of  other  religions  study  at  UCU? A:  Yes.  UCU  welcomes  students  of  all  religious  backgrounds.  Non-Anglican  students  are  expected  to  respect  
+UCU's
+ 
+Christian
+ 
+culture
+ 
+but
+ 
+can
+ 
+worship
+ 
+at
+ 
+their
+ 
+own
+ 
+churches
+ 
+off-campus. Q:  Does  UCU  have  a  student  newspaper? A:  Yes.  The  UCU  Standard  is  the  student  and  university  newspaper,  available  at  standard.ucu.ac.ug. 
+14.5  ACCOMMODATION  FAQs  
+Q:  How  do  I  apply  for  a  hostel  room  at  UCU? A:  During  registration  (using  Alpha),  indicate  your  interest  in  on-campus  accommodation.  Rooms  are  
+allocated
+ 
+first-come,
+ 
+first-served.
+ 
+Visit
+ 
+the
+ 
+accommodation
+ 
+office
+ 
+to
+ 
+complete
+ 
+the
+ 
+process. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  How  much  does  a  hostel  cost  at  UCU? A:  On-campus:  Ordinary  room  UGX  550,000/semester,  Double  UGX  650,000/semester,  Executive  UGX  
+1,200,000/semester
+ 
+(Mukono
+ 
+rates). Q:  Are  there  off-campus  hostels  near  UCU? A:  Yes.  Mukono  town  has  many  private  hostels  ranging  from  UGX  400,000  to  UGX  1,200,000  per  semester.  
+Some
+ 
+offer
+ 
+shuttles,
+ 
+DStv,
+ 
+internet,
+ 
+and
+ 
+meals.
+ 
+The
+ 
+university
+ 
+does
+ 
+not
+ 
+officially
+ 
+endorse
+ 
+specific
+ 
+off-campus
+ 
+hostels. Q:  Do  UCU  hostels  have  internet? A:  Yes.  All  on-campus  halls  of  residence  have  computer  laboratories  with  internet  hotspots  for  high-speed  
+Wi-Fi
+ 
+access. Q:  Do  UCU  hostels  have  TV? A:  Yes.  All  halls  of  residence  have  common  rooms  with  DStv  (satellite  TV). Q:  Is  on-campus  accommodation  separate  for  men  and  women? A:  Yes.  UCU  has  separate  halls  of  residence  for  male  and  female  students. Q:  Is  UCU  accommodation  safe? A:  Yes.  UCU  has  24-hour  campus  security  (contracted  firm  staff)  who  monitor  halls  and  the  entire  campus.  
+The
+ 
+Christian
+ 
+environment
+ 
+also
+ 
+promotes
+ 
+a
+ 
+safe
+ 
+and
+ 
+respectful
+ 
+community. 
+14.6  CAREER  &  OPPORTUNITIES  FAQs  
+Q:  Does  UCU  help  with  internships? A:  Yes.  UCU  coordinates  industrial  training/attachment  placements  for  students.  The  careers  section  on  
+Alpha
+ 
+also
+ 
+lists
+ 
+opportunities.
+ 
+The
+ 
+Dean
+ 
+of
+ 
+Students
+ 
+Affairs
+ 
+office
+ 
+provides
+ 
+guidance. Q:  Are  UCU  graduates  employed? A:  Yes.  UCU  graduates  are  highly  regarded  by  employers  for  their  discipline,  integrity,  and  professionalism.  
+The
+ 
+'UCU
+ 
+brand'
+ 
+is
+ 
+well-known
+ 
+in
+ 
+Uganda's
+ 
+job
+ 
+market
+ 
+across
+ 
+law,
+ 
+medicine,
+ 
+IT,
+ 
+business,
+ 
+education,
+ 
+and
+ 
+NGO
+ 
+sectors. Q:  Does  UCU  have  a  careers  office? A:  Yes.  Career  services  are  accessible  through  Alpha  (alpha.ucu.ac.ug/careers)  and  the  Student  Affairs  Office.  
+Services
+ 
+include
+ 
+job
+ 
+listings,
+ 
+CV
+ 
+workshops,
+ 
+interview
+ 
+preparation,
+ 
+and
+ 
+career
+ 
+fairs. Q:  Can  I  do  a  part-time  degree  at  UCU? A:  Some  programmes  (especially  at  Kampala  Campus)  offer  flexible  scheduling  suited  to  working  
+professionals.
+ 
+Evening
+ 
+and
+ 
+weekend
+ 
+classes
+ 
+are
+ 
+available
+ 
+for
+ 
+certain
+ 
+courses. Q:  Does  UCU  have  international  exchange  programmes? A:  Yes.  UCU  has  partnerships  with  Duke  University  (USA),  Stellenbosch  University  (South  Africa),  Waseda  
+University
+ 
+(Japan),
+ 
+and
+ 
+CCCU
+ 
+network
+ 
+universities
+ 
+worldwide,
+ 
+offering
+ 
+exchange
+ 
+and
+ 
+study
+ 
+abroad
+ 
+opportunities. 
+14.7  POLICIES  &  GENERAL  FAQs  
+Q:  What  is  UCU's  motto? A:  Alpha  and  Omega  —  God  the  Beginning  and  the  End. Q:  Who  owns  UCU? A:  Uganda  Christian  University  is  owned  and  administered  by  the  Church  of  Uganda  (Anglican). 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  Is  UCU  accredited? A:  Yes.  UCU  is  accredited  by  the  National  Council  for  Higher  Education  (NCHE)  of  Uganda  and  holds  a  
+government
+ 
+Charter
+ 
+—
+ 
+the
+ 
+first
+ 
+private
+ 
+university
+ 
+in
+ 
+Uganda
+ 
+to
+ 
+receive
+ 
+one
+ 
+(2004).
+ 
+UCU
+ 
+is
+ 
+also
+ 
+listed
+ 
+with
+ 
+the
+ 
+International
+ 
+Association
+ 
+of
+ 
+Universities
+ 
+(IAU). Q:  Who  is  the  current  Vice  Chancellor  of  UCU? A:  Assoc.  Prof.  Aaron  Mushengyezi  is  the  current  (3rd)  Vice  Chancellor  of  UCU.  He  holds  a  PhD  from  the  
+University
+ 
+of
+ 
+Connecticut. Q:  Who  is  the  Chancellor  of  UCU? A:  The  Chancellor  is  Most  Rev.  Dr.  Stephen  Samuel  Kaziimba  Mugalu,  the  Archbishop  of  Uganda  (since  March  
+2020). Q:  What  is  the  UCU  vision? A:  A  Centre  of  Excellence  in  the  Heart  of  Africa. Q:  What  is  the  UCU  mission? A:  To  Equip  students  for  productive,  holistic  lives  of  Christian  faith  and  service. Q:  When  was  UCU  founded? A:  UCU  was  founded  in  1997.  Its  predecessor,  Bishop  Tucker  Theological  College,  was  established  in  1913. Q:  How  many  students  does  UCU  have? A:  Approximately  15,000  students  at  the  Mukono  main  campus,  with  thousands  more  across  regional  
+campuses.
+ 
+Total
+ 
+enrolment
+ 
+across
+ 
+all
+ 
+campuses
+ 
+is
+ 
+estimated
+ 
+at
+ 
+7,000–15,000+. Q:  Does  UCU  have  a  law  school? A:  Yes.  The  School  of  Law  offers  Bachelor  of  Laws  (LLB,  4  years),  Diploma  in  Law  (2  years),  and  Masters  in  
+Laws
+ 
+(LLM)
+ 
+specialisations
+ 
+in
+ 
+International
+ 
+Business
+ 
+Law,
+ 
+Energy
+ 
+Law,
+ 
+and
+ 
+Oil
+ 
+&
+ 
+Gas. Q:  Does  UCU  offer  MBA? A:  Yes.  UCU  offers  a  Master  of  Business  Administration  (MBA)  —  a  2-year  programme.  It  requires  a  pre-entry  
+exam;
+ 
+application
+ 
+fee
+ 
+is
+ 
+UGX
+ 
+150,000. Q:  Can  I  study  theology  at  UCU? A:  Yes.  Bishop  Tucker  School  of  Divinity  and  Theology  offers  Bachelor  of  Divinity,  MA  Theology,  Master  of  
+Theological
+ 
+Studies,
+ 
+Master
+ 
+of
+ 
+Divinity,
+ 
+and
+ 
+PhD
+ 
+in
+ 
+Theology. Q:  How  do  I  contact  UCU  admissions? A:  Email:  admissions@ucu.ac.ug  |  Phone:  +256  312  350  880/835  |  Mobile:  +256  794  770  826.  P.O.  Box  4,  
+Mukono,
+ 
+Uganda. Q:  What  is  the  UCU  website? A:  www.ucu.ac.ug  —  the  official  website.  You  can  also  access  the  eLearning  platform  at  elearning.ucu.ac.ug  
+and
+ 
+the
+ 
+student
+ 
+system
+ 
+at
+ 
+alpha.ucu.ac.ug. Q:  Does  UCU  have  a  library? A:  Yes.  The  Hamu  Mukasa  Library  at  Mukono  seats  1,200  people,  holds  250,000+  volumes,  and  has  200  
+computers.
+ 
+Branch
+ 
+libraries
+ 
+exist
+ 
+at
+ 
+all
+ 
+regional
+ 
+campuses. Q:  What  is  the  grading  system  at  UCU? A:  80%+  =  First  Class/Distinction;  70–79%  =  Upper  Second  (2:1);  60–69%  =  Lower  Second  (2:2);  50–59%  =  
+Pass/Third
+ 
+Class;
+ 
+Below
+ 
+50%
+ 
+=
+ 
+Fail. Q:  How  many  graduation  ceremonies  does  UCU  hold  per  year? A:  Seven  graduation  ceremonies  annually  across  all  campuses.  Transcripts  are  issued  on  graduation  day. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+Q:  Can  I  transfer  credits  to  UCU  from  another  university? A:  UCU  may  consider  credit  transfers  on  a  case-by-case  basis.  Contact  the  Academic  Registrar's  office  or  the  
+relevant
+ 
+school
+ 
+dean
+ 
+for
+ 
+guidance. Q:  Does  UCU  have  a  writing  centre? A:  Yes.  The  UCU  Writing  Centre  supports  students  with  academic  writing,  research  papers,  and  dissertations.  
+See
+ 
+the
+ 
+UCU
+ 
+Standard
+ 
+for
+ 
+more. Q:  What  is  the  UCU  eLearning  platform  email? A:  elearning@ucu.ac.ug  |  Phone:  +256  312  350  896/826  |  WhatsApp:  +256  741  902  519 Q:  Is  UCU  good  for  international  students? A:  Yes.  UCU  has  attracted  students  from  Democratic  Republic  of  Congo  (DRC),  South  Sudan,  Kenya,  Tanzania,  
+and
+ 
+other
+ 
+countries.
+ 
+The
+ 
+campus
+ 
+is
+ 
+welcoming,
+ 
+English-medium,
+ 
+and
+ 
+has
+ 
+an
+ 
+active
+ 
+international
+ 
+community
+ 
+through
+ 
+the
+ 
+Uganda
+ 
+Studies
+ 
+Programme. Q:  What  is  the  UCU  Uganda  Studies  Programme? A:  The  Uganda  Studies  Programme  (USP)  is  a  study  abroad  programme  at  UCU  for  students  from  North  
+American
+ 
+universities.
+ 
+Students
+ 
+spend
+ 
+a
+ 
+semester
+ 
+at
+ 
+UCU,
+ 
+attend
+ 
+regular
+ 
+classes,
+ 
+and
+ 
+participate
+ 
+in
+ 
+community
+ 
+engagement
+ 
+and
+ 
+field
+ 
+trips
+ 
+across
+ 
+Uganda
+ 
+and
+ 
+Rwanda.  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+SECTION  15:  QUICK  REFERENCE  &  CONTACT  DIRECTORY  
+ 
+15.1  Key  Contact  Information  
+Department/Service Contact  Details 
+Main  Switchboard  +256  312  350  800  |  info@ucu.ac.ug  
+Admissions  (UG)  +256  312  350  880/835  |  Mobile:  +256  794  770  826  |  admissions@ucu.ac.ug  
+Admissions  (PG)  graduateadmissions@ucu.ac.ug  
+eLearning  Platform  +256  312  350  896/826  |  WhatsApp:  +256  741  902  519  |  elearning@ucu.ac.ug  
+Library  https://library.ucu.ac.ug  
+Student  System  (Alpha)  https://alpha.ucu.ac.ug  
+Application  Portal  https://application.ucu.ac.ug  
+Helpdesk  (IT/Alpha)  https://helpme.ucu.ac.ug  
+UCU  Main  Website  https://ucu.ac.ug  
+UCU  Standard  (News)  https://standard.ucu.ac.ug  
+Careers  /  Jobs  https://alpha.ucu.ac.ug/careers  
+Research  Website  https://research.ucu.ac.ug  
+Postal  Address  P.O.  Box  4,  Mukono,  Uganda  
+Physical  Address  Plot  67-173,  Mukono  Hill,  Bishop  Tucker  Road,  Mukono  
+15.2  Payment  Bank  Details  Summary  
+Stanbic  Bank  Uganda:  Account  9030005917610  (UGX)  |  9030008067111  (USD)  |  SWIFT:  SBICUGKX  |  Branch:  
+Mukono
+ Centenary  Bank  Uganda:  Account  4210600136  (UGX)  |  SWIFT:  CERBUGKA  |  Branch:  Mukono  KCB  Uganda:  Account  2201256357  (UGX)  |  SWIFT:  KCBLUGKA  |  Branch:  Mukono  Citibank  Uganda:  Account  100118009  (USD)  |  SWIFT:  CITIUGKA  |  Branch:  Kampala  MTN  Mobile  Money:  *165*4*3*2*1#  |  Airtel  Money:  *185*6*2*1#  —  Use  student  Access  Number  as  
+Student
+ 
+Code
+ Application  form  payments:  Use  APP000  as  Access  Number  
+15.3  Document  Index  —  Useful  Downloads  •  Fees  Structure  PDF:  https://ucu.ac.ug/Downloads/ucu-fees-structure.pdf  •  2025  Intake  Fees  Structure:  https://ucu.ac.ug/Downloads/FEES-STRUCTURE-2025-INTAKE.pdf  
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025
+Document Title: UCU Knowledge Base
+•  Undergraduate  Handbook:  available  at  ucu.ac.ug/important-documents/  •  Postgraduate  Handbook:  available  at  ucu.ac.ug/important-documents/  •  Student  Code  of  Conduct:  https://ucu.ac.ug/Downloads/student-code-conduct.pdf  •  UCU  Approved  Research  Manual:  
+https://ucu.ac.ug/Downloads/UCU-Revised-Research-Manual-April-15-2018.pdf
+ •  List  of  All  Programmes  (May  2026  intake):  
+https://ucu.ac.ug/Downloads/May_Intake_2026_View_Courses.pdf
+    
+END  OF  UCU  KNOWLEDGE  BASE  DOCUMENT Compiled  for  AI  Chatbot  System  |  Sources:  ucu.ac.ug,  Wikipedia,  NCHE,  News  Media,  Student  Forums Verify  all  fees  and  policies  with  UCU  directly  before  making  decisions. 
+UCU  AI  Chatbot  Knowledge  Base  |  Prepared  2025

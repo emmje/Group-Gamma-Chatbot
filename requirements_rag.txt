@@ -1,10 +1,13 @@
-chromadb
 flask
 flask-login
-gradio
-ollama
+gunicorn
+groq
+python-dotenv
+psycopg[binary]
 pypdf
 pytesseract
 pdf2image
-sentence-transformers
+qdrant-client
+fastembed
+supabase
 requests
