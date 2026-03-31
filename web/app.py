@@ -483,9 +483,11 @@ def api_ask():
     except Exception:
         app.logger.exception("Failed to persist web interaction analytics")
 
-    # Check for building images to include
-    from rag.buildings import find_building_images
-    building_images = find_building_images(original_question + " " + final_answer)
+    # Check for building images to include (search question only, not answer text)
+    building_images = []
+    if not fallback_used:
+        from rag.buildings import find_building_images
+        building_images = find_building_images(retrieval_question)
 
     response = {"answer": final_answer, "language": source_language}
     if building_images:
@@ -568,7 +570,7 @@ def api_ask_image():
         app.logger.exception("Failed to persist image interaction analytics")
 
     from rag.buildings import find_building_images
-    building_images = find_building_images(question + " " + answer)
+    building_images = find_building_images(question)
 
     response = {"answer": answer, "scenario": scenario}
     if building_images:
@@ -910,23 +912,19 @@ def meta_whatsapp_webhook_receive():
 
         delivery_ok = 200 <= status_code < 300
 
-        # Send building images if the answer mentions any UCU buildings
-        try:
-            from rag.buildings import find_building_images
-            building_imgs = find_building_images(question + " " + answer)
-            base_url = os.getenv("RENDER_EXTERNAL_URL", request.url_root.rstrip("/"))
-            sent = 0
-            for bldg in building_imgs[:2]:
-                for img_url in bldg["images"][:2]:
-                    img_public_url = f"{base_url}{img_url}"
-                    send_whatsapp_image(recipient, img_public_url, caption=bldg["name"])
-                    sent += 1
-                    if sent >= 3:
-                        break
-                if sent >= 3:
-                    break
-        except Exception:
-            app.logger.debug("Could not send building images via WhatsApp")
+        # Send a single building image when the RAG answer is not a fallback
+        if not is_fallback_response(answer) and not answer_generation_failed:
+            try:
+                from rag.buildings import find_building_images
+                building_imgs = find_building_images(wa_retrieval_question)
+                base_url = get_public_base_url()
+                if building_imgs and base_url:
+                    bldg = building_imgs[0]
+                    img_url = bldg["images"][0] if bldg.get("images") else None
+                    if img_url:
+                        send_whatsapp_image(recipient, f"{base_url}{img_url}", caption=bldg["name"])
+            except Exception:
+                app.logger.debug("Could not send building image via WhatsApp")
         error_type = ""
         if answer_generation_failed:
             error_type = "generation_error"

@@ -29,7 +29,7 @@ _BUILDINGS: list[tuple[str, list[str], re.Pattern]] = [
             "hamu_mukasa_library_3.jpeg",
             "hamu_mukasa_library_back.jpeg",
         ],
-        re.compile(r"hamu\s*mukasa|library", re.IGNORECASE),
+        re.compile(r"hamu?\s*mukasa|main\s+library", re.IGNORECASE),
     ),
     (
         "Nkoyoyo Hall",
